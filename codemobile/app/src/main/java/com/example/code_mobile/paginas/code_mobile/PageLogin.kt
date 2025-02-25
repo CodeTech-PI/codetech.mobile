@@ -1,11 +1,6 @@
-package com.example.code_mobile
+package com.example.code_mobile.paginas.code_mobile.ui.theme
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,32 +26,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            CodemobileTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Tela1(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
 fun Modifier.inputPadrao() = this
     .width(300.dp)
-    .height(40.dp)
+    .height(60.dp)
     .background(color = Color.White, RoundedCornerShape(10.dp))
     .clip(RoundedCornerShape(10.dp)) // Borda arredondada
 
@@ -81,7 +58,7 @@ fun Tela1(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
 
     ) {
-        Spacer(modifier = Modifier.weight(1f)) // Centraliza verticalmente
+        Spacer(modifier = Modifier.weight(0.5f)) // Centraliza verticalmente
 
         Text(
             text = "Lombardi",
@@ -132,8 +109,10 @@ fun Tela1(modifier: Modifier = Modifier) {
             frase = "Desenvolvido por ",
             codeTech = "Codetech",
             funText = textPadrao
-
         )
+
+        Spacer(modifier = Modifier.weight(0.2f)) // Empurra o próximo elemento para o final
+
     }
 }
 
@@ -156,19 +135,18 @@ fun Campo(titulo: String, valor: String, onValorChange: (String) -> Unit, textSt
     }
 }
 
-
 @Composable
 fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
-        Text(
-            //AnnotatedString = manipular style de diferentes partes do texto com estilos diferentes
-            // metade da frase (rosa) + final da frase (verde)
+    Text(
+        //AnnotatedString = manipular style de diferentes partes do texto com estilos diferentes
+        // metade da frase (rosa) + final da frase (verde)
 
-            text = AnnotatedString(frase) +
-                    AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
-            style = funText.copy(
-                fontSize = 16.sp
-            )
+        text = AnnotatedString(frase) +
+               AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
+        style = funText.copy(
+            fontSize = 16.sp
         )
+    )
 
 }
 
