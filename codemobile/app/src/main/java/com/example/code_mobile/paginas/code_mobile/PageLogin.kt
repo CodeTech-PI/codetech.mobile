@@ -30,16 +30,18 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 fun Modifier.inputPadrao() = this
     .width(300.dp)
-    .height(60.dp)
+    .height(48.dp)
     .background(color = Color.White, RoundedCornerShape(10.dp))
     .clip(RoundedCornerShape(10.dp)) // Borda arredondada
 
 @Composable
-fun Tela1(modifier: Modifier = Modifier) {
+fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
@@ -89,7 +91,7 @@ fun Tela1(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
 
         Button(
-            onClick = {},
+            onClick = { navController.navigate("Clientes") },
             modifier = Modifier
                 .width(300.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
@@ -129,8 +131,11 @@ fun Campo(titulo: String, valor: String, onValorChange: (String) -> Unit, textSt
         TextField(
             value = valor,
             onValueChange = onValorChange, // Atualiza o valor conforme o usuário digita
-            textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp, background = Color.Red),
-            modifier = Modifier.inputPadrao()
+            textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp),
+            modifier = Modifier
+                .inputPadrao()
+                .height(180.dp), // Aumenta a altura da área de digitação
+            singleLine = false // impede quebra de linha na input
         )
     }
 }
@@ -159,6 +164,8 @@ fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
 @Composable
 fun GreetingPreview() {
     CodemobileTheme {
-        Tela1()
+        // Inicialize o navController aqui
+        val navController = rememberNavController()
+        TelaLogin(navController)  // Passe o navController para TelaLogin
     }
 }
