@@ -94,37 +94,32 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth(0.9f) // vai ocupar 90% da largura
-                .height(95.dp)
+                .height(110.dp)
                 .clip(RoundedCornerShape(12.dp)) // Cor de fundo + cantos arredondados
                 .border(
                     2.dp,
                     Color(0xFF252525),
                     shape = RoundedCornerShape(12.dp)
-                ), // Borda preta arredondada
-            horizontalAlignment = Alignment.CenterHorizontally
+                )
         ){
 
+            // Nome e Icone
             Row (
                     modifier = Modifier
                      .padding(10.dp),
-
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.Center
                 ){
 
-                Spacer(modifier = Modifier.width(17.dp))
+                Spacer(modifier = Modifier.width(145.dp))
 
                 Text(
                     text = "João Pereira",
-                    style = textPadrao.copy(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier
-                        .background(Color.Red)
-
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    modifier = Modifier.weight(1f) // Ocupa o máximo possível do espaço disponível
                 )
 
-                Spacer(modifier = Modifier.weight(0.05f))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 Image(
                     painter = painterResource(id = R.drawable.icone_editar),
@@ -147,146 +142,56 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                             println("Clicou para excluir cliente!")
                         }
                 )
-
             }
-        }
 
-
-        // PRIMEIRA VERSÃO
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f) // vai ocupar 90% da largura
-                .height(95.dp)
-                .clip(RoundedCornerShape(12.dp)) // Cor de fundo + cantos arredondados
-                .border(
-                    2.dp,
-                    Color(0xFF252525),
-                    shape = RoundedCornerShape(12.dp)
-                ), // Borda preta arredondada
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
+            // Ícone de perfil e dados
             Row(
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.Start
-            )
-            {
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.icone_perfil),
-                    contentDescription = "Menu lateral",
+                    contentDescription = "Foto Perfil",
                     modifier = Modifier
-                        .size(65.dp)
-                        .clickable {
-                            println("Clicou para abrir menu!")
-                        }
+                        .size(85.dp)
+                        .padding(start = 20.dp)
                 )
-
-                Spacer(modifier = Modifier.weight(0.05f))
-
-                // Coluna 1
 
                 Column(
                     modifier = Modifier
-                        .padding(1.dp),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.Start
+                        .padding(start = 25.dp),
+                    verticalArrangement = Arrangement.Center
                 ) {
-
                     Text(
-                        text = "João Pereira",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
+                        text = "123.456.789-00",
+                        style = textPadrao.copy(fontSize = 16.sp)
                     )
 
-                    Spacer(modifier = Modifier.weight(0.05f))
-
-                    Text(
-                        text = "456.789.012-33",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.weight(0.05f))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "23/01/2004",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
+                        style = textPadrao.copy(fontSize = 16.sp)
                     )
                 }
 
-                // Coluna 2
-
-                Column( // quero que ocupe 100% do espaço disponível
+                Column(
                     modifier = Modifier
-                        .padding(10.dp)
-                        .background(Color.Magenta),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.Start
+                        .fillMaxWidth() // Ocupa o espaço restante
+                        .padding(start = 10.dp), // Aproxima os textos da esquerda
+                    verticalArrangement = Arrangement.Center
                 ) {
-
                     Text(
-                        text = "João Pereira",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
+                        text = "123.456.789-00",
+                        style = textPadrao.copy(fontSize = 16.sp)
                     )
 
-                    Spacer(modifier = Modifier.weight(0.05f))
-
-                    Text(
-                        text = "456.789.012-33",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.weight(0.05f))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "23/01/2004",
-                        style = textPadrao.copy(
-                            fontSize = 16.sp
-                        )
+                        style = textPadrao.copy(fontSize = 16.sp)
                     )
-                }
-
-
-                // ICONES
-                Column( // quero que ocupe 100% do espaço disponível
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .background(Color.Magenta),
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.Start
-                ) {
-
-                    Image(
-                        painter = painterResource(id = R.drawable.icone_editar),
-                        contentDescription = "Menu lateral",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                println("Clicou para abrir menu!")
-                            }
-                    )
-
-                    Spacer(modifier = Modifier.weight(0.05f))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.icone_deletar),
-                        contentDescription = "Menu lateral",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                println("Clicou para abrir menu!")
-                            }
-                    )
-
                 }
             }
         }
