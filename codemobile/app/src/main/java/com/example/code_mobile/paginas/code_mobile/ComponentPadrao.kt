@@ -29,7 +29,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.ui.theme.inputPadrao
+
+fun Modifier.inputPadrao() = this
+    .height(48.dp)
+    .width(310.dp)
+    .background(color = Color.White, RoundedCornerShape(10.dp))
+    .clip(RoundedCornerShape(10.dp)) // Borda arredondada
 
 @Composable // Input (Login)
 fun CampoLogin(

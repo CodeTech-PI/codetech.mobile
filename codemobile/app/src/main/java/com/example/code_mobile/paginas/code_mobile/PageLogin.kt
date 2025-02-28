@@ -34,12 +34,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.CampoLogin
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
-fun Modifier.inputPadrao() = this
-    .width(300.dp)
-    .height(48.dp)
-    .background(color = Color.White, RoundedCornerShape(10.dp))
-    .clip(RoundedCornerShape(10.dp)) // Borda arredondada
-
 @Composable
 fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
@@ -93,7 +87,7 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         Button(
             onClick = { navController.navigate("Clientes") },
             modifier = Modifier
-                .width(300.dp)
+                .width(280.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp)) // Borda arredondada
                 .background(Color(0xFFDF0050)),
