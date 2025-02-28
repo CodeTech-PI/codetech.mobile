@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.TelaClientes
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -34,6 +35,7 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }
         composable("Clientes") { TelaClientes(navController) }
+        composable("Categorias") { TelaCategorias(navController) }
     }
 
 }
