@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,10 +62,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         // Filtro e icone de adicionar
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.Start
         ) {
             Input(
                 titulo = "",
@@ -73,7 +74,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 textStyle = textPadrao,
                 labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por CPF") },
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
             )
 
             Image(
@@ -93,81 +94,83 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
         Column(
             modifier = Modifier
-                .fillMaxWidth(0.9f) // vai ocupar 90% da largura
-                .height(110.dp)
-                .clip(RoundedCornerShape(12.dp)) // Cor de fundo + cantos arredondados
+                .fillMaxWidth(0.9f)
+                .clip(RoundedCornerShape(12.dp))
                 .border(
                     2.dp,
                     Color(0xFF252525),
                     shape = RoundedCornerShape(12.dp)
-                )
-        ){
+                ),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-            // Nome e Icone
-            Row (
-                    modifier = Modifier
-                     .padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ){
-
-                Spacer(modifier = Modifier.width(145.dp))
-
+            Box( // a box deixa sobrepor algo em cima depois
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text(
                     text = "João Pereira",
                     style = textPadrao.copy(fontSize = 16.sp),
-                    modifier = Modifier.weight(1f) // Ocupa o máximo possível do espaço disponível
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.icone_editar),
-                    contentDescription = "Editar",
                     modifier = Modifier
-                        .size(25.dp)
-                        .clickable {
-                            println("Clicou para editar cliente!")
-                        }
+                        .padding(start = 10.dp)
+                        .align(Alignment.Center)  // Alinha o nome à esquerda
                 )
 
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.icone_deletar),
-                    contentDescription = "Excluir",
+                Row(
                     modifier = Modifier
-                        .size(25.dp)
-                        .clickable {
-                            println("Clicou para excluir cliente!")
-                        }
-                )
+                        .padding(end = 10.dp, top = 5.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icone_editar),
+                        contentDescription = "Editar",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .clickable {
+                                println("Clicou para editar cliente!")
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.icone_deletar),
+                        contentDescription = "Excluir",
+                        modifier = Modifier
+                            .size(25.dp)
+                            .clickable {
+                                println("Clicou para excluir cliente!")
+                            }
+                    )
+                }
             }
+
 
             // Ícone de perfil e dados
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.icone_perfil),
                     contentDescription = "Foto Perfil",
-                    modifier = Modifier
-                        .size(85.dp)
-                        .padding(start = 20.dp)
+                    modifier = Modifier.size(75.dp)
                 )
 
+                Spacer(modifier = Modifier.width(10.dp))
+
                 Column(
-                    modifier = Modifier
-                        .padding(start = 25.dp),
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.weight(0.5f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text(
                         text = "123.456.789-00",
                         style = textPadrao.copy(fontSize = 16.sp)
                     )
-
-                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "23/01/2004",
@@ -176,25 +179,23 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 }
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth() // Ocupa o espaço restante
-                        .padding(start = 10.dp), // Aproxima os textos da esquerda
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.weight(0.5f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "123.456.789-00",
+                        text = "11958585792",
                         style = textPadrao.copy(fontSize = 16.sp)
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
                     Text(
-                        text = "23/01/2004",
+                        text = "joao@codetech",
                         style = textPadrao.copy(fontSize = 16.sp)
                     )
                 }
             }
         }
+
     }
 }
 
