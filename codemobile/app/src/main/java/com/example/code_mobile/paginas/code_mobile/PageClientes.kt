@@ -126,6 +126,29 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         Box (
         ) {
             Text(
+                text = "Caio Araruna",
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.TopCenter)  // Alinha no topo, mas centraliza horizontalmente
+                    .padding(top = 10.dp)  // Adicionando um pouco de espaço do topo
+            )
+
+            card4Informacoes(
+                R.drawable.icone_perfil,
+                "perfil",
+                "123.456.789-00",
+                "23/01/2004",
+                "(11) 95858-5792",
+                "caio.araruna@codetech"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Box (
+        ) {
+            Text(
                 text = "Hosana Flores",
                 style = textPadrao.copy(fontSize = 16.sp),
                 modifier = Modifier

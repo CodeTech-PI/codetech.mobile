@@ -87,7 +87,7 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         Button(
             onClick = { navController.navigate("Clientes") },
             modifier = Modifier
-                .width(280.dp)
+                .width(310.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp)) // Borda arredondada
                 .background(Color(0xFFDF0050)),
