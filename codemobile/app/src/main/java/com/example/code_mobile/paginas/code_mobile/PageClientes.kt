@@ -1,4 +1,5 @@
 package com.example.code_mobile.paginas.code_mobile
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -48,11 +50,11 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
     var pesquisa by remember { mutableStateOf("") }
 
-    Column (
+    Column(
         modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFF1B1B1B)),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .background(Color(0xFF1B1B1B)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -91,114 +93,77 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .clip(RoundedCornerShape(12.dp))
-                .border(
-                    2.dp,
-                    Color(0xFF252525),
-                    shape = RoundedCornerShape(12.dp)
-                ),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box (
         ) {
+            Text(
+                text = "Samarah Costa",
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.TopCenter)  // Alinha no topo, mas centraliza horizontalmente
+                    .padding(top = 10.dp)  // Adicionando um pouco de espaço do topo
+            )
 
-            Box( // a box deixa sobrepor algo em cima depois
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = "João Pereira",
-                    style = textPadrao.copy(fontSize = 16.sp),
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .align(Alignment.Center)  // Alinha o nome à esquerda
-                )
-
-                Row(
-                    modifier = Modifier
-                        .padding(end = 10.dp, top = 5.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.icone_editar),
-                        contentDescription = "Editar",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                println("Clicou para editar cliente!")
-                            }
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.icone_deletar),
-                        contentDescription = "Excluir",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable {
-                                println("Clicou para excluir cliente!")
-                            }
-                    )
-                }
-            }
-
-
-            // Ícone de perfil e dados
-            Row(
-                modifier = Modifier.padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.icone_perfil),
-                    contentDescription = "Foto Perfil",
-                    modifier = Modifier.size(75.dp)
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Column(
-                    modifier = Modifier.weight(0.5f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = "123.456.789-00",
-                        style = textPadrao.copy(fontSize = 16.sp)
-                    )
-
-                    Text(
-                        text = "23/01/2004",
-                        style = textPadrao.copy(fontSize = 16.sp)
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(0.5f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = "11958585792",
-                        style = textPadrao.copy(fontSize = 16.sp)
-                    )
-
-                    Text(
-                        text = "joao@codetech",
-                        style = textPadrao.copy(fontSize = 16.sp)
-                    )
-                }
-            }
+            card4Informacoes(
+                R.drawable.icone_perfil,
+                "perfil",
+                "123.456.789-00",
+                "23/01/2004",
+                "(11) 95858-5792",
+                "samarah@codetech"
+            )
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Box (
+        ) {
+            Text(
+                text = "Caio Araruna",
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.TopCenter)  // Alinha no topo, mas centraliza horizontalmente
+                    .padding(top = 10.dp)  // Adicionando um pouco de espaço do topo
+            )
+
+            card4Informacoes(
+                R.drawable.icone_perfil,
+                "perfil",
+                "123.456.789-00",
+                "23/01/2004",
+                "(11) 95858-5792",
+                "caio.araruna@codetech"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Box (
+        ) {
+            Text(
+                text = "Hosana Flores",
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.TopCenter)  // Alinha no topo, mas centraliza horizontalmente
+                    .padding(top = 10.dp)  // Adicionando um pouco de espaço do topo
+            )
+
+            card4Informacoes(
+                R.drawable.icone_perfil,
+                "perfil",
+                "123.456.789-00",
+                "23/01/2004",
+                "(11) 95858-5792",
+                "hosana@codetech"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
 
     }
 }
-
 
 
 @Preview(
