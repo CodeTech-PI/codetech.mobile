@@ -36,6 +36,7 @@ fun menuComTituloPage(nomeTela: String) {
                 .size(25.dp)
                 .clickable {
                     println("Clicou para abrir menu!")
+
                 }
         )
         Text(
