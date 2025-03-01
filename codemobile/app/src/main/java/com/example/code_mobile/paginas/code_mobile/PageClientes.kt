@@ -46,9 +46,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        manuComTituloPage("Clientes")
+        menuComTituloPage("Clientes")
 
         // Filtro e icone de adicionar
         Row(
@@ -71,6 +69,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                     .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar um cliente!")
+                        navController.navigate("Categorias")
                     }
             )
         }
@@ -157,7 +156,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 )
 
 @Composable
-fun GreetingPreview() {
+fun GreetingPreviewClientes() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
