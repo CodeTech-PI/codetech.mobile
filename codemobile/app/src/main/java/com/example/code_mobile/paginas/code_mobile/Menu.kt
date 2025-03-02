@@ -16,11 +16,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +38,7 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
 fun Menu(navController: NavController, modifier: Modifier){
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +66,7 @@ fun Menu(navController: NavController, modifier: Modifier){
         MenuItem(iconResId = R.drawable.icone_perfil, text = "Clientes")
         MenuItem(iconResId = R.drawable.icone_perfil, text = "Estoque")
         MenuItem(iconResId = R.drawable.icone_perfil, text = "Atendimentos")
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Dashboard")
+        MenuItem(iconResId = R.drawable.icone_perfil, text = "Dashboard", selected = true)
         MenuItem(iconResId = R.drawable.icone_perfil, text = "Filiais")
         MenuItem(iconResId = R.drawable.icone_perfil, text = "Sair")
     }
@@ -83,9 +89,9 @@ fun MenuItem(iconResId: Int, text: String, selected: Boolean = false){
         Spacer(modifier = Modifier.height(15.dp))
         Text(
             text = text,
-            color = if (selected) Color(0xFFE91E63) else Color.White,
+            color = if(selected) Color(0xFFE91E63) else Color.White,
             fontSize = 18.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+            fontWeight = if(selected) FontWeight.Bold else FontWeight.Normal
         )
     }
 }
