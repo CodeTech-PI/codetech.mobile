@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,17 +29,13 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.code_mobile.paginas.code_mobile.DashboardScreen
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.CampoLogin
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
-fun Modifier.inputPadrao() = this
-    .width(300.dp)
-    .height(60.dp)
-    .background(color = Color.White, RoundedCornerShape(10.dp))
-    .clip(RoundedCornerShape(10.dp)) // Borda arredondada
-
 @Composable
-fun Tela1(modifier: Modifier = Modifier) {
+fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
@@ -71,7 +66,7 @@ fun Tela1(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(50.dp)) // espaço entre os campos
 
-        Campo (
+        CampoLogin (
             titulo = "Email:",
             valor = email,
             onValorChange = { email = it },
@@ -80,7 +75,7 @@ fun Tela1(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
 
-        Campo (
+        CampoLogin (
             titulo = "Senha:",
             valor = senha,
             onValorChange = { senha = it },
@@ -90,9 +85,9 @@ fun Tela1(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
 
         Button(
-            onClick = {},
+            onClick = { navController.navigate("Clientes") },
             modifier = Modifier
-                .width(300.dp)
+                .width(310.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp)) // Borda arredondada
                 .background(Color(0xFFDF0050)),
@@ -117,24 +112,6 @@ fun Tela1(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable // Input
-fun Campo(titulo: String, valor: String, onValorChange: (String) -> Unit, textStyle: TextStyle) {
-    Column(
-        horizontalAlignment = Alignment.Start // Alinha para esquerda
-    ) {
-        Text(text = titulo, style = textStyle) // será do tipo texto com o estilo passado no "Campo"
-
-        Spacer(modifier = Modifier.height(10.dp)) // Espaço entre título e campo
-
-        // Input
-        TextField(
-            value = valor,
-            onValueChange = onValorChange, // Atualiza o valor conforme o usuário digita
-            textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp, background = Color.Red),
-            modifier = Modifier.inputPadrao()
-        )
-    }
-}
 
 @Composable
 fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
@@ -143,7 +120,7 @@ fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
         // metade da frase (rosa) + final da frase (verde)
 
         text = AnnotatedString(frase) +
-               AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
+                AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
         style = funText.copy(
             fontSize = 16.sp
         )
@@ -160,6 +137,8 @@ fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
 @Composable
 fun GreetingPreview() {
     CodemobileTheme {
-        DashboardScreen()
+        // Inicialize o navController aqui
+        val navController = rememberNavController()
+        TelaLogin(navController)  // Passe o navController para TelaLogin
     }
 }
