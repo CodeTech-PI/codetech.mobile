@@ -38,7 +38,7 @@ import com.example.code_mobile.R
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun Menu(navController: NavController, modifier: Modifier){
+fun Menu(navController: NavController){
 
     var selectedItem by remember { mutableStateOf("Dashboard") }
 
@@ -59,7 +59,7 @@ fun Menu(navController: NavController, modifier: Modifier){
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
-                    // Adicionar a ação para fechar o menu
+                   navController.popBackStack()
                 }
             )
 
@@ -68,21 +68,28 @@ fun Menu(navController: NavController, modifier: Modifier){
         //Lista de itens do menu
         MenuItem(iconResId = R.drawable.clientes_branco, text = "Clientes", selected = selectedItem == "Clientes", onClick = {
             selectedItem = "Clientes"
+            navController.navigate("Clientes")
         })
         MenuItem(iconResId = R.drawable.estoque_branco, text = "Estoque", selected = selectedItem == "Estoque", onClick = {
             selectedItem = "Estoque"
         })
         MenuItem(iconResId = R.drawable.atendimentos_branco, text = "Atendimentos", selected = selectedItem == "Atendimentos", onClick = {
             selectedItem = "Atendimentos"
+            navController.navigate("Atendimentos")
         })
         MenuItem(iconResId = R.drawable.dash_branco, text = "Dashboard", selected = selectedItem == "Dashboard", onClick = {
             selectedItem = "Dashboard"
+            navController.navigate("Dashboard")
         })
         MenuItem(iconResId = R.drawable.filiais_branco, text = "Filiais", selected = selectedItem == "Filiais", onClick = {
             selectedItem = "Filiais"
+            navController.navigate("Filiais")
         })
         MenuItem(iconResId = R.drawable.logout_branco, text = "Sair", selected = selectedItem == "Sair", onClick = {
             selectedItem = "Sair"
+            navController.navigate("PageLogin"){
+                popUpTo(navController.graph.startDestinationId) { inclusive = true } // Remove todas as telas do histórico
+            }
         })
     }
 }
@@ -122,6 +129,6 @@ fun MenuItem(iconResId: Int, text: String, selected: Boolean = false, onClick: (
 fun GreetingPreviewMenu(){
     CodemobileTheme {
         val navController = rememberNavController()
-        Menu(navController, modifier = Modifier)
+        Menu(navController)
     }
 }

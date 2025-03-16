@@ -15,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.code_mobile.R
 
 @Composable
-fun menuComTituloPage(nomeTela: String) {
+fun menuComTituloPage(nomeTela: String, navController: NavController) {
 
     Spacer(modifier = Modifier.height(30.dp))
 
@@ -35,8 +36,7 @@ fun menuComTituloPage(nomeTela: String) {
             modifier = Modifier
                 .size(25.dp)
                 .clickable {
-                    println("Clicou para abrir menu!")
-
+                    navController.navigate("Menu")
                 }
         )
         Text(
