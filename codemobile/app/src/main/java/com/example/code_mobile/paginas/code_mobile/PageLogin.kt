@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.code_mobile.paginas.code_mobile.DashboardScreen
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 fun Modifier.inputPadrao() = this
@@ -159,6 +160,6 @@ fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
 @Composable
 fun GreetingPreview() {
     CodemobileTheme {
-        Tela1()
+        DashboardScreen()
     }
 }
