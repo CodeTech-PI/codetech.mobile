@@ -45,7 +45,7 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        menuComTituloPage("Categorias")
+        menuComTituloPage("Categorias", navController)
 
         Column(
             modifier = Modifier

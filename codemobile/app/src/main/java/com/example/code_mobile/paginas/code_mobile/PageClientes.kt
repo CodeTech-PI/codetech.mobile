@@ -45,7 +45,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        menuComTituloPage("Clientes")
+        menuComTituloPage("Clientes", navController)
 
         // Filtro e icone de adicionar
         Row(
