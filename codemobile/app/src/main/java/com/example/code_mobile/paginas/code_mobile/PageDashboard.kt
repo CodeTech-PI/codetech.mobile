@@ -25,9 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,8 +93,8 @@ fun DashboardScreen() {
                 color = Color.DarkGray
             )
 
-            AlertItem("Shampoo acabando", "Estoque: 3 unidades")
-            AlertItem("Pagamento pendente", "Cliente: Maria Silva")
+            AlertItem("Tinta Preta acabando", "Estoque: 3 unidades")
+            AlertItem("Agulha acabando", "Estoque: 5 unidades")
         }
     }
 }
@@ -184,7 +186,7 @@ fun AlertItem(title: String, description: String) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewDashboard() {
-    MaterialTheme {
-        DashboardScreen()
+    // Inicialize o navController aqui
+    val navController = rememberNavController()
+    DashboardScreen(navController)  // Passe o navController para TelaLogin
     }
-}
