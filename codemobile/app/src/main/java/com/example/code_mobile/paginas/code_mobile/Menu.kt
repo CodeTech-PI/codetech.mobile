@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,8 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
 fun Menu(navController: NavController, modifier: Modifier){
+
+    var selectedItem by remember { mutableStateOf("Dashboard") }
 
     Column(
         modifier = Modifier
@@ -63,21 +66,34 @@ fun Menu(navController: NavController, modifier: Modifier){
         }
 
         //Lista de itens do menu
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Clientes")
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Estoque")
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Atendimentos")
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Dashboard", selected = true)
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Filiais")
-        MenuItem(iconResId = R.drawable.icone_perfil, text = "Sair")
+        MenuItem(iconResId = R.drawable.clientes_branco, text = "Clientes", selected = selectedItem == "Clientes", onClick = {
+            selectedItem = "Clientes"
+        })
+        MenuItem(iconResId = R.drawable.estoque_branco, text = "Estoque", selected = selectedItem == "Estoque", onClick = {
+            selectedItem = "Estoque"
+        })
+        MenuItem(iconResId = R.drawable.atendimentos_branco, text = "Atendimentos", selected = selectedItem == "Atendimentos", onClick = {
+            selectedItem = "Atendimentos"
+        })
+        MenuItem(iconResId = R.drawable.dash_branco, text = "Dashboard", selected = selectedItem == "Dashboard", onClick = {
+            selectedItem = "Dashboard"
+        })
+        MenuItem(iconResId = R.drawable.filiais_branco, text = "Filiais", selected = selectedItem == "Filiais", onClick = {
+            selectedItem = "Filiais"
+        })
+        MenuItem(iconResId = R.drawable.logout_branco, text = "Sair", selected = selectedItem == "Sair", onClick = {
+            selectedItem = "Sair"
+        })
     }
 }
 
 @Composable
-fun MenuItem(iconResId: Int, text: String, selected: Boolean = false){
+fun MenuItem(iconResId: Int, text: String, selected: Boolean = false, onClick: () -> Unit){
     Column (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 15.dp, horizontal = 15.dp),
+            .padding(vertical = 15.dp, horizontal = 15.dp)
+            .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Image(
