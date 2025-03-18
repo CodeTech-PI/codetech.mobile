@@ -39,7 +39,7 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(30.dp))
-        manuComTituloPage("Estoque")
+        menuComTituloPage("Estoque", navController)
 
         Row(
             modifier = Modifier

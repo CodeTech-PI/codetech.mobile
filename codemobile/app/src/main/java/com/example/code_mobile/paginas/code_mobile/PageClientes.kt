@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -147,7 +146,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 "123.456.789-00",
                 "23/01/2004",
                 "(11) 95858-5792",
-                "caio.araruna@codetech"
+                "caio.araruna@codetech",
+                onEditClick = {
+                    println("teste")
+                }
             )
         }
 

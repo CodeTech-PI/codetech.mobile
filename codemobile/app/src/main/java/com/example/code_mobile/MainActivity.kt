@@ -41,6 +41,7 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }
         composable("Clientes") { TelaClientes(navController) }
+        composable("Estoque") { TelaEstoque(navController) }
         composable("Categorias") { TelaCategorias(navController) }
         composable("Menu"){ Menu(navController) }
     }
