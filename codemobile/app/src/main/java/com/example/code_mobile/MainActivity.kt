@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.TelaClientes
+import com.example.code_mobile.paginas.code_mobile.TelaEstoque
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
                         //
     val navController = rememberNavController()
+
 
     NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }

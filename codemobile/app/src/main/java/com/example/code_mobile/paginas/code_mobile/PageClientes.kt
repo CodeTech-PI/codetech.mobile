@@ -35,7 +35,8 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 @Composable
 fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
-
+    var showEdicaoDialog by remember { mutableStateOf(false) }
+    var produtoEditado by remember { mutableStateOf(Produto("Tinta", "Tinta Preta", "Tinta Preta para desenho", "ml", "35", "10,00")) }
     var pesquisa by remember { mutableStateOf("") }
 
     Column(
@@ -93,7 +94,11 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 "23/01/2004",
                 "(11) 95858-5792",
                 "samarah@codetech"
-            )
+            ) {
+                produtoEditado =
+                    Produto("Tinta", "Tinta Preta", "Tinta Preta para desenho", "ml", "35", "10,00")
+                showEdicaoDialog = true
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -116,7 +121,11 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 "23/01/2004",
                 "(11) 95858-5792",
                 "caio.araruna@codetech"
-            )
+            ) {
+                produtoEditado =
+                    Produto("Tinta", "Tinta Preta", "Tinta Preta para desenho", "ml", "35", "10,00")
+                showEdicaoDialog = true
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -162,7 +171,11 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 "23/01/2004",
                 "(11) 95858-5792",
                 "hosana@codetech"
-            )
+            ) {
+                produtoEditado =
+                    Produto("Tinta", "Tinta Preta", "Tinta Preta para desenho", "ml", "35", "10,00")
+                showEdicaoDialog = true
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))

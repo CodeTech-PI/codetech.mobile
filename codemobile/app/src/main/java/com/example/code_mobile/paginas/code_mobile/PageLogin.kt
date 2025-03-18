@@ -85,7 +85,7 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
 
         Button(
-            onClick = { navController.navigate("Clientes") },
+            onClick = { navController.navigate("Estoque") },
             modifier = Modifier
                 .width(310.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
