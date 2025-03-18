@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,26 +46,19 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        manuComTituloPage("Clientes")
+        menuComTituloPage("Clientes", navController)
 
         // Filtro e icone de adicionar
         Row(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Input(
                 titulo = "",
                 valor = pesquisa,
                 onValorChange = { pesquisa = it },
                 textStyle = textPadrao,
-                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por CPF") },
-                modifier = Modifier
-                    .fillMaxWidth()
+                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por CPF") }
             )
 
             Image(
@@ -73,9 +66,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 contentDescription = "Adicionar",
                 modifier = Modifier
                     .size(80.dp)
-                    .padding(start = 8.dp, top = 25.dp)
+                    .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar um cliente!")
+                        navController.navigate("Categorias")
                     }
             )
         }
@@ -139,6 +133,29 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         Box (
         ) {
             Text(
+                text = "Caio Araruna",
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(Alignment.TopCenter)  // Alinha no topo, mas centraliza horizontalmente
+                    .padding(top = 10.dp)  // Adicionando um pouco de espaço do topo
+            )
+
+            card4Informacoes(
+                R.drawable.icone_perfil,
+                "perfil",
+                "123.456.789-00",
+                "23/01/2004",
+                "(11) 95858-5792",
+                "caio.araruna@codetech"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Box (
+        ) {
+            Text(
                 text = "Hosana Flores",
                 style = textPadrao.copy(fontSize = 16.sp),
                 modifier = Modifier
@@ -174,7 +191,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 )
 
 @Composable
-fun GreetingPreview() {
+fun GreetingPreviewClientes() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
