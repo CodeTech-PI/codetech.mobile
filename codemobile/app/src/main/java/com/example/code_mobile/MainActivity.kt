@@ -12,6 +12,9 @@ import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.Filiais
+import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
+import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.TelaClientes
@@ -44,6 +47,9 @@ fun AppNavigation() {
         composable("Estoque") { TelaEstoque(navController) }
         composable("Categorias") { TelaCategorias(navController) }
         composable("Menu"){ Menu(navController) }
+        composable("Filiais"){ Filiais(navController) }
+        composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
+        composable("FiliaisEditar"){ FiliaisEditar(navController) }
     }
 
 }

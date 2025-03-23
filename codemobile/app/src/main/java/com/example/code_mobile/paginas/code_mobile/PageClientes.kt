@@ -64,7 +64,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 painter = painterResource(id = R.drawable.icon_add),
                 contentDescription = "Adicionar",
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(60.dp)
                     .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar um cliente!")
