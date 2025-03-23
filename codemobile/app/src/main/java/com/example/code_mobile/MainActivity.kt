@@ -34,7 +34,7 @@ fun AppNavigation() {
                         //
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "Dashboard") {
+    NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }
         composable("Clientes") { TelaClientes(navController) }
         composable("Categorias") { TelaCategorias(navController) }
