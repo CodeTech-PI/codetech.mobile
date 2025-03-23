@@ -120,7 +120,7 @@ fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
         // metade da frase (rosa) + final da frase (verde)
 
         text = AnnotatedString(frase) +
-               AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
+                AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
         style = funText.copy(
             fontSize = 16.sp
         )
