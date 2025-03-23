@@ -6,15 +6,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
@@ -39,10 +41,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
+data class MonthlyFinance(
+    val month: String,
+    val lucro: Float,
+    val bruto: Float,
+    val gastos: Float,
+    val maxValue: Float
+)
+
+val financialData = listOf(
+    MonthlyFinance("Jan", 60f, 80f, 45f, 80f),
+    MonthlyFinance("Fev", 70f, 85f, 50f, 85f),
+    MonthlyFinance("Mar", 65f, 90f, 55f, 90f),
+    MonthlyFinance("Abr", 75f, 95f, 60f, 95f)
+)
+
 @Composable
 fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier) {
-
-
     var showFinancialChart by remember { mutableStateOf(false) }
     var showAlerts by remember { mutableStateOf(false) }
     val lowStockItems = listOf(
@@ -53,7 +68,7 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         menuComTituloPage("Dashboard", navController)
         Column(
@@ -65,7 +80,7 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
             KpiItem(
                 title = "Itens Baixo Estoque",
                 value = "${lowStockItems.size} itens",
-                color = Color(0xFFFF9800),
+                color = Color(0xFF252525),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp),
@@ -81,7 +96,7 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
                 KpiItem(
                     title = "Média Atend. Mensais",
                     value = "45/mês",
-                    color = Color(0xFF2196F3),
+                    color = Color(0xFF252525),
                     modifier = Modifier
                         .weight(1f)
                         .height(66.dp)
@@ -90,7 +105,7 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
                 KpiItem(
                     title = "Lucro Anual",
                     value = "R\$ 300K",
-                    color = Color(0xFF4CAF50),
+                    color = Color(0xFF252525),
                     modifier = Modifier
                         .weight(1f)
                         .height(66.dp)
@@ -102,19 +117,19 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
             FinancialChart(onBackClick = { showFinancialChart = false })
         } else {
             ChartWithArrow(
-                title = "Desempenho Mensal",
+                title = "Atendimentos Mensais",
                 showIcon = true,
-                onArrowClick = { showFinancialChart = true }
+                onArrowClick = { showFinancialChart = true },
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.Bottom,
                 ) {
-                    ChartBar(70.dp, "Jan", Color(0xFF4CAF50))
-                    ChartBar(70.dp, "Fev", Color(0xFF2196F3))
-                    ChartBar(70.dp, "Mar", Color(0xFFFF9800))
-                    ChartBar(70.dp, "Abr", Color(0xFF9C27B0))
+                    ChartBar(70.dp, "Jan", Color(0xFFDF0050))
+                    ChartBar(70.dp, "Fev", Color(0xFFDF0050))
+                    ChartBar(70.dp, "Mar", Color(0xFFDF0050))
+                    ChartBar(70.dp, "Abr", Color(0xFFDF0050))
                 }
             }
 
@@ -128,16 +143,15 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    ChartBar(70.dp, "Tinta Preta", Color(0xFFFF9800))
-                    ChartBar(45.dp, "Agulha", Color(0xFFFF9800))
-                    ChartBar(75.dp, "T. Vermelha", Color(0xFFFF9800))
-                    ChartBar(60.dp, "T. Azul", Color(0xFFFF9800))
+                    ChartBar(70.dp, "Tinta Preta", Color(0xFF4888B7))
+                    ChartBar(45.dp, "Agulha", Color(0xFF4888B7))
+                    ChartBar(75.dp, "T. Vermelha", Color(0xFF4888B7))
+                    ChartBar(60.dp, "T. Azul", Color(0xFF4888B7))
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun ChartWithArrow(
@@ -151,7 +165,7 @@ fun ChartWithArrow(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
             .height(200.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF252525))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -165,7 +179,7 @@ fun ChartWithArrow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.DarkGray
+                    color = Color.White
                 )
 
                 if (showIcon) {
@@ -173,7 +187,7 @@ fun ChartWithArrow(
                         Icon(
                             imageVector = Icons.Filled.ArrowForward,
                             contentDescription = "Alternar gráfico",
-                            tint = Color.Gray
+                            tint = Color.White
                         )
                     }
                 }
@@ -186,18 +200,82 @@ fun ChartWithArrow(
 
 @Composable
 fun FinancialChart(onBackClick: () -> Unit) {
-    ChartWithArrow(
-        title = "Bruto x Gastos x Lucro",
+    FinancialChartWithArrow(
+        title = "Bruto x Gastos x Lucro por Mês",
         showIcon = true,
         onArrowClick = onBackClick
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp) // Espaço entre meses
         ) {
-            HorizontalBar("Lucro", 60f, Color(0xFF2196F3)) // Barra de lucro adicionada
-            HorizontalBar("Bruto", 80f, Color(0xFF4CAF50))
-            HorizontalBar("Gastos", 45f, Color(0xFFF44336))
+            financialData.forEach { data ->
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(1.dp) // 🔽 Espaço entre as barras
+                ) {
+                    Text(
+                        text = data.month,
+                        color = Color.White,
+                        fontSize = 12.sp, // Fonte menor
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 1.dp)
+                    )
+
+                    HorizontalBar("Lucro", data.lucro, data.maxValue, Color(0xFF2196F3))
+                    HorizontalBar("Bruto", data.bruto, data.maxValue, Color(0xFF4CAF50))
+                    HorizontalBar("Gastos", data.gastos, data.maxValue, Color(0xFFF44336))
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun FinancialChartWithArrow(
+    title: String,
+    showIcon: Boolean,
+    onArrowClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+            .fillMaxWidth()
+            .fillMaxHeight(0.8f),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF252525))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
+                )
+
+                if (showIcon) {
+                    IconButton(onClick = onArrowClick) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = "Alternar gráfico",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            content()
         }
     }
 }
@@ -296,32 +374,40 @@ fun ChartBar(height: Dp, label: String, color: Color) {
 }
 
 @Composable
-fun HorizontalBar(label: String, percentage: Float, color: Color) {
+fun HorizontalBar(label: String, value: Float, maxValue: Float, color: Color) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.height(20.dp)
     ) {
         Text(
             text = label,
-            modifier = Modifier.width(80.dp),
-            fontSize = 14.sp
+            modifier = Modifier
+                .width(70.dp)
+                .padding(vertical = 0.dp),
+            fontSize = 12.sp,
+            color = Color.White
         )
+
         Box(
             modifier = Modifier
-                .height(20.dp)
+                .height(14.dp)
                 .fillMaxWidth()
-                .background(Color.LightGray, RoundedCornerShape(4.dp))
+                .background(Color(0xFF424242), RoundedCornerShape(4.dp))
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(percentage / 100f)
-                    .height(20.dp)
-                    .background(color, RoundedCornerShape(4.dp))
-            )
+                    .fillMaxWidth(value / maxValue)
+                    .height(14.dp)
+                    .background(color, RoundedCornerShape(4.dp)) // Fecha o background aqui
+            ) // Fecha o Box interno aqui
         }
+
         Text(
-            text = "${percentage.toInt()}%",
-            fontSize = 14.sp
+            text = "R$ ${value.toInt()}K",
+            fontSize = 12.sp,
+            modifier = Modifier.padding(vertical = 0.dp),
+            color = Color.White
         )
     }
 }
