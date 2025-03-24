@@ -95,8 +95,10 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 12345678",
                 "Status: Inoperante",
+
                 onDeleteClick = { showDialog = true },
                 navController
+
 
             )
         }
@@ -112,8 +114,10 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 87456321",
                 "Status: Operante",
+
                 onDeleteClick = { showDialog = true },
                 navController
+
 
                 )
         }
@@ -130,8 +134,10 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 19141010",
                 "Status: Operante",
+
                 onDeleteClick = { showDialog = true },
                 navController
+
 
                 )
         }
