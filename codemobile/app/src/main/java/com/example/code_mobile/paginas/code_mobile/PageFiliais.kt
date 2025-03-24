@@ -66,7 +66,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                     .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar uma filial!")
-                        navController.navigate("AdicionarFilial")
+                        navController.navigate("FiliaisCadastro")
                     }
             )
         }
@@ -84,6 +84,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 12345678",
                 "Status: Inoperante",
+                navController,
 
             )
         }
@@ -99,6 +100,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 87456321",
                 "Status: Operante",
+                navController,
 
                 )
         }
@@ -115,7 +117,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 19141010",
                 "Status: Operante",
-
+                 navController,
                 )
         }
 
