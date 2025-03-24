@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.ClienteCadastro
+import com.example.code_mobile.paginas.code_mobile.ClienteEditar
 import com.example.code_mobile.paginas.code_mobile.DashboardScreen
 import com.example.code_mobile.paginas.code_mobile.Filiais
 import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
@@ -56,6 +57,7 @@ fun AppNavigation() {
         composable("FiliaisEditar"){ FiliaisEditar(navController) }
         composable("Dashboard") { DashboardScreen(navController) }
         composable("ClienteCadastro") { ClienteCadastro(navController) }
+        composable("ClienteEditar") { ClienteEditar(navController) }
 
     }
 

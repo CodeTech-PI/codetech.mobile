@@ -68,7 +68,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                     .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar um cliente!")
-                        navController.navigate("Categorias")
+                        navController.navigate("ClienteCadastro")
                     }
             )
         }
