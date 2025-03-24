@@ -71,8 +71,8 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
 
         Box {
             card4Informacoes(
-                R.drawable.icon_instrumentos,
-                "Equipamentos de tatuagem",
+//                R.drawable.icon_instrumentos,
+//                "Equipamentos de tatuagem",
                 "Tinta Rosa",
                 "R$20.00",
                 "Tinta",
