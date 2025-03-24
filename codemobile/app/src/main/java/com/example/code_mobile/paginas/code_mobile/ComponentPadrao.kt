@@ -16,6 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +45,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.code_mobile.R
 
 fun Modifier.inputPadrao() = this
@@ -219,7 +224,9 @@ fun cardFilial(
     cidade: String,
     cep: String,
     status: String,
+    onDeleteClick: () -> Unit
 ) {
+
 
 
     // tudo que tem dentro do card
@@ -262,7 +269,7 @@ fun cardFilial(
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-                        println("Clicou para excluir cliente!")
+                        onDeleteClick()
                     }
             )
         }
@@ -427,6 +434,55 @@ fun CampoFilialStatus( // Novo componente para o campo "Status"
         }
     }
 }
+
+// Em ComponentesPadrao.kt
+@Composable
+fun ConfirmDeleteDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Gray.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Confirmar Exclusão", color = Color.White)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Tem certeza que deseja excluir esta filial?", color = Color.White)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.End) {
+                    Button(
+                        onClick = {
+                            onConfirm()
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text("Sim", color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            onCancel()
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF1B1B1B)),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text("Não", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 
