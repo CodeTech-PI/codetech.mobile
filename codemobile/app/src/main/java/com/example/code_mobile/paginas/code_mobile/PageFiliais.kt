@@ -199,10 +199,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
         )
     }
 
-    // Exemplo de como acionar o diálogo (por exemplo, ao clicar no ícone de lixeira)
-    IconButton(onClick = { showDialog = true }) {
-        Icon(imageVector = Icons.Default.Delete, contentDescription = "Excluir Filial")
-    }
+    
 }
 
 
