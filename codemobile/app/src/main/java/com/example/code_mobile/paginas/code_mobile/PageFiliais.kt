@@ -77,7 +77,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                     .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar uma filial!")
-                        navController.navigate("AdicionarFilial")
+                        navController.navigate("FiliaisCadastro")
                     }
             )
         }
@@ -95,7 +95,8 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 12345678",
                 "Status: Inoperante",
-                onDeleteClick = { showDialog = true }
+                onDeleteClick = { showDialog = true },
+                navController
 
             )
         }
@@ -111,7 +112,8 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 87456321",
                 "Status: Operante",
-                onDeleteClick = { showDialog = true }
+                onDeleteClick = { showDialog = true },
+                navController
 
                 )
         }
@@ -128,63 +130,15 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
                 "Cidade: São Paulo",
                 "CEP: 19141010",
                 "Status: Operante",
-                onDeleteClick = { showDialog = true }
+                onDeleteClick = { showDialog = true },
+                navController
 
                 )
         }
 
-
-
-
-
-
     }
 
-//    if (showDialog) {
-//        // Fundo cinza semi-transparente
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(Color.Gray.copy(alpha = 0.5f)), // Fundo cinza com transparência
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Card(
-//                modifier = Modifier.padding(16.dp),
-//                colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)), // Fundo do Card cinza
-//                shape = RoundedCornerShape(10.dp) // Borda arredondada
-//            ) {
-//                Column(
-//                    modifier = Modifier.padding(16.dp),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Text("Confirmar Exclusão", color = Color.White)
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    Text("Tem certeza que deseja excluir esta filial?", color = Color.White)
-//                    Spacer(modifier = Modifier.height(16.dp))
-//                    Row(horizontalArrangement = Arrangement.End) {
-//                        Button(
-//                            onClick = {
-//                                println("Filial excluída!")
-//                                showDialog = false
-//                            },
-//                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)), // Botão salvar rosa
-//                            shape = RoundedCornerShape(15.dp)
-//                        ) {
-//                            Text("Sim", color = Color.White)
-//                        }
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Button(
-//                            onClick = { showDialog = false },
-//                            colors = ButtonDefaults.buttonColors(Color(0xFF1B1B1B)), // Botão cancelar preto
-//                            shape = RoundedCornerShape(15.dp)
-//                        ) {
-//                            Text("Não", color = Color.White)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+//
 
     if (showDialog) {
         // Chame o ConfirmDeleteDialog passando as funções para confirmar ou cancelar
@@ -199,7 +153,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
         )
     }
 
-    
+
 }
 
 

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
 
 fun Modifier.inputPadrao() = this
@@ -224,7 +225,8 @@ fun cardFilial(
     cidade: String,
     cep: String,
     status: String,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    navController: NavController
 ) {
 
 
@@ -257,7 +259,7 @@ fun cardFilial(
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-                        println("Clicou para editar cliente!")
+                     navController.navigate("FiliaisEditar")
                     }
             )
 
