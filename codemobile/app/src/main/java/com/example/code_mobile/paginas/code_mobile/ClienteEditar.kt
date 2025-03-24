@@ -36,14 +36,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
-    var status by remember { mutableStateOf("Operante") }
-    var cep by remember { mutableStateOf("19141010") }
-    var logradouro by remember { mutableStateOf("Rua Caraibas") }
-    var bairro by remember { mutableStateOf("Emilio Marengo") }
-    var cidade by remember { mutableStateOf("São Paulo") }
-    var estado by remember { mutableStateOf("São Paulo") }
-    var numero by remember { mutableStateOf("10") }
+fun ClienteEditar(navController: NavController, modifier: Modifier = Modifier){
+    var nome by remember { mutableStateOf("Hosana Flores") }
+    var cpf by remember { mutableStateOf("12345678900") }
+    var dataNasc by remember { mutableStateOf("23/01/2004") }
+    var telefone by remember { mutableStateOf("(11)95858-5792") }
+    var email by remember { mutableStateOf("hosana@codetech.com") }
+
 
     val scrollState = rememberScrollState() // Cria um estado de scroll
 
@@ -75,71 +74,47 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
-        CampoFilialStatus(
-            titulo = "Status:",
-            valor = status,
-            onValorChange = { status = it },
+        CampoFilial (
+            titulo = "Nome:",
+            valor = nome,
+            onValorChange = { nome = it },
             textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "CEP:",
-            valor = cep,
-            onValorChange = { cep = it },
-            textStyle = textPadrao,
-            placeholderText = "19141010"
+            titulo = "CPF:",
+            valor = cpf,
+            onValorChange = { cpf = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Logradouro:",
-            valor = logradouro,
-            onValorChange = { logradouro = it },
-            textStyle = textPadrao,
-            placeholderText = "Caraibas"
+            titulo = "Data de nascimento:",
+            valor = dataNasc,
+            onValorChange = { dataNasc = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Bairro:",
-            valor = bairro,
-            onValorChange = { bairro = it },
-            textStyle = textPadrao,
-            placeholderText = "Emilio Marengo"
+            titulo = "Telefone:",
+            valor = telefone,
+            onValorChange = { telefone = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Cidade:",
-            valor = cidade,
-            onValorChange = { cidade = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Estado:",
-            valor = estado,
-            onValorChange = { estado = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Número:",
-            valor = numero,
-            onValorChange = { numero = it },
-            textStyle = textPadrao,
-            placeholderText = "10"
+            titulo = "E-mail:",
+            valor = email,
+            onValorChange = { email = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
@@ -154,7 +129,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = { navController.navigate("ClienteEditar") },
                 modifier = Modifier
                     .width(130.dp)
                     .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
@@ -165,7 +140,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
             }
 
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = { navController.navigate("ClienteEditar") },
                 modifier = Modifier
                     .width(130.dp)
                     .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
@@ -175,10 +150,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
                 Text(text = "Cancelar")
             }
         }
-
-
     }
-
 }
 
 @Preview(
@@ -188,10 +160,10 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
 )
 
 @Composable
-fun FiliaisEditarPreview() {
+fun ClienteEditarPreview() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
-        FiliaisEditar(navController)
+        ClienteEditar(navController)
     }
 }

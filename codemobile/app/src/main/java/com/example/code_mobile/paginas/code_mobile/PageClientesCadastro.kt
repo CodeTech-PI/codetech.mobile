@@ -33,17 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.CampoFilial
+import com.example.code_mobile.paginas.code_mobile.CampoFilialStatus
+import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
-    var status by remember { mutableStateOf("Operante") }
-    var cep by remember { mutableStateOf("19141010") }
-    var logradouro by remember { mutableStateOf("Rua Caraibas") }
-    var bairro by remember { mutableStateOf("Emilio Marengo") }
-    var cidade by remember { mutableStateOf("São Paulo") }
-    var estado by remember { mutableStateOf("São Paulo") }
-    var numero by remember { mutableStateOf("10") }
+fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier){
+    var nome by remember { mutableStateOf("") }
+    var cpf by remember { mutableStateOf("") }
+    var dataNasc by remember { mutableStateOf("") }
+    var telefone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
 
     val scrollState = rememberScrollState() // Cria um estado de scroll
 
@@ -66,7 +68,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
 
 
         Text(
-            text = "Editar",
+            text = "Cadastrar",
             style = textPadrao.copy(
                 fontSize = 30.sp, // unidade sp, somente para tamanho de texto
                 fontWeight = FontWeight.Bold
@@ -75,71 +77,47 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
-        CampoFilialStatus(
-            titulo = "Status:",
-            valor = status,
-            onValorChange = { status = it },
+        CampoFilial (
+            titulo = "Nome:",
+            valor = nome,
+            onValorChange = { nome = it },
             textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "CEP:",
-            valor = cep,
-            onValorChange = { cep = it },
-            textStyle = textPadrao,
-            placeholderText = "19141010"
+            titulo = "CPF:",
+            valor = cpf,
+            onValorChange = { cpf = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Logradouro:",
-            valor = logradouro,
-            onValorChange = { logradouro = it },
-            textStyle = textPadrao,
-            placeholderText = "Caraibas"
+            titulo = "Data de nascimento:",
+            valor = dataNasc,
+            onValorChange = { dataNasc = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Bairro:",
-            valor = bairro,
-            onValorChange = { bairro = it },
-            textStyle = textPadrao,
-            placeholderText = "Emilio Marengo"
+            titulo = "Telefone:",
+            valor = telefone,
+            onValorChange = { telefone = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
 
         CampoFilial (
-            titulo = "Cidade:",
-            valor = cidade,
-            onValorChange = { cidade = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Estado:",
-            valor = estado,
-            onValorChange = { estado = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Número:",
-            valor = numero,
-            onValorChange = { numero = it },
-            textStyle = textPadrao,
-            placeholderText = "10"
+            titulo = "E-mail:",
+            valor = email,
+            onValorChange = { email = it },
+            textStyle = textPadrao
         )
 
         Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
@@ -154,7 +132,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = { navController.navigate("ClienteCadastro") },
                 modifier = Modifier
                     .width(130.dp)
                     .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
@@ -165,7 +143,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
             }
 
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = { navController.navigate("ClienteCadastro") },
                 modifier = Modifier
                     .width(130.dp)
                     .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
@@ -175,10 +153,7 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
                 Text(text = "Cancelar")
             }
         }
-
-
     }
-
 }
 
 @Preview(
@@ -188,10 +163,10 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
 )
 
 @Composable
-fun FiliaisEditarPreview() {
+fun ClienteCadastroPreview() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
-        FiliaisEditar(navController)
+        ClienteCadastro(navController)
     }
 }
