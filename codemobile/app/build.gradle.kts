@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.storage)
+
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 

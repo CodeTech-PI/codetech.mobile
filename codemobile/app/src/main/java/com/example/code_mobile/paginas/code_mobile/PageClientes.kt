@@ -87,8 +87,8 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             )
 
             card4Informacoes(
-                R.drawable.icone_perfil,
-                "perfil",
+//                R.drawable.icone_perfil,
+//                "perfil",
                 "123.456.789-00",
                 "23/01/2004",
                 "(11) 95858-5792",
@@ -114,8 +114,8 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             )
 
             card4Informacoes(
-                R.drawable.icone_perfil,
-                "perfil",
+//                R.drawable.icone_perfil,
+//                "perfil",
                 "123.456.789-00",
                 "23/01/2004",
                 "(11) 95858-5792",
@@ -141,8 +141,8 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             )
 
             card4Informacoes(
-                R.drawable.icone_perfil,
-                "perfil",
+//                R.drawable.icone_perfil,
+//                "perfil",
                 "123.456.789-00",
                 "23/01/2004",
                 "(11) 95858-5792",
@@ -167,8 +167,8 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             )
 
             card4Informacoes(
-                R.drawable.icone_perfil,
-                "perfil",
+//                R.drawable.icone_perfil,
+//                "perfil",
                 "123.456.789-00",
                 "23/01/2004",
                 "(11) 95858-5792",
