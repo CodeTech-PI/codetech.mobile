@@ -112,15 +112,15 @@ fun Input(
 
 @Composable
 fun card4Informacoes(
-    caminhoImagem: Int,
-    descricaoImagem: String,
+//    caminhoImagem: Int,
+//    descricaoImagem: String,
     coluna1Info1: String,
     coluna1Info2: String,
     coluna2Info1: String,
     coluna2Info2: String
 ) {
 
-    val imagemInformada = painterResource(id = caminhoImagem)
+//    val imagemInformada = painterResource(id = caminhoImagem)
 
     // tudo que tem dentro do card
     Column(
@@ -173,11 +173,11 @@ fun card4Informacoes(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Image(
-                painter = imagemInformada,
-                contentDescription = descricaoImagem,
-                modifier = Modifier.size(75.dp)
-            )
+//            Image(
+//                painter = imagemInformada,
+//                contentDescription = descricaoImagem,
+//                modifier = Modifier.size(75.dp)
+//            )
 
             Spacer(modifier = Modifier.width(10.dp))
 
