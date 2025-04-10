@@ -1,4 +1,4 @@
-package com.example.code_mobile.paginas.code_mobile.Cliente
+package com.example.code_mobile.Model
 
 data class ModelCliente(
     val id: Int,

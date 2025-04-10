@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.CampoLogin
+import com.example.code_mobile.token.auth.AuthService
+import com.example.code_mobile.token.auth.LoginRequest
+import com.example.code_mobile.token.network.RetrofithAuth
+import com.example.code_mobile.token.network.TokenManager
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
@@ -39,6 +44,8 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) } // Para mostrar ou esconder o carregamento
+    var loginRequested by remember { mutableStateOf(false) } // Estado para indicar quando o login foi solicitado
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
@@ -46,56 +53,96 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         fontStyle = FontStyle.Normal
     )
 
+    suspend fun login() {
+        if (email.isNotEmpty() && senha.isNotEmpty()) {
+            loading = true
+            try {
+                // Chama o AuthService para fazer o login
+                val response = RetrofithAuth.retrofit.create(AuthService::class.java)
+                    .login(LoginRequest(email, senha))
+
+                if (response.isSuccessful) {
+                    // Armazenando o token sem o "Bearer"
+                    TokenManager.token = response.body()?.token
+                    println("Login bem-sucedido! Token: ${TokenManager.token}")
+
+                    // Navega para a tela de estoque
+                    navController.navigate("Estoque")
+                } else {
+                    println("Erro ao fazer login: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Erro ao tentar fazer login: ${e.message}")
+            } finally {
+                loading = false
+            }
+        } else {
+            println("Por favor, preencha todos os campos.")
+        }
+    }
+
+
+
+
+    // LaunchedEffect para chamar a função de login quando loginRequested mudar para true
+    LaunchedEffect(loginRequested) {
+        if (loginRequested) {
+            login() // Chama a função login
+            loginRequested = false // Reseta o estado de solicitação de login
+        }
+    }
+
     Column(modifier = modifier
-        .fillMaxSize() // faz a mudança pegar na tela toda
+        .fillMaxSize() // Faz a mudança pegar na tela toda
         .background(Color(0xFF1B1B1B))
         .padding(20.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
-
     ) {
         Spacer(modifier = Modifier.weight(0.5f)) // Centraliza verticalmente
 
         Text(
             text = "Lombardi",
             style = textPadrao.copy(
-                fontSize = 40.sp, // unidade sp, somente para tamanho de texto
+                fontSize = 40.sp, // Tamanho de texto
                 fontWeight = FontWeight.Bold
             )
         )
 
-        Spacer(modifier = Modifier.height(50.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(50.dp)) // Espaço entre os campos
 
-        CampoLogin (
+        CampoLogin(
             titulo = "Email:",
             valor = email,
             onValorChange = { email = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(30.dp)) // Espaço entre os campos
 
-        CampoLogin (
+        CampoLogin(
             titulo = "Senha:",
             valor = senha,
             onValorChange = { senha = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(30.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(30.dp)) // Espaço entre os campos
 
         Button(
-            onClick = { navController.navigate("Estoque") },
+            onClick = {
+                // Altera o estado para indicar que o login foi solicitado
+                loginRequested = true
+            },
             modifier = Modifier
                 .width(310.dp)
                 .background(color = Color.White, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp)) // Borda arredondada
                 .background(Color(0xFFDF0050)),
-            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)), // está mudando o front padrão do botão
-            contentPadding = PaddingValues(0.dp) // centralizando
+            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+            contentPadding = PaddingValues(0.dp) // Centralizando
         ) {
             Text(
-                text = "Entrar"
+                text = if (loading) "Carregando..." else "Entrar"
             )
         }
 
@@ -108,9 +155,9 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         )
 
         Spacer(modifier = Modifier.weight(0.2f)) // Empurra o próximo elemento para o final
-
     }
 }
+
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.code_mobile.paginas.code_mobile.Cliente
+package com.example.code_mobile.paginas.code_mobile
 
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.Image
@@ -31,11 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.Model.ModelCliente
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.Input
-import com.example.code_mobile.paginas.code_mobile.card4Informacoes
-import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
-import com.example.code_mobile.paginas.code_mobile.textPadrao
+import com.example.code_mobile.Service.ServiceCliente
+import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 
@@ -45,7 +44,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
     LaunchedEffect(true) {
         try {
-            val response = InterfaceCliente.RetrofitClient.api.getUsuarios()
+
+            //pegando a url base e colocando o /endpoint da interface
+            val response = RetrofithAuth.retrofit.create(ServiceCliente::class.java).getUsuarios()
+
             if (response.isSuccessful) {
                 clientes = response.body() ?: emptyList()
             } else {
