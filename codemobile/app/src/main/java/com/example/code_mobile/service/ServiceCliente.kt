@@ -1,9 +1,9 @@
-package com.example.code_mobile.Service
+package com.example.code_mobile.service
 
 
 import retrofit2.http.GET
 import retrofit2.Response
-import com.example.code_mobile.Model.ModelCliente
+import com.example.code_mobile.model.ModelCliente
 
 interface ServiceCliente {
     @GET("usuarios")

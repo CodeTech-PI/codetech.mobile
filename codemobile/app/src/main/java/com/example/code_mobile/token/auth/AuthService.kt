@@ -11,3 +11,7 @@ interface AuthService {
     @POST("lombardi/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 }
+
+/*
+    Envia a requisição de login para o backend
+*/

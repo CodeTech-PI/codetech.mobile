@@ -16,3 +16,9 @@ class AuthInterceptor : Interceptor {
         return chain.proceed(requestBuilder.build())
     }
 }
+
+/*
+    Interceptar todas as requisições HTTP do app
+    Valida se o token está armazenado no TokenManager
+    Adiciona o token nos headers
+*/

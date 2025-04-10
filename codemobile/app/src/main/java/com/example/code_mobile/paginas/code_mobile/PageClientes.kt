@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.Model.ModelCliente
+import com.example.code_mobile.model.ModelCliente
 import com.example.code_mobile.R
-import com.example.code_mobile.Service.ServiceCliente
+import com.example.code_mobile.service.ServiceCliente
 import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
