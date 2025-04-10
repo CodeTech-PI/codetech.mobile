@@ -50,12 +50,12 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     println("Executando tela de clientes")
 
     LaunchedEffect(true) {
-        println("TelaClientes: LaunchedEffect executado. Token atual: ${TokenManager.token}")
+        println("TelaClientes LaunchedEffect, token atual: ${TokenManager.token}")
         try {
             val serviceCliente = RetrofithAuth.retrofit.create(ServiceCliente::class.java)
             val response = serviceCliente.getUsuarios()
 
-            println("Estou dentro do try, token atual: ${TokenManager.token}")
+            println("Entrou no try")
             println(response.body())
 
             if (response.isSuccessful) {
@@ -69,11 +69,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             }
         } catch (e: Exception) {
             println("Erro na requisição: ${e.message}")
-            println("Estou no catch. Token: ${TokenManager.token}")
+            println("Entrou no catch")
             e.printStackTrace()
         }
     }
-
 
     var pesquisa by remember { mutableStateOf("") }
 
@@ -85,7 +84,6 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     ) {
         menuComTituloPage("Clientes", navController)
 
-        // Filtro e botão de adicionar
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -120,7 +118,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 30.dp)
                 ) {
                     Text(
                         text = cliente.nome,
@@ -140,7 +138,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
