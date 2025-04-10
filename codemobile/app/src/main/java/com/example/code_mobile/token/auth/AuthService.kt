@@ -8,6 +8,6 @@ data class LoginRequest(val email: String, val senha: String)
 data class LoginResponse(val token: String)
 
 interface AuthService {
-    @POST("auth/login")
+    @POST("lombardi/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 }
