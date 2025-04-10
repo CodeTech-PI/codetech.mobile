@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -34,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.CampoLogin
+import com.example.code_mobile.paginas.code_mobile.componente.CampoLogin
 import com.example.code_mobile.token.auth.AuthService
 import com.example.code_mobile.token.auth.LoginRequest
 import com.example.code_mobile.token.network.RetrofithAuth
@@ -187,7 +186,10 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 fun FraseInferior(frase: String, codeTech: String, funText: TextStyle) {
     Text(
         text = AnnotatedString(frase) +
-                AnnotatedString(codeTech, spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()),
+                AnnotatedString(
+                    codeTech,
+                    spanStyle = funText.copy(Color(0XFF9B00CE), fontSize = 16.sp).toSpanStyle()
+                ),
         style = funText.copy(
             fontSize = 16.sp
         )

@@ -1,4 +1,7 @@
-package com.example.code_mobile.paginas.code_mobile
+package com.example.code_mobile.paginas.code_mobile.cliente
+
+import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
+import com.example.code_mobile.paginas.code_mobile.service.ServiceCliente
 
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.Image
@@ -31,34 +34,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.model.ModelCliente
 import com.example.code_mobile.R
-import com.example.code_mobile.service.ServiceCliente
+import com.example.code_mobile.paginas.code_mobile.componente.Input
+import com.example.code_mobile.paginas.code_mobile.componente.card4Informacoes
+import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
+import com.example.code_mobile.paginas.code_mobile.componente.textPadrao
 import com.example.code_mobile.token.network.RetrofithAuth
+import com.example.code_mobile.token.network.TokenManager
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 
 @Composable
 fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     var clientes by remember { mutableStateOf<List<ModelCliente>>(emptyList()) }
+    println("Executando tela de clientes")
 
     LaunchedEffect(true) {
+        println("TelaClientes: LaunchedEffect executado. Token atual: ${TokenManager.token}")
         try {
+            val serviceCliente = RetrofithAuth.retrofit.create(ServiceCliente::class.java)
+            val response = serviceCliente.getUsuarios()
 
-            //pegando a url base e colocando o /endpoint da interface
-            val response = RetrofithAuth.retrofit.create(ServiceCliente::class.java).getUsuarios()
+            println("Estou dentro do try, token atual: ${TokenManager.token}")
+            println(response.body())
 
             if (response.isSuccessful) {
                 clientes = response.body() ?: emptyList()
             } else {
-                println("Erro ao carregar clientes: ${response.code()} - ${response.errorBody()?.string()}")
+                println(
+                    "Erro ao carregar clientes: ${response.code()} - ${
+                        response.errorBody()?.string()
+                    }"
+                )
             }
         } catch (e: Exception) {
             println("Erro na requisição: ${e.message}")
+            println("Estou no catch. Token: ${TokenManager.token}")
             e.printStackTrace()
         }
     }
-
 
 
     var pesquisa by remember { mutableStateOf("") }
@@ -130,8 +144,6 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 }
             }
         }
-
-
     }
 }
 

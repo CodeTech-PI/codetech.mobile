@@ -17,7 +17,7 @@ import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
 import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
-import com.example.code_mobile.paginas.code_mobile.TelaClientes
+import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
 import com.example.code_mobile.paginas.code_mobile.TelaEstoque
 
 import com.example.code_mobile.ui.theme.CodemobileTheme

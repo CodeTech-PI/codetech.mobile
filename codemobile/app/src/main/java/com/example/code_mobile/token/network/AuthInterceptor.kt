@@ -9,7 +9,7 @@ class AuthInterceptor : Interceptor {
 
         val requestBuilder = chain.request().newBuilder()
         if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", token)
+            requestBuilder.addHeader("Authorization", "Bearer $token")
             println("TOKEN ENVIADO: $token")
         }
 
