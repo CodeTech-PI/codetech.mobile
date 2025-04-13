@@ -223,6 +223,70 @@ fun card4Informacoes(
 }
 
 @Composable
+fun cardCategoria(
+    coluna1Info1: String,
+    onEditClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
+            .clip(RoundedCornerShape(12.dp))
+            .border(
+                2.dp,
+                Color(0xFF252525),
+                shape = RoundedCornerShape(12.dp)
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Texto da categoria
+            Text(
+                text = coluna1Info1,
+                style = textPadrao.copy(fontSize = 16.sp),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Ícones de editar e excluir
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.icone_editar),
+                    contentDescription = "Editar",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .clickable {
+                            println("Clicou para editar cliente!")
+                            onEditClick()
+                        }
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.icone_deletar),
+                    contentDescription = "Excluir",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .clickable {
+                            println("Clicou para excluir cliente!")
+                        }
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
 fun cardFilial(
     logradouro: String,
     estado: String,

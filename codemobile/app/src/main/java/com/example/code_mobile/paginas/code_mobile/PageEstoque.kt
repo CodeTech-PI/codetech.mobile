@@ -61,8 +61,8 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
                 painter = painterResource(id = R.drawable.icon_add),
                 contentDescription = "Adicionar",
                 modifier = Modifier
-                    .size(50.dp)
-                    .padding(start = 8.dp)
+                    .size(60.dp)
+                    .padding(top = 25.dp)
                     .clickable { showCadastroDialog = true }
             )
         }
