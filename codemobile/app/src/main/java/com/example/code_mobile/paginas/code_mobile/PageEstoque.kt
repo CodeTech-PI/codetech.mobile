@@ -198,7 +198,7 @@ fun ModalEdicaoProduto(produto: Produto, onDismiss: () -> Unit) {
             ) {
                 Text("Editar", color = Color.White, fontSize = 18.sp)
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Color.Red)
+                    Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Color.Gray)
                 }
             }
         },

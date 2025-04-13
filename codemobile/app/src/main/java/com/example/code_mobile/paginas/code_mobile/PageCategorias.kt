@@ -59,6 +59,7 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
     var pesquisa by remember { mutableStateOf("") }
     var showCadastroDialog by remember { mutableStateOf(false) }
     var showEdicaoDialog by remember { mutableStateOf(false) }
+    var categoriaEditado by remember { mutableStateOf(Categoria("Tinta")) }
 
     Column(
         modifier = Modifier
@@ -120,9 +121,9 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
         }
     }
 
-//    if (showEdicaoDialog) {
-//        ModalEdicaoProduto(produto = produtoEditado, onDismiss = { showEdicaoDialog = false })
-//    }
+    if (showEdicaoDialog) {
+        ModalEdicaoCategoria(categoria = categoriaEditado, onDismiss = { showEdicaoDialog = false })
+    }
 
     if (showCadastroDialog) {
         NovoProdutoDialog(onDismiss = { showCadastroDialog = false })
@@ -144,49 +145,70 @@ fun CampoTextoCat(label: String, valor: String, onValorChange: (String) -> Unit)
 }
 
 @Composable
-fun ModalEdicaoCategoria(produto: Produto, onDismiss: () -> Unit) {
-    var categoria by remember { mutableStateOf(produto.categoria) }
+fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit) {
+    var categoriaTexto by remember { mutableStateOf(categoria.categoria) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        modifier = Modifier.clip(RoundedCornerShape(12.dp)),
-        containerColor = Color(0xFF1B1B1B),
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Editar", color = Color.White, fontSize = 18.sp)
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Color.Red)
+    Dialog(onDismissRequest = {}) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF1B1B1B))
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Column {
+                // Título e botão fechar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Editar", color = Color.White, fontSize = 18.sp)
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Fechar",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CampoTexto("Categoria", categoriaTexto, { categoriaTexto = it })
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                    ) {
+                        Text("Cancelar", color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            // Aqui você pode salvar, se necessário
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                    ) {
+                        Text("Salvar", color = Color.White)
+                    }
                 }
             }
-        },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                CampoTexto("Categoria", categoria, { categoria = it })
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
-            ) {
-                Text("Salvar", color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Color.Gray)
-            ) {
-                Text("Cancelar", color = Color.White)
-            }
         }
-    )
+    }
 }
 
-data class Cat(
+
+data class Categoria(
     val categoria: String,
 )
 
