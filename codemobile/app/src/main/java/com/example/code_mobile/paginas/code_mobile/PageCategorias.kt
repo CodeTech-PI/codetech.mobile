@@ -100,7 +100,7 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
 
         Box {
             cardCategoria(
-                "Tinta Rosa",
+                categoriaEditado.categoria,
                 onEditClick = {
                     println("Ícone de edição clicado!")
                     showEdicaoDialog = true
@@ -122,7 +122,12 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
     }
 
     if (showEdicaoDialog) {
-        ModalEdicaoCategoria(categoria = categoriaEditado, onDismiss = { showEdicaoDialog = false })
+        ModalEdicaoCategoria(
+            categoria = categoriaEditado,
+            onDismiss = { showEdicaoDialog = false },
+            onSave = { novaCategoria ->
+                categoriaEditado = novaCategoria
+            })
     }
 
     if (showCadastroDialog) {
@@ -145,7 +150,7 @@ fun CampoTextoCat(label: String, valor: String, onValorChange: (String) -> Unit)
 }
 
 @Composable
-fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit) {
+fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit, onSave: (Categoria)-> Unit) {
     var categoriaTexto by remember { mutableStateOf(categoria.categoria) }
 
     Dialog(onDismissRequest = {}) {
@@ -181,7 +186,7 @@ fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit) {
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
                         onClick = onDismiss,
@@ -194,7 +199,7 @@ fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit) {
 
                     Button(
                         onClick = {
-                            // Aqui você pode salvar, se necessário
+                            onSave(Categoria(categoriaTexto))
                             onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))

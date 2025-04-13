@@ -557,9 +557,6 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
     }
 }
 
-
-
-
 val textPadrao = TextStyle(
     fontSize = 20.sp,
     color = Color.White,
