@@ -72,6 +72,11 @@ fun Menu(navController: NavController){
         })
         MenuItem(iconResId = R.drawable.estoque_branco, text = "Estoque", selected = selectedItem == "Estoque", onClick = {
             selectedItem = "Estoque"
+            navController.navigate("Estoque")
+        })
+        MenuItem(iconResId = R.drawable.estoque_branco, text = "Categoria", selected = selectedItem == "Categoria", onClick = {
+            selectedItem = "Categoria"
+            navController.navigate("Categoria")
         })
         MenuItem(iconResId = R.drawable.atendimentos_branco, text = "Atendimentos", selected = selectedItem == "Atendimentos", onClick = {
             selectedItem = "Atendimentos"
