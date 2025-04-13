@@ -32,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,6 +62,8 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
     var showEdicaoDialog by remember { mutableStateOf(false) }
     var categoriaEditado by remember { mutableStateOf(Categoria("Tinta")) }
 
+    val categorias = remember { mutableStateListOf(Categoria("Tinta")) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,13 +73,13 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
         Spacer(modifier = Modifier.height(30.dp))
         menuComTituloPage("Categoria", navController)
 
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
+//        Row(
+//            modifier = Modifier
+//                .padding(horizontal = 20.dp)
+//                .fillMaxWidth(),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.Start
+//        ) {
             Input(
                 titulo = "",
                 valor = pesquisa,
@@ -86,26 +89,32 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
                 modifier = Modifier.weight(1f)
             )
 
-            Image(
-                painter = painterResource(id = R.drawable.icon_add),
-                contentDescription = "Adicionar",
-                modifier = Modifier
-                    .size(60.dp)
-                    .padding(top = 25.dp)
-                    .clickable { showCadastroDialog = true }
-            )
-        }
+//            Image(
+//                painter = painterResource(id = R.drawable.icon_add),
+//                contentDescription = "Adicionar",
+//                modifier = Modifier
+//                    .size(60.dp)
+//                    .padding(top = 25.dp)
+//                    .clickable { showCadastroDialog = true }
+//            )
+//        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box {
-            cardCategoria(
-                categoriaEditado.categoria,
-                onEditClick = {
-                    println("Ícone de edição clicado!")
-                    showEdicaoDialog = true
-                }
-            )
+        Column {
+            categorias
+                .filter { it.categoria.contains(pesquisa, ignoreCase = true) }
+                .forEachIndexed{
+                index, categoria ->
+                cardCategoria(
+                    categoria.categoria,
+                    onEditClick = {
+                        categoriaEditado = categoria
+                        showEdicaoDialog = true
+                    }
+                )
+                Spacer(modifier = modifier.height(10.dp))
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -117,7 +126,7 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
                 .padding(bottom = 16.dp),
             colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
         ) {
-            Text("Novo Produto", color = Color.White)
+            Text("Nova Categoria", color = Color.White)
         }
     }
 
@@ -131,7 +140,13 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
     }
 
     if (showCadastroDialog) {
-        NovoProdutoDialog(onDismiss = { showCadastroDialog = false })
+        NovaCategoriaDialog(
+            onDismiss = { showCadastroDialog = false },
+            onSalvar = { novaCategoria ->
+                categorias.add(novaCategoria)
+                showCadastroDialog = false
+            }
+            )
     }
 }
 
@@ -146,6 +161,50 @@ fun CampoTextoCat(label: String, valor: String, onValorChange: (String) -> Unit)
             singleLine = true,
             textStyle = TextStyle(color = Color.White)
         )
+    }
+}
+
+
+@Composable
+fun NovaCategoriaDialog(onDismiss: () -> Unit, onSalvar: (Categoria) -> Unit) {
+    var categoriaTexto by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(Color(0xFF121212))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Cadastrar", color = Color.White, fontSize = 20.sp)
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = categoriaTexto,
+                    onValueChange = { categoriaTexto = it},
+                    label = { Text("Categoria") },
+                    textStyle = TextStyle(color = Color.White)
+                    )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Button(
+                        onClick = { onDismiss() },
+                        colors = ButtonDefaults.buttonColors(Color.Gray)) {
+                        Text("Cancelar")
+                    }
+                    Button(
+                        onClick = {
+                          onSalvar(Categoria(categoriaTexto))
+                            },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFE91E63))
+                    ){
+                        Text("Salvar")
+                    }
+                }
+            }
+        }
     }
 }
 
