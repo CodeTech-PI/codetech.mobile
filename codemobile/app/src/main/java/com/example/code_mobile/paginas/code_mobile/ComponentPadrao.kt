@@ -225,7 +225,8 @@ fun card4Informacoes(
 @Composable
 fun cardCategoria(
     coluna1Info1: String,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -278,6 +279,7 @@ fun cardCategoria(
                         .size(25.dp)
                         .clickable {
                             println("Clicou para excluir cliente!")
+                            onDeleteClick()
                         }
                 )
             }
@@ -556,6 +558,55 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
         }
     }
 }
+
+// Em ComponentesPadrao.kt
+@Composable
+fun ConfirmDeleteDialogCategoria(onConfirm: () -> Unit, onCancel: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Gray.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Confirmar Exclusão", color = Color.White)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Tem certeza que deseja excluir esta categoria?", color = Color.White)
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.End) {
+                    Button(
+                        onClick = {
+                            onConfirm()
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text("Sim", color = Color.White)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            onCancel()
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF1B1B1B)),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text("Não", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 val textPadrao = TextStyle(
     fontSize = 20.sp,

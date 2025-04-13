@@ -61,8 +61,10 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
     var showCadastroDialog by remember { mutableStateOf(false) }
     var showEdicaoDialog by remember { mutableStateOf(false) }
     var categoriaEditado by remember { mutableStateOf(Categoria("Tinta")) }
-
     val categorias = remember { mutableStateListOf(Categoria("Tinta")) }
+    var showConfirmDeleteDialog by remember { mutableStateOf(false) }
+    var categoriaParaExcluir by remember { mutableStateOf<Categoria?>(null) }
+
 
     Column(
         modifier = Modifier
@@ -111,6 +113,10 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
                     onEditClick = {
                         categoriaEditado = categoria
                         showEdicaoDialog = true
+                    },
+                    onDeleteClick ={
+                        categoriaParaExcluir = categoria
+                        showConfirmDeleteDialog = true
                     }
                 )
                 Spacer(modifier = modifier.height(10.dp))
@@ -135,8 +141,13 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
             categoria = categoriaEditado,
             onDismiss = { showEdicaoDialog = false },
             onSave = { novaCategoria ->
-                categoriaEditado = novaCategoria
-            })
+                val index = categorias.indexOfFirst { it == categoriaEditado }
+                if (index != -1) {
+                    categorias[index] = novaCategoria
+                }
+                showEdicaoDialog = false
+            }
+        )
     }
 
     if (showCadastroDialog) {
@@ -148,6 +159,21 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
             }
             )
     }
+
+    if (showConfirmDeleteDialog && categoriaParaExcluir != null) {
+        ConfirmDeleteDialogCategoria(
+            onConfirm = {
+                categorias.remove(categoriaParaExcluir)
+                categoriaParaExcluir = null
+                showConfirmDeleteDialog = false
+            },
+            onCancel = {
+                categoriaParaExcluir = null
+                showConfirmDeleteDialog = false
+            }
+        )
+    }
+
 }
 
 @Composable
