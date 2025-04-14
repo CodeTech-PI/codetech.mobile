@@ -160,7 +160,7 @@ fun Modifier.inputPadrao() = this
 
 
 @Composable // Input
-fun InputCliente(
+fun InputPesquisarCliente(
     titulo: String,
     valor: String,
     onValorChange: (String) -> Unit,
@@ -182,6 +182,48 @@ fun InputCliente(
                 .inputPadrao(),
             singleLine = false, // impede quebra de linha na input
             label = labelInfo
+        )
+    }
+}
+
+@Composable
+fun CampoCadastrarCliente(
+    titulo: String,
+    valor: String,
+    onValorChange: (String) -> Unit,
+    textStyle: TextStyle,
+    placeholderText: String = ""
+) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.fillMaxWidth(0.9f)
+    ) {
+        Text(text = titulo, style = textStyle)
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Input
+        TextField(
+            value = valor,
+            onValueChange = onValorChange,
+            placeholder = { Text(placeholderText) },
+            textStyle = textStyle.copy(fontSize = 16.sp, color = Color.White),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            singleLine = true,
+            shape = RoundedCornerShape(15.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF252525), // Cor de fundo quando focado (cinza)
+                unfocusedContainerColor = Color(0xFF252525), // Cor de fundo quando desfocado (cinza)
+                cursorColor = Color.White,
+                focusedTextColor = Color.White, // Cor do texto digitado quando focado (branco)
+                unfocusedTextColor = Color.White, // Cor do texto digitado quando desfocado (branco)
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent
+            )
         )
     }
 }

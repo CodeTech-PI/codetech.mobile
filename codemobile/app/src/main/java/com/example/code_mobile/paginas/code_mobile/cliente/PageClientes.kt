@@ -102,7 +102,7 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            InputCliente(
+            InputPesquisarCliente(
                 titulo = "",
                 valor = pesquisa,
                 onValorChange = { pesquisa = it },
@@ -169,7 +169,9 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                         Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
+
             }
+
         }
 
         if (showDialog && clienteParaExcluir != null) {

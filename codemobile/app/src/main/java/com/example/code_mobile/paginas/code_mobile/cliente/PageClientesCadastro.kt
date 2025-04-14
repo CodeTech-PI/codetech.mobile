@@ -1,20 +1,26 @@
-package com.example.code_mobile.paginas.code_mobile
+package com.example.code_mobile.paginas.code_mobile.cliente
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,17 +39,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.componente.CampoFilial
+import com.example.code_mobile.paginas.code_mobile.cliente.CampoCadastrarCliente
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier){
+fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
     var nome by remember { mutableStateOf("") }
     var cpf by remember { mutableStateOf("") }
     var dataNasc by remember { mutableStateOf("") }
     var telefone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-
 
     val scrollState = rememberScrollState() // Cria um estado de scroll
 
@@ -53,99 +58,101 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         fontStyle = FontStyle.Normal
     )
 
-    Column(modifier = modifier
-        .fillMaxSize() // faz a mudança pegar na tela toda
-        .verticalScroll(scrollState)
-        .background(Color(0xFF1B1B1B))
-        .padding(20.dp),
-
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
-
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .fillMaxHeight(0.6f)
+            .verticalScroll(scrollState)
+            .background(Color(0xFF1B1B1B))
+            .padding(horizontal = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround // Alinha os itens com espaço igual antes, entre e depois deles
     ) {
-        Spacer(modifier = Modifier.height(20.dp)) // Remova o Spacer.weight() inicial
-
-
-        Text(
-            text = "Cadastrar",
-            style = textPadrao.copy(
-                fontSize = 30.sp, // unidade sp, somente para tamanho de texto
-                fontWeight = FontWeight.Bold
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 30.dp), // Aumentei o padding bottom para descer mais
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Voltar",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable { navController.popBackStack() }
             )
-        )
+            Text(
+                text = "Cadastrar",
+                style = textPadrao.copy(
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Spacer(modifier = Modifier.width(30.dp))
+        }
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoCadastrarCliente(
             titulo = "Nome:",
             valor = nome,
             onValorChange = { nome = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoCadastrarCliente(
             titulo = "CPF:",
             valor = cpf,
             onValorChange = { cpf = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoCadastrarCliente(
             titulo = "Data de nascimento:",
             valor = dataNasc,
             onValorChange = { dataNasc = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoCadastrarCliente(
             titulo = "Telefone:",
             valor = telefone,
             onValorChange = { telefone = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoCadastrarCliente(
             titulo = "E-mail:",
             valor = email,
             onValorChange = { email = it },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
-
-
-
+        Spacer(modifier = Modifier.height(20.dp)) // Reduzi o espaço antes dos botões
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp), // Adiciona padding horizontal ao Row
+                .padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
                 onClick = { navController.navigate("ClienteCadastro") },
                 modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
-                shape = RoundedCornerShape(15.dp),
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
                 colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
             ) {
                 Text(text = "Salvar")
             }
 
             Button(
-                onClick = { navController.navigate("ClienteCadastro") },
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
-                shape = RoundedCornerShape(15.dp),
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
                 colors = ButtonDefaults.buttonColors(Color(0xFF252525))
             ) {
                 Text(text = "Cancelar")
@@ -159,11 +166,9 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
     showSystemUi = true,
     device = Devices.PIXEL_2
 )
-
 @Composable
 fun ClienteCadastroPreview() {
     CodemobileTheme {
-        // Inicialize o navController aqui
         val navController = rememberNavController()
         ClienteCadastro(navController)
     }
