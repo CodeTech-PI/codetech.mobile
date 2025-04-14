@@ -25,8 +25,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -221,72 +219,6 @@ fun card4Informacoes(
         }
     }
 }
-
-@Composable
-fun cardCategoria(
-    coluna1Info1: String,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .clip(RoundedCornerShape(12.dp))
-            .border(
-                2.dp,
-                Color(0xFF252525),
-                shape = RoundedCornerShape(12.dp)
-            ),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Texto da categoria
-            Text(
-                text = coluna1Info1,
-                style = textPadrao.copy(fontSize = 16.sp),
-                modifier = Modifier.weight(1f)
-            )
-
-            // Ícones de editar e excluir
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.icone_editar),
-                    contentDescription = "Editar",
-                    modifier = Modifier
-                        .size(25.dp)
-                        .clickable {
-                            println("Clicou para editar cliente!")
-                            onEditClick()
-                        }
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.icone_deletar),
-                    contentDescription = "Excluir",
-                    modifier = Modifier
-                        .size(25.dp)
-                        .clickable {
-                            println("Clicou para excluir cliente!")
-                            onDeleteClick()
-                        }
-                )
-            }
-        }
-    }
-}
-
 
 @Composable
 fun cardFilial(
@@ -559,53 +491,7 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
     }
 }
 
-// Em ComponentesPadrao.kt
-@Composable
-fun ConfirmDeleteDialogCategoria(onConfirm: () -> Unit, onCancel: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Gray.copy(alpha = 0.5f)),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier.padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Confirmar Exclusão", color = Color.White)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Tem certeza que deseja excluir esta categoria?", color = Color.White)
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(horizontalArrangement = Arrangement.End) {
-                    Button(
-                        onClick = {
-                            onConfirm()
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text("Sim", color = Color.White)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = {
-                            onCancel()
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(0xFF1B1B1B)),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text("Não", color = Color.White)
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 
 val textPadrao = TextStyle(

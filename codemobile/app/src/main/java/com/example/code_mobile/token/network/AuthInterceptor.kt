@@ -9,10 +9,16 @@ class AuthInterceptor : Interceptor {
 
         val requestBuilder = chain.request().newBuilder()
         if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", token)
+            requestBuilder.addHeader("Authorization", "Bearer $token")
             println("TOKEN ENVIADO: $token")
         }
 
         return chain.proceed(requestBuilder.build())
     }
 }
+
+/*
+    Interceptar todas as requisições HTTP do app
+    Valida se o token está armazenado no TokenManager
+    Adiciona o token nos headers
+*/
