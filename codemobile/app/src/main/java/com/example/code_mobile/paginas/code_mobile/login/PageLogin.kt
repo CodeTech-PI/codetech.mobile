@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.CampoLogin
+import com.example.code_mobile.paginas.code_mobile.componente.CampoLogin
 import com.example.code_mobile.token.auth.AuthService
 import com.example.code_mobile.token.auth.LoginRequest
 import com.example.code_mobile.token.network.RetrofithAuth
