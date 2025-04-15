@@ -1,4 +1,4 @@
-package com.example.code_mobile.paginas.code_mobile.componente
+package com.example.code_mobile.paginas.code_mobile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+import androidx.navigation.compose.rememberNavController
 
 import com.example.code_mobile.R
 
@@ -59,14 +60,12 @@ fun CampoLogin(
     titulo: String,
     valor: String,
     onValorChange: (String) -> Unit,
-    textStyle: TextStyle,
-    modifier: Modifier = Modifier
+    textStyle: TextStyle
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start // Alinha para esquerda
     ) {
-        Text(text = titulo, style = textStyle)
+        Text(text = titulo, style = textStyle) // será do tipo texto com o estilo passado no "Campo"
 
         Spacer(modifier = Modifier.height(10.dp)) // Espaço entre título e campo
 
@@ -76,15 +75,15 @@ fun CampoLogin(
             onValueChange = onValorChange, // Atualiza o valor conforme o usuário digita
             textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp),
             modifier = Modifier
-                .fillMaxWidth()
-                .inputPadrao(),
+                .inputPadrao()
+                .height(180.dp), // Aumenta a altura da área de digitação
             singleLine = false // impede quebra de linha na input
         )
     }
 }
 
 
-@Composable // Input
+@Composable // Input                                                                            //label não é uma String
 fun Input(
     titulo: String,
     valor: String,
@@ -491,6 +490,8 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
         }
     }
 }
+
+
 
 
 val textPadrao = TextStyle(
