@@ -3,6 +3,7 @@ package com.example.code_mobile.paginas.code_mobile.cliente
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,112 +51,118 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
     var telefone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
 
-    val scrollState = rememberScrollState() // Cria um estado de scroll
+    val scrollState = rememberScrollState()
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
         color = Color.White,
         fontStyle = FontStyle.Normal
     )
-
-    Column(
-        modifier = modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .fillMaxHeight(0.6f)
-            .verticalScroll(scrollState)
-            .background(Color(0xFF1B1B1B))
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround // Alinha os itens com espaço igual antes, entre e depois deles
+            .background(Color(0xFF1B1B1B)),
+        contentAlignment = Alignment.Center
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 30.dp), // Aumentei o padding bottom para descer mais
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Voltar",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable { navController.popBackStack() }
-            )
-            Text(
-                text = "Cadastrar",
-                style = textPadrao.copy(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            Spacer(modifier = Modifier.width(30.dp))
-        }
 
-        CampoCadastrarCliente(
-            titulo = "Nome:",
-            valor = nome,
-            onValorChange = { nome = it },
-            textStyle = textPadrao
-        )
-
-        CampoCadastrarCliente(
-            titulo = "CPF:",
-            valor = cpf,
-            onValorChange = { cpf = it },
-            textStyle = textPadrao
-        )
-
-        CampoCadastrarCliente(
-            titulo = "Data de nascimento:",
-            valor = dataNasc,
-            onValorChange = { dataNasc = it },
-            textStyle = textPadrao
-        )
-
-        CampoCadastrarCliente(
-            titulo = "Telefone:",
-            valor = telefone,
-            onValorChange = { telefone = it },
-            textStyle = textPadrao
-        )
-
-        CampoCadastrarCliente(
-            titulo = "E-mail:",
-            valor = email,
-            onValorChange = { email = it },
-            textStyle = textPadrao
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // Reduzi o espaço antes dos botões
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
+        Column(
+            modifier = modifier
+                .fillMaxHeight(0.75f)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .background(Color(0xFF1B1B1B))
                 .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(
-                onClick = { navController.navigate("ClienteCadastro") },
+
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                    .fillMaxWidth()
+                    .padding(bottom = 30.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Salvar")
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Voltar",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable { navController.popBackStack() }
+                )
+                Text(
+                    text = "Cadastrar",
+                    style = textPadrao.copy(
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Spacer(modifier = Modifier.width(30.dp))
             }
 
-            Button(
-                onClick = { navController.popBackStack() },
+            CampoCadastrarCliente(
+                titulo = "Nome:",
+                valor = nome,
+                onValorChange = { nome = it },
+                textStyle = textPadrao
+            )
+
+            CampoCadastrarCliente(
+                titulo = "CPF:",
+                valor = cpf,
+                onValorChange = { cpf = it },
+                textStyle = textPadrao
+            )
+
+            CampoCadastrarCliente(
+                titulo = "Data de nascimento:",
+                valor = dataNasc,
+                onValorChange = { dataNasc = it },
+                textStyle = textPadrao
+            )
+
+            CampoCadastrarCliente(
+                titulo = "Telefone:",
+                valor = telefone,
+                onValorChange = { telefone = it },
+                textStyle = textPadrao
+            )
+
+            CampoCadastrarCliente(
+                titulo = "E-mail:",
+                valor = email,
+                onValorChange = { email = it },
+                textStyle = textPadrao
+            )
+
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
-                colors = ButtonDefaults.buttonColors(Color(0xFF252525))
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(text = "Cancelar")
+                Button(
+                    onClick = { navController.navigate("ClienteCadastro") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                ) {
+                    Text(text = "Salvar")
+                }
+
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
+                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
+                ) {
+                    Text(text = "Cancelar")
+                }
             }
         }
     }
