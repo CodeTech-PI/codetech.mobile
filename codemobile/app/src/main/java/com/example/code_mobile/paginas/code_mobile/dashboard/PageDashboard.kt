@@ -1,4 +1,4 @@
-package com.example.code_mobile.paginas.code_mobile
+package com.example.code_mobile.paginas.code_mobile.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
 
 data class MonthlyFinance(
     val month: String,
