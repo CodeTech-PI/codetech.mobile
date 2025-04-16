@@ -36,24 +36,44 @@ import com.example.code_mobile.paginas.code_mobile.service.ServiceEstoque
 import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.token.network.TokenManager
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response as RetrofitResponse
 
 @Composable
 fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
+
     var produtos by remember { mutableStateOf<List<ModelEstoque>>(emptyList()) }
     var pesquisa by remember { mutableStateOf("") }
     var showCadastroDialog by remember { mutableStateOf(false) }
     var showEdicaoDialog by remember { mutableStateOf(false) }
     var produtoParaEditar by remember { mutableStateOf<ModelEstoque?>(null) } // Estado para o produto a ser editado
 
-    // Função para adicionar um novo produto à lista
+    val serviceProduto = RetrofithAuth.retrofit.create(ServiceEstoque::class.java)
+
+    // Função para adicionar um novo produto à lista (localmente)
     val adicionarNovoProduto: (ModelEstoque) -> Unit = { novoProduto ->
         produtos = produtos + novoProduto
+        // TODO: Implementar a chamada para cadastrar o produto no backend
+        // serviceProduto.cadastrarProduto(novoProduto).enqueue(...)
+    }
+
+    // Função para atualizar um produto na lista (localmente)
+    val atualizarProduto: (ModelEstoque) -> Unit = { produtoAtualizado ->
+        produtos = produtos.map {
+            if (it.id == produtoAtualizado.id) {
+                produtoAtualizado
+            } else {
+                it
+            }
+        }
+        // TODO: Implementar a chamada para editar o produto no backend
+        // serviceProduto.editarProduto(produtoAtualizado.id, produtoAtualizado).enqueue(...)
     }
 
     LaunchedEffect(true) {
         println("TelaEstoque LaunchedEffect, token atual: ${TokenManager.token}")
         try {
-            val serviceProduto = RetrofithAuth.retrofit.create(ServiceEstoque::class.java)
             val response = serviceProduto.getProdutos()
 
             println("Entrou no try")
@@ -83,9 +103,9 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
 
     val produtosFiltrados = remember(produtos, pesquisa) {
         produtos.filter {
-            it.categoria?.contains(pesquisa, ignoreCase = true) ?: false ||
-                    it.nome?.contains(pesquisa, ignoreCase = true) ?: false ||
-                    it.descricao?.contains(pesquisa, ignoreCase = true) ?: false
+            it.categoria.contains(pesquisa, ignoreCase = true) || // Usando a categoria mockada
+                    it.nome.contains(pesquisa, ignoreCase = true) ||
+                    it.descricao.contains(pesquisa, ignoreCase = true)
         }
     }
 
@@ -143,7 +163,7 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
                         .padding(horizontal = 30.dp)
                 ) {
                     Text(
-                        text = produto.nome ?: "",
+                        text = produto.nome,
                         style = textPadrao.copy(fontSize = 16.sp),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
@@ -151,13 +171,14 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
                     )
 
                     card4Informacoes(
-                        coluna1Info1 = "Categoria: ${produto.categoria ?: ""}",
-                        coluna1Info2 = "Descrição: ${produto.descricao ?: ""}",
-                        coluna2Info1 = "Unidade: ${produto.unidadeMedida ?: ""}",
-                        coluna2Info2 = "Quantidade: ${produto.quantidade ?: ""}",
+                        coluna1Info1 = "Categoria: ${produto.categoria}", // Usando a categoria mockada
+                        coluna1Info2 = "Descrição: ${produto.descricao}",
+                        coluna2Info1 = "Unidade: ${produto.unidadeMedida}",
+                        coluna2Info2 = "Quantidade: ${produto.quantidade}",
                         onEditClick = {
                             println("Editar produto: ${produto.nome}")
-                            produtoParaEditar = produto // Atribui o produto clicado à variável de estado
+                            produtoParaEditar =
+                                produto // Atribui o produto clicado à variável de estado
                             showEdicaoDialog = true
                         }
                     )
@@ -171,14 +192,20 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
     }
 
     if (showEdicaoDialog) {
-        // Agora passamos o produtoParaEditar para o ModalEdicaoProduto
         produtoParaEditar?.let {
-            ModalEdicaoProduto(produto = it, onDismiss = { showEdicaoDialog = false })
+            ModalEdicaoProduto(
+                produto = it,
+                onDismiss = { showEdicaoDialog = false },
+                onProdutoEditado = atualizarProduto // Passa a função para atualizar
+            )
         }
     }
 
     if (showCadastroDialog) {
-        NovoProdutoDialog(onDismiss = { showCadastroDialog = false }, onProdutoCadastrado = adicionarNovoProduto)
+        NovoProdutoDialog(
+            onDismiss = { showCadastroDialog = false },
+            onProdutoCadastrado = adicionarNovoProduto // Passa a função para adicionar
+        )
     }
 }
 
@@ -198,12 +225,11 @@ fun CampoTexto(label: String, valor: String, onValorChange: (String) -> Unit) {
 
 @Composable
 fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque) -> Unit) {
-    var categoriaSelecionada by remember { mutableStateOf("Selecione") }
-    val categorias = listOf("Tinta", "Papel", "Agulha", "Outro")
-    var expanded by remember { mutableStateOf(false) }
+    var categoriaSelecionada by remember { mutableStateOf("Teste") } // Mocado
+    // val categorias = listOf("Tinta", "Papel", "Agulha", "Outro") // Removido, pois está mockado
+    // var expanded by remember { mutableStateOf(false) } // Removido, pois está mockado
 
     // Estados para os campos de texto
-    var id by remember { mutableStateOf("") }
     var nomeProduto by remember { mutableStateOf("") }
     var descricaoProduto by remember { mutableStateOf("") }
     var unidadeMedidaProduto by remember { mutableStateOf("") }
@@ -222,26 +248,17 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
                 Text(text = "Cadastrar.", color = Color.White, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Campo de categoria mockado
                 Text(text = "Categoria:", color = Color.White)
-                Box {
-                    Button(
-                        onClick = { expanded = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(Color.DarkGray)
-                    ) {
-                        Text(text = categoriaSelecionada, color = Color.White)
-                    }
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        categorias.forEach { categoria ->
-                            DropdownMenuItem(text = { Text(categoria) }, onClick = {
-                                categoriaSelecionada = categoria
-                                expanded = false
-                            })
-                        }
-                    }
-                }
-
+                OutlinedTextField(
+                    value = categoriaSelecionada,
+                    onValueChange = { categoriaSelecionada = it },
+                    label = { Text("Categoria (Mocado)") },
+                    textStyle = TextStyle(color = Color.White),
+                    enabled = false // Desabilita a edição, pois está mockado
+                )
                 Spacer(modifier = Modifier.height(10.dp))
+
                 OutlinedTextField(
                     value = nomeProduto,
                     onValueChange = { nomeProduto = it },
@@ -276,21 +293,26 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(onClick = { onDismiss() }, colors = ButtonDefaults.buttonColors(Color.Gray)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = { onDismiss() },
+                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                    ) {
                         Text("Cancelar")
                     }
                     Button(
                         onClick = {
                             val novoProduto = ModelEstoque(
-                                categoria = categoriaSelecionada,
+                                categoria = categoriaSelecionada, // Usando o valor mockado
                                 nome = nomeProduto,
                                 descricao = descricaoProduto,
                                 unidadeMedida = unidadeMedidaProduto,
                                 quantidade = quantidadeProduto.toIntOrNull() ?: 0,
                                 preco = precoProduto.toDoubleOrNull() ?: 0.0,
-                                id = id.toIntOrNull() ?: 0,
-                                // Adicione outros campos do seu ModelEstoque aqui, se houver
+                                id = 0 // O ID será gerado pelo backend
                             )
                             onProdutoCadastrado(novoProduto)
                             onDismiss()
@@ -306,13 +328,17 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
 }
 
 @Composable
-fun ModalEdicaoProduto(produto: ModelEstoque, onDismiss: () -> Unit) {
-    var categoria by remember { mutableStateOf(produto.categoria ?: "") }
-    var nome by remember { mutableStateOf(produto.nome ?: "") }
-    var descricao by remember { mutableStateOf(produto.descricao ?: "") }
-    var unidade by remember { mutableStateOf(produto.unidadeMedida ?: "") }
-    var quantidade by remember { mutableStateOf(produto.quantidade?.toString() ?: "") }
-    var preco by remember { mutableStateOf(produto.preco?.toString() ?: "") }
+fun ModalEdicaoProduto(
+    produto: ModelEstoque,
+    onDismiss: () -> Unit,
+    onProdutoEditado: (ModelEstoque) -> Unit
+) {
+    var categoria by remember { mutableStateOf(produto.categoria) } // Usando o valor mockado
+    var nome by remember { mutableStateOf(produto.nome) }
+    var descricao by remember { mutableStateOf(produto.descricao) }
+    var unidade by remember { mutableStateOf(produto.unidadeMedida) }
+    var quantidade by remember { mutableStateOf(produto.quantidade.toString()) }
+    var preco by remember { mutableStateOf(produto.preco.toString()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -331,7 +357,10 @@ fun ModalEdicaoProduto(produto: ModelEstoque, onDismiss: () -> Unit) {
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                CampoTexto("Categoria", categoria, { categoria = it })
+                // Campo de categoria mockado
+                CampoTexto(label = "Categoria (Mocado)", valor = categoria, onValorChange = {
+                    categoria = it
+                })
                 CampoTexto("Produto", nome, { nome = it })
                 CampoTexto("Descrição", descricao, { descricao = it })
                 CampoTexto("Unidade Medida", unidade, { unidade = it })
@@ -342,22 +371,17 @@ fun ModalEdicaoProduto(produto: ModelEstoque, onDismiss: () -> Unit) {
         confirmButton = {
             Button(
                 onClick = {
-                    // Aqui você implementaria a lógica para salvar as edições
                     val produtoEditado = ModelEstoque(
-                        id = produto.id, // Mantém o ID do produto original
-                        categoria = categoria,
+                        id = produto.id,
+                        categoria = categoria, // Usando o valor mockado
                         nome = nome,
                         descricao = descricao,
                         unidadeMedida = unidade,
                         quantidade = quantidade.toIntOrNull() ?: 0,
-                        preco = preco.toDoubleOrNull() ?: 0.0,
-
-                        // Adicione outros campos conforme necessário
+                        preco = preco.toDoubleOrNull() ?: 0.0
                     )
-                    println("Produto editado: $produtoEditado")
+                    onProdutoEditado(produtoEditado)
                     onDismiss()
-                    // TODO: Implementar a chamada para atualizar o produto na sua lista 'produtos'
-                    // e possivelmente na API.
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
             ) {
@@ -374,10 +398,6 @@ fun ModalEdicaoProduto(produto: ModelEstoque, onDismiss: () -> Unit) {
         }
     )
 }
-
-// Remova a declaração de Produto e produto2, pois ModalEdicaoProduto agora usa ModelEstoque diretamente.
-// data class Produto(...)
-// val produto2 = Produto(...)
 
 @Preview(
     showBackground = true,
