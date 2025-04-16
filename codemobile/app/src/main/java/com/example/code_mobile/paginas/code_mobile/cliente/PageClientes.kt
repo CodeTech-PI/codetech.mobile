@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
 import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
-import com.example.code_mobile.paginas.code_mobile.componente.textPadrao
+import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.token.network.TokenManager
 import com.example.code_mobile.ui.theme.CodemobileTheme

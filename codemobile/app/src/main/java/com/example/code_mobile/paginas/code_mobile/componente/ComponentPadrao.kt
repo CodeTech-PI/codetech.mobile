@@ -60,7 +60,8 @@ fun CampoLogin(
     titulo: String,
     valor: String,
     onValorChange: (String) -> Unit,
-    textStyle: TextStyle
+    textStyle: TextStyle,
+    modifier: Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.Start // Alinha para esquerda

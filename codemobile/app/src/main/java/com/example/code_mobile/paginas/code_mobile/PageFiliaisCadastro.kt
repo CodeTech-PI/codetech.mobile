@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.componente.CampoFilial
-import com.example.code_mobile.paginas.code_mobile.componente.CampoFilialStatus
+import com.example.code_mobile.paginas.code_mobile.CampoFilial
+import com.example.code_mobile.paginas.code_mobile.CampoFilialStatus
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable

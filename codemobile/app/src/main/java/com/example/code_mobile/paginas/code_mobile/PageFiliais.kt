@@ -28,10 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.componente.ConfirmDeleteDialog
-import com.example.code_mobile.paginas.code_mobile.componente.Input
-import com.example.code_mobile.paginas.code_mobile.componente.cardFilial
-import com.example.code_mobile.paginas.code_mobile.componente.textPadrao
+import com.example.code_mobile.paginas.code_mobile.ConfirmDeleteDialog
+import com.example.code_mobile.paginas.code_mobile.Input
+import com.example.code_mobile.paginas.code_mobile.cardFilial
+import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
