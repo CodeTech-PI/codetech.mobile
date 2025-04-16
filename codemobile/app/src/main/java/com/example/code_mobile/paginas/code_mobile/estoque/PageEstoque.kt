@@ -31,8 +31,8 @@ import com.example.code_mobile.paginas.code_mobile.Input
 import com.example.code_mobile.paginas.code_mobile.card4Informacoes
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
-//import com.example.code_mobile.paginas.code_mobile.model.ModelEstoque
-//import com.example.code_mobile.paginas.code_mobile.service.ServiceEstoque
+import com.example.code_mobile.paginas.code_mobile.model.ModelEstoque
+import com.example.code_mobile.paginas.code_mobile.service.ServiceEstoque
 import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.token.network.TokenManager
 import com.example.code_mobile.ui.theme.CodemobileTheme
