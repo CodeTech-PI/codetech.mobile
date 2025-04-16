@@ -305,8 +305,7 @@ fun ExcluirClienteDialog(
 @Composable
 fun GreetingPreviewClientes() {
     CodemobileTheme {
-        // Inicialize o navController aqui
         val navController = rememberNavController()
-        TelaClientes(navController)  // Passe o navController para TelaLogin
+        TelaClientes(navController)
     }
 }
