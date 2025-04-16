@@ -18,7 +18,7 @@ import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
-import com.example.code_mobile.paginas.code_mobile.TelaEstoque
+import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -42,7 +42,7 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
 
-    NavHost(navController = navController, startDestination = "Categoria") {
+    NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }
         composable("Clientes") { TelaClientes(navController) }
         composable("Estoque") { TelaEstoque(navController) }
