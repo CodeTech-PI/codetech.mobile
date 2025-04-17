@@ -1,6 +1,5 @@
 package com.example.code_mobile.paginas.code_mobile.cliente
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.cliente.CampoCadastrarCliente
+import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
 import kotlinx.coroutines.delay
 
@@ -68,14 +69,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
     var emailError by remember { mutableStateOf<String?>(null) }
     var cadastroSucesso by remember { mutableStateOf(false) }
 
-
     val scrollState = rememberScrollState()
-
-    val textPadrao = TextStyle(
-        fontSize = 20.sp,
-        color = Color.White,
-        fontStyle = FontStyle.Normal
-    )
 
     var showCancelDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
@@ -86,6 +80,57 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             showSuccessDialog = false
             navController.navigate("Clientes")
         }
+    }
+
+    fun validarCampos(): Boolean {
+        var isValid = true
+        if (nome.isEmpty()) {
+            nomeError = "O nome é obrigatório."
+            isValid = false
+        } else {
+            nomeError = null
+        }
+
+        if (cpf.isEmpty()) {
+            cpfError = "O CPF é obrigatório."
+            isValid = false
+        } else if (cpf.length != 11) { // Validação simples do tamanho do CPF
+            cpfError = "CPF inválido."
+            isValid = false
+        } else {
+            cpfError = null
+        }
+
+        if (dataNasc.isEmpty()) {
+            dataNascError = "A data de nascimento é obrigatória."
+            isValid = false
+        } else {
+            dataNascError = null
+        }
+
+        if (telefone.isEmpty()) {
+            telefoneError = "O telefone é obrigatório."
+            isValid = false
+        } else if (telefone.length < 8) { // Validação simples do tamanho do telefone
+            telefoneError = "Telefone inválido."
+            isValid = false
+        } else {
+            telefoneError = null
+        }
+
+        if (email.isEmpty()) {
+            emailError = "O e-mail é obrigatório."
+            isValid = false
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email)
+                .matches()
+        ) { // Validação simples de e-mail
+            emailError = "E-mail inválido."
+            isValid = false
+        } else {
+            emailError = null
+        }
+
+        return isValid
     }
 
     Box(
@@ -109,7 +154,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 30.dp),
+                    .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
@@ -136,50 +181,56 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "Nome:",
                 valor = nome,
-                onValorChange = { nome = it },
+                onValorChange = { nome = it; nomeError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: Letícia Lombardi",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
-
-                )
+                errorMessage = nomeError
+            )
 
             CampoCadastrarCliente(
                 titulo = "CPF:",
                 valor = cpf,
-                onValorChange = { cpf = it },
+                onValorChange = { cpf = it; cpfError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 890.623.227-08",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp)
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = cpfError
             )
 
             CampoCadastrarCliente(
                 titulo = "Data de nascimento:",
                 valor = dataNasc,
-                onValorChange = { dataNasc = it },
+                onValorChange = { dataNasc = it; dataNascError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 1999-08-22",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp)
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = dataNascError
             )
 
             CampoCadastrarCliente(
                 titulo = "Telefone:",
                 valor = telefone,
-                onValorChange = { telefone = it },
+                onValorChange = { telefone = it; telefoneError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 11957567821",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp)
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = telefoneError
             )
 
             CampoCadastrarCliente(
                 titulo = "E-mail:",
                 valor = email,
-                onValorChange = { email = it },
+                onValorChange = { email = it; emailError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: leticia@lombardi.com",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp)
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = emailError
             )
 
             Spacer(modifier = Modifier.height(15.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier
@@ -189,8 +240,10 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             ) {
                 Button(
                     onClick = {
-                        // Lógica para salvar o cliente aqui
-                        showSuccessDialog = true
+                        if (validarCampos()) {
+                            // Lógica para salvar o cliente AQUI
+                            showSuccessDialog = true
+                        }
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -252,7 +305,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         // Popup de sucesso ao cadastrar
         if (showSuccessDialog) {
             Dialog(
-                onDismissRequest = { /* Não permitir fechar clicando fora */ }
+                onDismissRequest = { }
             ) {
                 Box(
                     modifier = Modifier
@@ -287,7 +340,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                                 showSuccessDialog = false
                                 navController.navigate("Clientes")
                             },
-                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
                         ) {
                             Text("OK", color = Color.White)
                         }

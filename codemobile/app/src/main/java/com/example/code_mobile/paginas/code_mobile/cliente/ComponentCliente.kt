@@ -26,6 +26,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -192,40 +193,27 @@ fun CampoCadastrarCliente(
     valor: String,
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
-    placeholderText: String = "",
-    tituloStyle: TextStyle = TextStyle(),
+    placeholderText: String,
+    tituloStyle: TextStyle,
+    errorMessage: String? = null
 ) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        modifier = Modifier.fillMaxWidth(0.9f)
-    ) {
-        Text(text = titulo, style = tituloStyle) // Usando o estilo do título
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-
-        // Input
-        TextField(
+    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+        Text(titulo, style = tituloStyle)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
             value = valor,
             onValueChange = onValorChange,
-            placeholder = { Text(placeholderText, style = textStyle.copy(fontSize = 14.sp, color = Color.LightGray.copy(alpha = 0.5f))) }, // Estilo do placeholder menor
-            textStyle = textStyle.copy(fontSize = 14.sp), // Texto digitado menor
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            singleLine = true,
-            shape = RoundedCornerShape(15.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF252525), // Cor de fundo quando focado (cinza)
-                unfocusedContainerColor = Color(0xFF252525), // Cor de fundo quando desfocado (cinza)
-                cursorColor = Color.White,
-                focusedTextColor = Color.White, // Cor do texto digitado quando focado (branco)
-                unfocusedTextColor = Color.White, // Cor do texto digitado quando desfocado (branco)
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent
-            )
+            textStyle = textStyle,
+            placeholder = { Text(placeholderText, style = textStyle.copy(color = Color.Gray)) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
         )
+        if (!errorMessage.isNullOrEmpty()) {
+            Text(
+                text = errorMessage,
+                color = Color(0xFFDF0050),
+                fontSize = 12.sp
+            )
+        }
     }
 }
