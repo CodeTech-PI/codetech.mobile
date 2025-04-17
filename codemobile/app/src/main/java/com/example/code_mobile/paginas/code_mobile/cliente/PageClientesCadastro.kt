@@ -20,17 +20,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -40,10 +46,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.cliente.CampoCadastrarCliente
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
@@ -53,6 +61,14 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
     var telefone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
 
+    var nomeError by remember { mutableStateOf<String?>(null) }
+    var cpfError by remember { mutableStateOf<String?>(null) }
+    var dataNascError by remember { mutableStateOf<String?>(null) }
+    var telefoneError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var cadastroSucesso by remember { mutableStateOf(false) }
+
+
     val scrollState = rememberScrollState()
 
     val textPadrao = TextStyle(
@@ -60,6 +76,18 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         color = Color.White,
         fontStyle = FontStyle.Normal
     )
+
+    var showCancelDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showSuccessDialog) {
+        if (showSuccessDialog) {
+            delay(3000)
+            showSuccessDialog = false
+            navController.navigate("Clientes")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -73,13 +101,10 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
-//                .background(Color.Red)
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-
-//            Spacer(modifier = Modifier.height(30.dp))
 
             Row(
                 modifier = Modifier
@@ -116,7 +141,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 placeholderText = "Ex: Letícia Lombardi",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
 
-            )
+                )
 
             CampoCadastrarCliente(
                 titulo = "CPF:",
@@ -163,25 +188,110 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { navController.navigate("ClienteCadastro") },
+                    onClick = {
+                        // Lógica para salvar o cliente aqui
+                        showSuccessDialog = true
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
-                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
                 ) {
                     Text(text = "Salvar")
                 }
 
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = { showCancelDialog = true },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
-                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF252525))
                 ) {
                     Text(text = "Cancelar")
+                }
+            }
+        }
+
+        // Popup de confirmação de cancelamento
+        if (showCancelDialog) {
+            AlertDialog(
+                onDismissRequest = { showCancelDialog = false },
+                title = { Text("Confirmar Cancelamento", color = Color.White) },
+                text = { Text("Deseja mesmo abandonar as alterações?", color = Color.White) },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                showCancelDialog = false
+                                navController.navigate("Clientes")
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Sim", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White)
+                        }
+                    }
+                },
+                containerColor = Color(0xFF2B2B2B)
+            )
+        }
+
+        // Popup de sucesso ao cadastrar
+        if (showSuccessDialog) {
+            Dialog(
+                onDismissRequest = { /* Não permitir fechar clicando fora */ }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF2B2B2B))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Sucesso",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Text(
+                            "Cliente cadastrado com sucesso!",
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Redirecionando...",
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                        Button(
+                            onClick = {
+                                showSuccessDialog = false
+                                navController.navigate("Clientes")
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                        ) {
+                            Text("OK", color = Color.White)
+                        }
+                    }
                 }
             }
         }
