@@ -1,5 +1,6 @@
 package com.example.code_mobile.paginas.code_mobile.cliente
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,21 +69,24 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         Column(
             modifier = modifier
-                .fillMaxHeight(0.75f)
+                .fillMaxHeight(0.90f)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
+//                .background(Color.Red)
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
+
+//            Spacer(modifier = Modifier.height(30.dp))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 30.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
@@ -89,14 +94,16 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     tint = Color.White,
                     modifier = Modifier
                         .size(30.dp)
-                        .clickable { navController.popBackStack() }
+                        .clickable { navController.navigate("Clientes") }
                 )
                 Text(
                     text = "Cadastrar",
-                    style = textPadrao.copy(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = textPadrao,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(10.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(30.dp))
             }
@@ -105,36 +112,49 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 titulo = "Nome:",
                 valor = nome,
                 onValorChange = { nome = it },
-                textStyle = textPadrao
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: Letícia Lombardi",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+
             )
 
             CampoCadastrarCliente(
                 titulo = "CPF:",
                 valor = cpf,
                 onValorChange = { cpf = it },
-                textStyle = textPadrao
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: 890.623.227-08",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp)
             )
 
             CampoCadastrarCliente(
                 titulo = "Data de nascimento:",
                 valor = dataNasc,
                 onValorChange = { dataNasc = it },
-                textStyle = textPadrao
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: 1999-08-22",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp)
             )
 
             CampoCadastrarCliente(
                 titulo = "Telefone:",
                 valor = telefone,
                 onValorChange = { telefone = it },
-                textStyle = textPadrao
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: 11957567821",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp)
             )
 
             CampoCadastrarCliente(
                 titulo = "E-mail:",
                 valor = email,
                 onValorChange = { email = it },
-                textStyle = textPadrao
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: leticia@lombardi.com",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp)
             )
+
+            Spacer(modifier = Modifier.height(15.dp))
 
             Row(
                 modifier = Modifier

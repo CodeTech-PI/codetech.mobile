@@ -192,22 +192,24 @@ fun CampoCadastrarCliente(
     valor: String,
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
-    placeholderText: String = ""
+    placeholderText: String = "",
+    tituloStyle: TextStyle = TextStyle(),
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier.fillMaxWidth(0.9f)
     ) {
-        Text(text = titulo, style = textStyle)
+        Text(text = titulo, style = tituloStyle) // Usando o estilo do título
 
         Spacer(modifier = Modifier.height(10.dp))
+
 
         // Input
         TextField(
             value = valor,
             onValueChange = onValorChange,
-            placeholder = { Text(placeholderText) },
-            textStyle = textStyle.copy(fontSize = 16.sp, color = Color.White),
+            placeholder = { Text(placeholderText, style = textStyle.copy(fontSize = 14.sp, color = Color.LightGray.copy(alpha = 0.5f))) }, // Estilo do placeholder menor
+            textStyle = textStyle.copy(fontSize = 14.sp), // Texto digitado menor
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -227,9 +229,3 @@ fun CampoCadastrarCliente(
         )
     }
 }
-
-val textPadrao = TextStyle(
-    fontSize = 20.sp,
-    color = Color.White,
-    fontStyle = FontStyle.Normal
-)
