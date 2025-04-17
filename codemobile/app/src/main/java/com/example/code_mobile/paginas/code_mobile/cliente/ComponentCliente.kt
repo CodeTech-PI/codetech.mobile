@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -195,18 +196,28 @@ fun CampoCadastrarCliente(
     textStyle: TextStyle,
     placeholderText: String,
     tituloStyle: TextStyle,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default // Adicione isso
 ) {
     Column(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(titulo, style = tituloStyle)
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = valor,
-            onValueChange = onValorChange,
-            textStyle = textStyle,
-            placeholder = { Text(placeholderText, style = textStyle.copy(color = Color.Gray)) },
+            onValueChange = { newValor ->
+                // Aplicar máscara de CPF se o título for "CPF:"
+                val formattedValue = if (titulo == "CPF:") {
+                    formatarCpf(newValor)
+                } else {
+                    newValor
+                }
+                onValorChange(formattedValue)
+            },
+            textStyle = textStyle.copy(color = Color.White),
+            placeholder = { Text(placeholderText, style = textStyle.copy(fontSize = 14.sp, color = Color.LightGray.copy(alpha = 0.5f))) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
+            keyboardOptions = keyboardOptions
         )
         if (!errorMessage.isNullOrEmpty()) {
             Text(
@@ -216,4 +227,18 @@ fun CampoCadastrarCliente(
             )
         }
     }
+}
+
+fun formatarCpf(cpf: String): String {
+    val digitsOnly = cpf.filter { it.isDigit() }
+    val formattedCpf = StringBuilder()
+    digitsOnly.forEachIndexed { index, char ->
+        formattedCpf.append(char)
+        if (index == 2 || index == 5) {
+            formattedCpf.append('.')
+        } else if (index == 8) {
+            formattedCpf.append('-')
+        }
+    }
+    return formattedCpf.toString()
 }

@@ -175,7 +175,6 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         }
 
         if (showDialog && clienteParaExcluir != null) {
-
             ExcluirClienteDialog(
                 cliente = clienteParaExcluir!!,
                 onDismiss = { showDialog = false },
@@ -184,32 +183,40 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
 
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            val response = serviceCliente.deletarUsuario(clienteExcluir.id)
-                            if (response.isSuccessful) {
-                                println("Cliente com ID ${clienteExcluir.id} excluído com sucesso.")
+                            if (clienteExcluir.id != null) {
+                                val response = serviceCliente.deletarUsuario(clienteExcluir.id)
+                                if (response.isSuccessful) {
+                                    println("Cliente com ID ${clienteExcluir.id} excluído com sucesso.")
 
-                                val responseAtualizado = serviceCliente.getUsuarios()
-                                if (responseAtualizado.isSuccessful) {
-                                    withContext(Dispatchers.Main) {
-                                        clientes = responseAtualizado.body() ?: emptyList()
+                                    val responseAtualizado = serviceCliente.getUsuarios()
+                                    if (responseAtualizado.isSuccessful) {
+                                        withContext(Dispatchers.Main) {
+                                            clientes = responseAtualizado.body() ?: emptyList()
+                                        }
+                                    } else {
+                                        println(
+                                            "Erro ao recarregar clientes após exclusão: ${responseAtualizado.code()} - ${
+                                                responseAtualizado.errorBody()?.string()
+                                            }"
+                                        )
                                     }
                                 } else {
-                                    println(
-                                        "Erro ao recarregar clientes após exclusão: ${responseAtualizado.code()} - ${
-                                            responseAtualizado.errorBody()?.string()
-                                        }"
-                                    )
+                                    val errorBodyExclusao = response.errorBody()?.string()
+                                    val errorCodeExclusao = response.code()
+                                    println("Erro ao excluir cliente ${clienteExcluir.id} (Código: $errorCodeExclusao): $errorBodyExclusao")
+                                    val mensagemErro = when (errorCodeExclusao) {
+                                        404 -> "Cliente não encontrado."
+                                        else -> "Erro ao excluir o cliente. Tente novamente."
+                                    }
+                                    println("Mensagem de erro para o usuário: $mensagemErro")
                                 }
                             } else {
-                                val errorBodyExclusao = response.errorBody()?.string()
-                                val errorCodeExclusao = response.code()
-                                println("Erro ao excluir cliente ${clienteExcluir.id} (Código: $errorCodeExclusao): $errorBodyExclusao")
-                                val mensagemErro = when (errorCodeExclusao) {
-                                    404 -> "Cliente não encontrado."
-                                    else -> "Erro ao excluir o cliente. Tente novamente."
+                                println("Erro: ID do cliente é nulo. Não é possível excluir.")
+                                withContext(Dispatchers.Main) {
+                                    showDialog = false
                                 }
-                                println("Mensagem de erro para o usuário: $mensagemErro")
                             }
+
                         } catch (e: Exception) {
                             println("Erro na requisição de exclusão: ${e.message}")
                             e.printStackTrace()
@@ -229,83 +236,82 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 
-
-@Composable
-fun ExcluirClienteDialog(
-    cliente: ModelCliente,
-    onDismiss: () -> Unit,
-    onConfirmExcluir: (ModelCliente) -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF252525),
-        shape = RoundedCornerShape(1.dp),
-        modifier = Modifier
-            .border(0.5.dp, Color(0xFFDF0050), RoundedCornerShape(2.dp))
-            .clip(RoundedCornerShape(2.dp)),
-        title = {
-            Text(
-                "Excluir Cliente?",
-                style = textPadrao,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        text = {
-            Text(
-                "Nome: \n${cliente.nome}\nCPF: ${cliente.cpf}",
-                style = textPadrao.copy(fontSize = 18.sp, color = Color.White),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        confirmButton = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = { onConfirmExcluir(cliente); onDismiss() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDF0050),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
+    @Composable
+    fun ExcluirClienteDialog(
+        cliente: ModelCliente,
+        onDismiss: () -> Unit,
+        onConfirmExcluir: (ModelCliente) -> Unit
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            containerColor = Color(0xFF252525),
+            shape = RoundedCornerShape(1.dp),
+            modifier = Modifier
+                .border(0.5.dp, Color(0xFFDF0050), RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(2.dp)),
+            title = {
+                Text(
+                    "Excluir Cliente?",
+                    style = textPadrao,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Text(
+                    "Nome: \n${cliente.nome}\nCPF: ${cliente.cpf}",
+                    style = textPadrao.copy(fontSize = 18.sp, color = Color.White),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("Excluir")
+                    Button(
+                        onClick = { onConfirmExcluir(cliente); onDismiss() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFDF0050),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Excluir")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF555555),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(4.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancelar")
+                    }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF555555),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Cancelar")
-                }
-            }
-        },
-        dismissButton = { }
-    )
-}
-
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = Devices.PIXEL_2
-)
-
-@Composable
-fun GreetingPreviewClientes() {
-    CodemobileTheme {
-        val navController = rememberNavController()
-        TelaClientes(navController)
+            },
+            dismissButton = { }
+        )
     }
-}
+
+
+    @Preview(
+        showBackground = true,
+        showSystemUi = true,
+        device = Devices.PIXEL_2
+    )
+
+    @Composable
+    fun GreetingPreviewClientes() {
+        CodemobileTheme {
+            val navController = rememberNavController()
+            TelaClientes(navController)
+        }
+    }

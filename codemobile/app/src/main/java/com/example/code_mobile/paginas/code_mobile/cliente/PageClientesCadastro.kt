@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -34,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,9 +53,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
+import com.example.code_mobile.paginas.code_mobile.service.ServiceCliente
 import com.example.code_mobile.paginas.code_mobile.textPadrao
+import com.example.code_mobile.token.network.RetrofithAuth
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 @Composable
 fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
@@ -71,8 +81,12 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
 
     val scrollState = rememberScrollState()
 
+    val coroutineScope = rememberCoroutineScope()
     var showCancelDialog by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) } // Para indicar carregamento
+    var mensagemErroBackend by remember { mutableStateOf<String?>(null) }
+
 
     LaunchedEffect(showSuccessDialog) {
         if (showSuccessDialog) {
@@ -94,8 +108,9 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         if (cpf.isEmpty()) {
             cpfError = "O CPF é obrigatório."
             isValid = false
-        } else if (cpf.length != 11) { // Validação simples do tamanho do CPF
+        } else if (cpf.filter { it.isDigit() }.length != 11) { // Validação correta do tamanho
             cpfError = "CPF inválido."
+            println("CPF inválido: $cpf")
             isValid = false
         } else {
             cpfError = null
@@ -132,6 +147,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         return isValid
     }
+
 
     Box(
         modifier = Modifier
@@ -191,11 +207,15 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "CPF:",
                 valor = cpf,
-                onValorChange = { cpf = it; cpfError = null },
+                onValorChange = { newCpf ->
+                    cpf = formatarCpf(newCpf)
+                    cpfError = null
+                },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 890.623.227-08",
+                placeholderText = "Ex: 89062322708",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
-                errorMessage = cpfError
+                errorMessage = cpfError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
             CampoCadastrarCliente(
@@ -228,7 +248,6 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 errorMessage = emailError
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -241,8 +260,55 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 Button(
                     onClick = {
                         if (validarCampos()) {
-                            // Lógica para salvar o cliente AQUI
-                            showSuccessDialog = true
+                            coroutineScope.launch {
+                                showLoadingDialog = true
+                                mensagemErroBackend = null
+                                try {
+
+                                    val novoCliente = ModelCliente(
+                                        id = null,
+                                        nome = nome,
+                                        cpf = cpf,
+                                        dataNascimento = dataNasc,
+                                        telefone = telefone,
+                                        email = email
+                                    )
+
+                                    println("Dados do novoCliente antes do envio:")
+                                    println("Nome: ${novoCliente.nome}")
+                                    println("CPF: ${novoCliente.cpf}")
+                                    println("Data de Nascimento: ${novoCliente.dataNascimento}")
+                                    println("Telefone: ${novoCliente.telefone}")
+                                    println("Email: ${novoCliente.email}")
+                                    println("------------------------------------")
+
+
+                                    // Chamar o serviço Retrofit para enviar os dados
+                                    val response = withContext(Dispatchers.IO) {
+                                        RetrofithAuth.retrofit.create(ServiceCliente::class.java).postUsuario(novoCliente)
+                                    }
+
+                                    if (response.isSuccessful) {
+                                        cadastroSucesso = true
+                                        nome = ""
+                                        cpf = ""
+                                        dataNasc = ""
+                                        telefone = ""
+                                        email = ""
+                                        showSuccessDialog = true
+
+                                    } else {
+                                        mensagemErroBackend =
+                                            "Erro ao cadastrar: ${response.code()} - ${response.message()}"
+                                    }
+                                } catch (e: IOException) {
+                                    mensagemErroBackend = "Erro de conexão: ${e.message}"
+                                } catch (e: Exception) {
+                                    mensagemErroBackend = "Erro inesperado: ${e.message}"
+                                } finally {
+                                    showLoadingDialog = false
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
@@ -309,6 +375,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             ) {
                 Box(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFF2B2B2B))
                         .padding(16.dp),
@@ -340,7 +407,8 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                                 showSuccessDialog = false
                                 navController.navigate("Clientes")
                             },
-                            colors = ButtonDefaults.buttonColors(Color(0xFF4CAF50))
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("OK", color = Color.White)
                         }
