@@ -1,12 +1,13 @@
 package com.example.code_mobile.token.network
 
 /* Biblioteca para realizar requisições HTTP */
+import com.example.code_mobile.paginas.code_mobile.service.ServiceDashboard
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofithAuth {
-    private const val BASE_URL = "http://192.168.219.208:8080/"
+    private const val BASE_URL = "http://192.168.15.11:8080/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor())
@@ -18,6 +19,9 @@ object RetrofithAuth {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+    val dashboardService: ServiceDashboard by lazy {
+        retrofit.create(ServiceDashboard::class.java)
     }
 }
 
