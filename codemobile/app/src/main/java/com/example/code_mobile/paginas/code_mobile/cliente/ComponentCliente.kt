@@ -47,9 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.componente.inputPadrao
+import com.example.code_mobile.paginas.code_mobile.inputPadrao
 import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
-import com.example.code_mobile.paginas.code_mobile.componente.textPadrao
+import com.example.code_mobile.paginas.code_mobile.textPadrao
 
 @Composable
 fun cardCliente(

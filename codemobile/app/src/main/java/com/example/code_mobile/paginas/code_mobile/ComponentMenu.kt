@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.componente.textPadrao
+import com.example.code_mobile.paginas.code_mobile.textPadrao
 
 @Composable
 fun menuComTituloPage(nomeTela: String, navController: NavController) {
