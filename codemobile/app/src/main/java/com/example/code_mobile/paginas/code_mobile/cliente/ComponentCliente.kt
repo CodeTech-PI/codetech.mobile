@@ -41,9 +41,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +58,43 @@ import com.example.code_mobile.R
 import com.example.code_mobile.paginas.code_mobile.inputPadrao
 import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
 import com.example.code_mobile.paginas.code_mobile.textPadrao
+
+class CpfVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val digits = text.text.filter { it.isDigit() }.take(11)
+        val formatted = buildString {
+            for (i in digits.indices) {
+                append(digits[i])
+                if (i == 2 || i == 5) append('.')
+                else if (i == 8) append('-')
+            }
+        }
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                return when {
+                    offset <= 3 -> offset
+                    offset <= 6 -> offset + 1
+                    offset <= 9 -> offset + 2
+                    offset <= 11 -> offset + 3
+                    else -> 14
+                }
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                return when {
+                    offset <= 3 -> offset
+                    offset <= 7 -> offset - 1
+                    offset <= 11 -> offset - 2
+                    offset <= 14 -> offset - 3
+                    else -> 11
+                }
+            }
+        }
+
+        return TransformedText(AnnotatedString(formatted), offsetMapping)
+    }
+}
 
 @Composable
 fun cardCliente(
@@ -197,27 +240,21 @@ fun CampoCadastrarCliente(
     placeholderText: String,
     tituloStyle: TextStyle,
     errorMessage: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default // Adicione isso
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.None), // Correção aqui
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     Column(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(titulo, style = tituloStyle)
         Spacer(modifier = Modifier.height(4.dp))
         OutlinedTextField(
             value = valor,
-            onValueChange = { newValor ->
-                // Aplicar máscara de CPF se o título for "CPF:"
-                val formattedValue = if (titulo == "CPF:") {
-                    formatarCpf(newValor)
-                } else {
-                    newValor
-                }
-                onValorChange(formattedValue)
-            },
+            onValueChange = onValorChange,
             textStyle = textStyle.copy(color = Color.White),
             placeholder = { Text(placeholderText, style = textStyle.copy(fontSize = 14.sp, color = Color.LightGray.copy(alpha = 0.5f))) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-            keyboardOptions = keyboardOptions
+            keyboardOptions = keyboardOptions,
+            visualTransformation = visualTransformation
         )
         if (!errorMessage.isNullOrEmpty()) {
             Text(
@@ -229,16 +266,61 @@ fun CampoCadastrarCliente(
     }
 }
 
-fun formatarCpf(cpf: String): String {
-    val digitsOnly = cpf.filter { it.isDigit() }
-    val formattedCpf = StringBuilder()
-    digitsOnly.forEachIndexed { index, char ->
-        formattedCpf.append(char)
-        if (index == 2 || index == 5) {
-            formattedCpf.append('.')
-        } else if (index == 8) {
-            formattedCpf.append('-')
+class TelefoneVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val digits = text.text.filter { it.isDigit() }.take(11)
+        val formatted = buildString {
+            if (digits.length > 0) append("(")
+            append(digits.take(2))
+            if (digits.length > 2) append(") ")
+            append(digits.substring(2, minOf(digits.length, 7)))
+            if (digits.length > 7) append("-")
+            append(digits.substring(7, minOf(digits.length, 11)))
         }
+        return TransformedText(AnnotatedString(formatted), object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int = when {
+                offset <= 0 -> offset
+                offset <= 2 -> offset + 1
+                offset <= 7 -> offset + 3
+                offset <= 11 -> offset + 4
+                else -> formatted.length
+            }
+
+            override fun transformedToOriginal(offset: Int): Int = when {
+                offset <= 1 -> offset
+                offset <= 4 -> offset - 1
+                offset <= 9 -> offset - 3
+                offset <= 14 -> offset - 4
+                else -> 11
+            }
+        })
     }
-    return formattedCpf.toString()
+}
+
+class DataNascimentoVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val digits = text.text.filter { it.isDigit() }.take(8)
+        val formatted = buildString {
+            append(digits.take(2))
+            if (digits.length > 2) append("/")
+            if (digits.length > 2) append(digits.substring(2, minOf(digits.length, 4)))
+            if (digits.length > 4) append("/")
+            if (digits.length > 4) append(digits.substring(4, minOf(digits.length, 8)))
+        }
+        return TransformedText(AnnotatedString(formatted), object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int = when {
+                offset <= 2 -> offset
+                offset <= 4 -> offset + 1
+                offset <= 8 -> offset + 2
+                else -> formatted.length
+            }
+
+            override fun transformedToOriginal(offset: Int): Int = when {
+                offset <= 2 -> offset
+                offset <= 5 -> offset - 1
+                offset <= 10 -> offset - 2
+                else -> 8
+            }
+        })
+    }
 }

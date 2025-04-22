@@ -208,14 +208,15 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 titulo = "CPF:",
                 valor = cpf,
                 onValorChange = { newCpf ->
-                    cpf = formatarCpf(newCpf)
+                    cpf = newCpf
                     cpfError = null
                 },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 89062322708",
+                placeholderText = "Ex: 890.623.227-08",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
                 errorMessage = cpfError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                visualTransformation = CpfVisualTransformation()
             )
 
             CampoCadastrarCliente(
@@ -223,9 +224,10 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 valor = dataNasc,
                 onValorChange = { dataNasc = it; dataNascError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 1999-08-22",
+                placeholderText = "Ex: 01/01/2000",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
                 errorMessage = dataNascError
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
             CampoCadastrarCliente(
@@ -233,9 +235,10 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 valor = telefone,
                 onValorChange = { telefone = it; telefoneError = null },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 11957567821",
+                placeholderText = "Ex: (11) 98765-4321",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
-                errorMessage = telefoneError
+                errorMessage = telefoneError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
             CampoCadastrarCliente(
@@ -265,12 +268,16 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                                 mensagemErroBackend = null
                                 try {
 
+//                                    val dataParaBackend = dataNasc.filter { it.isDigit() }.let { digits ->
+//                                        if (digits.length == 8) "${digits.substring(4, 8)}-${digits.substring(2, 4)}-${digits.substring(0, 2)}" else ""
+//                                    }
+
                                     val novoCliente = ModelCliente(
                                         id = null,
                                         nome = nome,
                                         cpf = cpf,
                                         dataNascimento = dataNasc,
-                                        telefone = telefone,
+                                        telefone = telefone.filter { it.isDigit() },
                                         email = email
                                     )
 
