@@ -59,43 +59,6 @@ import com.example.code_mobile.paginas.code_mobile.inputPadrao
 import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 
-class CpfVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val digits = text.text.filter { it.isDigit() }.take(11)
-        val formatted = buildString {
-            for (i in digits.indices) {
-                append(digits[i])
-                if (i == 2 || i == 5) append('.')
-                else if (i == 8) append('-')
-            }
-        }
-
-        val offsetMapping = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                return when {
-                    offset <= 3 -> offset
-                    offset <= 6 -> offset + 1
-                    offset <= 9 -> offset + 2
-                    offset <= 11 -> offset + 3
-                    else -> 14
-                }
-            }
-
-            override fun transformedToOriginal(offset: Int): Int {
-                return when {
-                    offset <= 3 -> offset
-                    offset <= 7 -> offset - 1
-                    offset <= 11 -> offset - 2
-                    offset <= 14 -> offset - 3
-                    else -> 11
-                }
-            }
-        }
-
-        return TransformedText(AnnotatedString(formatted), offsetMapping)
-    }
-}
-
 @Composable
 fun cardCliente(
     cliente: ModelCliente,
@@ -322,5 +285,36 @@ class DataNascimentoVisualTransformation : VisualTransformation {
                 else -> 8
             }
         })
+    }
+}
+
+class CpfVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = text.text.replace(Regex("[^0-9]"), "")
+        var out = ""
+        for (i in trimmed.indices) {
+            out += trimmed[i]
+            if (i == 2 || i == 5) out += "."
+            if (i == 8) out += "-"
+        }
+
+        return TransformedText(
+            text = AnnotatedString(out),
+            offsetMapping = object : OffsetMapping {
+                override fun originalToTransformed(offset: Int): Int {
+                    if (offset <= 2) return offset
+                    if (offset <= 5) return offset + 1
+                    if (offset <= 8) return offset + 2
+                    return 11
+                }
+
+                override fun transformedToOriginal(offset: Int): Int {
+                    if (offset <= 2) return offset
+                    if (offset <= 6) return offset - 1
+                    if (offset <= 10) return offset - 2
+                    return 9
+                }
+            }
+        )
     }
 }

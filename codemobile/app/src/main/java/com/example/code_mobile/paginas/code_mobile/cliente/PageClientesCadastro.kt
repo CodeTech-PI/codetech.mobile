@@ -21,28 +21,27 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -51,103 +50,51 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
-import com.example.code_mobile.paginas.code_mobile.service.ServiceCliente
 import com.example.code_mobile.paginas.code_mobile.textPadrao
-import com.example.code_mobile.token.network.RetrofithAuth
+import com.example.code_mobile.paginas.code_mobile.viewModel.cliente.ViweModelCliente
 import com.example.code_mobile.ui.theme.CodemobileTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.IOException
+import java.time.Instant
+import java.time.ZoneId
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
-    var nome by remember { mutableStateOf("") }
-    var cpf by remember { mutableStateOf("") }
-    var dataNasc by remember { mutableStateOf("") }
-    var telefone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
 
-    var nomeError by remember { mutableStateOf<String?>(null) }
-    var cpfError by remember { mutableStateOf<String?>(null) }
-    var dataNascError by remember { mutableStateOf<String?>(null) }
-    var telefoneError by remember { mutableStateOf<String?>(null) }
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var cadastroSucesso by remember { mutableStateOf(false) }
+    val viewModel: ViweModelCliente = viewModel()
+
+    val nome by viewModel.nome
+    val cpf by viewModel.cpf
+    val dataNasc by viewModel.dataNasc
+    val telefone by viewModel.telefone
+    val email by viewModel.email
+
+    val nomeError by viewModel.nomeError
+    val cpfError by viewModel.cpfError
+    val dataNascError by viewModel.dataNascError
+    val telefoneError by viewModel.telefoneError
+    val emailError by viewModel.emailError
+
+    val cadastroSucesso by viewModel.cadastroSucesso.collectAsState()
+    val showLoading by viewModel.showLoading.collectAsState()
+    val mensagemErroBackend by viewModel.mensagemErro.collectAsState()
+
 
     val scrollState = rememberScrollState()
-
-    val coroutineScope = rememberCoroutineScope()
     var showCancelDialog by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var showLoadingDialog by remember { mutableStateOf(false) } // Para indicar carregamento
-    var mensagemErroBackend by remember { mutableStateOf<String?>(null) }
+    var exibirCalendario by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
 
-    LaunchedEffect(showSuccessDialog) {
-        if (showSuccessDialog) {
+    LaunchedEffect(cadastroSucesso) {
+        if (cadastroSucesso) {
             delay(3000)
-            showSuccessDialog = false
             navController.navigate("Clientes")
         }
     }
-
-    fun validarCampos(): Boolean {
-        var isValid = true
-        if (nome.isEmpty()) {
-            nomeError = "O nome é obrigatório."
-            isValid = false
-        } else {
-            nomeError = null
-        }
-
-        if (cpf.isEmpty()) {
-            cpfError = "O CPF é obrigatório."
-            isValid = false
-        } else if (cpf.filter { it.isDigit() }.length != 11) { // Validação correta do tamanho
-            cpfError = "CPF inválido."
-            println("CPF inválido: $cpf")
-            isValid = false
-        } else {
-            cpfError = null
-        }
-
-        if (dataNasc.isEmpty()) {
-            dataNascError = "A data de nascimento é obrigatória."
-            isValid = false
-        } else {
-            dataNascError = null
-        }
-
-        if (telefone.isEmpty()) {
-            telefoneError = "O telefone é obrigatório."
-            isValid = false
-        } else if (telefone.length < 8) { // Validação simples do tamanho do telefone
-            telefoneError = "Telefone inválido."
-            isValid = false
-        } else {
-            telefoneError = null
-        }
-
-        if (email.isEmpty()) {
-            emailError = "O e-mail é obrigatório."
-            isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-                .matches()
-        ) { // Validação simples de e-mail
-            emailError = "E-mail inválido."
-            isValid = false
-        } else {
-            emailError = null
-        }
-
-        return isValid
-    }
-
 
     Box(
         modifier = Modifier
@@ -197,7 +144,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "Nome:",
                 valor = nome,
-                onValorChange = { nome = it; nomeError = null },
+                onValorChange = viewModel::atualizarNome,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: Letícia Lombardi",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
@@ -207,10 +154,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "CPF:",
                 valor = cpf,
-                onValorChange = { newCpf ->
-                    cpf = newCpf
-                    cpfError = null
-                },
+                onValorChange = viewModel::atualizarCpf,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 890.623.227-08",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
@@ -219,21 +163,47 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 visualTransformation = CpfVisualTransformation()
             )
 
-            CampoCadastrarCliente(
-                titulo = "Data de nascimento:",
-                valor = dataNasc,
-                onValorChange = { dataNasc = it; dataNascError = null },
-                textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 01/01/2000",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp),
-                errorMessage = dataNascError
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            )
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Data de nascimento: ${dataNasc}")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { exibirCalendario = true }) {
+                    Text("Alterar")
+                }
+            }
+
+            if (exibirCalendario) {
+                DatePickerDialog(
+                    onDismissRequest = { exibirCalendario = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            exibirCalendario = false
+                            datePickerState.selectedDateMillis?.let {
+                                viewModel.atualizarDataNasc(
+                                    Instant.ofEpochMilli(it)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate().format(viewModel.dateFormatter)
+                                )
+                            }
+                        }) {
+                            Text("Confirmar")
+
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { exibirCalendario = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
 
             CampoCadastrarCliente(
                 titulo = "Telefone:",
                 valor = telefone,
-                onValorChange = { telefone = it; telefoneError = null },
+                onValorChange = viewModel::atualizarTelefone,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: (11) 98765-4321",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
@@ -244,7 +214,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "E-mail:",
                 valor = email,
-                onValorChange = { email = it; emailError = null },
+                onValorChange = viewModel::atualizarEmail,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: leticia@lombardi.com",
                 tituloStyle = textPadrao.copy(fontSize = 18.sp),
@@ -261,70 +231,15 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = {
-                        if (validarCampos()) {
-                            coroutineScope.launch {
-                                showLoadingDialog = true
-                                mensagemErroBackend = null
-                                try {
-
-//                                    val dataParaBackend = dataNasc.filter { it.isDigit() }.let { digits ->
-//                                        if (digits.length == 8) "${digits.substring(4, 8)}-${digits.substring(2, 4)}-${digits.substring(0, 2)}" else ""
-//                                    }
-
-                                    val novoCliente = ModelCliente(
-                                        id = null,
-                                        nome = nome,
-                                        cpf = cpf,
-                                        dataNascimento = dataNasc,
-                                        telefone = telefone.filter { it.isDigit() },
-                                        email = email
-                                    )
-
-                                    println("Dados do novoCliente antes do envio:")
-                                    println("Nome: ${novoCliente.nome}")
-                                    println("CPF: ${novoCliente.cpf}")
-                                    println("Data de Nascimento: ${novoCliente.dataNascimento}")
-                                    println("Telefone: ${novoCliente.telefone}")
-                                    println("Email: ${novoCliente.email}")
-                                    println("------------------------------------")
-
-
-                                    // Chamar o serviço Retrofit para enviar os dados
-                                    val response = withContext(Dispatchers.IO) {
-                                        RetrofithAuth.retrofit.create(ServiceCliente::class.java).postUsuario(novoCliente)
-                                    }
-
-                                    if (response.isSuccessful) {
-                                        cadastroSucesso = true
-                                        nome = ""
-                                        cpf = ""
-                                        dataNasc = ""
-                                        telefone = ""
-                                        email = ""
-                                        showSuccessDialog = true
-
-                                    } else {
-                                        mensagemErroBackend =
-                                            "Erro ao cadastrar: ${response.code()} - ${response.message()}"
-                                    }
-                                } catch (e: IOException) {
-                                    mensagemErroBackend = "Erro de conexão: ${e.message}"
-                                } catch (e: Exception) {
-                                    mensagemErroBackend = "Erro inesperado: ${e.message}"
-                                } finally {
-                                    showLoadingDialog = false
-                                }
-                            }
-                        }
-                    },
+                    onClick = viewModel::cadastrarCliente,
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    enabled = !showLoading // Desabilita o botão enquanto carrega
                 ) {
-                    Text(text = "Salvar")
+                    Text(text = if (showLoading) "Salvando..." else "Salvar")
                 }
 
                 Button(
@@ -375,8 +290,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             )
         }
 
-        // Popup de sucesso ao cadastrar
-        if (showSuccessDialog) {
+        if (cadastroSucesso) {
             Dialog(
                 onDismissRequest = { }
             ) {
@@ -410,16 +324,41 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                             textAlign = TextAlign.Center
                         )
                         Button(
-                            onClick = {
-                                showSuccessDialog = false
-                                navController.navigate("Clientes")
-                            },
+                            onClick = {  },
                             colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("OK", color = Color.White)
                         }
                     }
+                }
+            }
+        }
+
+        mensagemErroBackend?.let { erro ->
+            AlertDialog(
+                onDismissRequest = { viewModel.limparMensagemDeErro() },
+                title = { Text("Erro", color = Color.White) },
+                text = { Text(erro, color = Color.White) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.limparMensagemDeErro() }) {
+                        Text("OK", color = Color.White)
+                    }
+                },
+                containerColor = Color(0xFF2B2B2B)
+            )
+        }
+
+        if (showLoading) {
+            Dialog(onDismissRequest = {  }) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF2B2B2B)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Carregando...", color = Color.White)
                 }
             }
         }
