@@ -20,6 +20,7 @@ interface ServiceFiliais {
     @POST("unidades")
     suspend fun createFilial(@Body filial: ModelFiliais): Response<ModelFiliais>
 
+
     @PUT("unidades/{id}")
     suspend fun updateFilial(@Path("id") id: Int, @Body filial: ModelFiliais): Response<ModelFiliais>
 
