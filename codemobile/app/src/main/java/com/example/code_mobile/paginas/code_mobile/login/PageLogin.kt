@@ -44,8 +44,8 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 @Composable
 fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
-    var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("lombardi@localhost") }
+    var senha by remember { mutableStateOf("lombardi123") }
     var loading by remember { mutableStateOf(false) } // Para mostrar "carregando" no botão
     var loginRequested by remember { mutableStateOf(false) } // Estado para indicar quando o login foi solicitado
     var errorMessage by remember { mutableStateOf<String?>(null) } // Mensagem de erro para o usuário

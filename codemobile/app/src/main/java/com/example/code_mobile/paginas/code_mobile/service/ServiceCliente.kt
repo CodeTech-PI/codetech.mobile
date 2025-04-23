@@ -4,7 +4,9 @@ package com.example.code_mobile.paginas.code_mobile.service
 import retrofit2.http.GET
 import retrofit2.Response
 import com.example.code_mobile.paginas.code_mobile.model.ModelCliente
+import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ServiceCliente {
@@ -13,5 +15,8 @@ interface ServiceCliente {
 
     @DELETE("usuarios/{id}")
     suspend fun deletarUsuario(@Path("id") id: Int): Response<Unit> // Void =  Unit
+
+    @POST("usuarios")
+    suspend fun postUsuario(@Body novoCliente: ModelCliente): Response<Unit>
 
 }

@@ -16,48 +16,86 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.cliente.CampoCadastrarCliente
+import com.example.code_mobile.paginas.code_mobile.textPadrao
+import com.example.code_mobile.paginas.code_mobile.viewModel.cliente.ViewModelCliente
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import kotlinx.coroutines.delay
+import java.time.Instant
+import java.time.ZoneId
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
-    var nome by remember { mutableStateOf("") }
-    var cpf by remember { mutableStateOf("") }
-    var dataNasc by remember { mutableStateOf("") }
-    var telefone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+
+    val viewModel: ViewModelCliente = viewModel()
+
+    val nome by viewModel.nome
+    val cpf by viewModel.cpf
+    val dataNasc by viewModel.dataNasc
+    val telefone by viewModel.telefone
+    val email by viewModel.email
+
+    val nomeError by viewModel.nomeError
+    val cpfError by viewModel.cpfError
+    val dataNascError by viewModel.dataNascError
+    val telefoneError by viewModel.telefoneError
+    val emailError by viewModel.emailError
+
+    val cadastroSucesso by viewModel.cadastroSucesso.collectAsState()
+    val showLoading by viewModel.showLoading.collectAsState()
+    val mensagemErroBackend by viewModel.mensagemErro.collectAsState()
+
 
     val scrollState = rememberScrollState()
+    var showCancelDialog by remember { mutableStateOf(false) }
+    var exibirCalendario by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
-    val textPadrao = TextStyle(
-        fontSize = 20.sp,
-        color = Color.White,
-        fontStyle = FontStyle.Normal
-    )
+
+    LaunchedEffect(cadastroSucesso) {
+        if (cadastroSucesso) {
+            delay(3000)
+            navController.navigate("Clientes")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,7 +105,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         Column(
             modifier = modifier
-                .fillMaxHeight(0.75f)
+                .fillMaxHeight(0.90f)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
@@ -79,9 +117,9 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 30.dp),
+                    .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
@@ -89,14 +127,16 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     tint = Color.White,
                     modifier = Modifier
                         .size(30.dp)
-                        .clickable { navController.popBackStack() }
+                        .clickable { navController.navigate("Clientes") }
                 )
                 Text(
                     text = "Cadastrar",
-                    style = textPadrao.copy(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = textPadrao,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(10.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(30.dp))
             }
@@ -104,37 +144,85 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             CampoCadastrarCliente(
                 titulo = "Nome:",
                 valor = nome,
-                onValorChange = { nome = it },
-                textStyle = textPadrao
+                onValorChange = viewModel::atualizarNome,
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: Letícia Lombardi",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = nomeError
             )
 
             CampoCadastrarCliente(
                 titulo = "CPF:",
                 valor = cpf,
-                onValorChange = { cpf = it },
-                textStyle = textPadrao
+                onValorChange = viewModel::atualizarCpf,
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: 890.623.227-08",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = cpfError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                visualTransformation = CpfVisualTransformation()
             )
 
-            CampoCadastrarCliente(
-                titulo = "Data de nascimento:",
-                valor = dataNasc,
-                onValorChange = { dataNasc = it },
-                textStyle = textPadrao
-            )
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Data de nascimento: ${dataNasc}")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { exibirCalendario = true }) {
+                    Text("Alterar")
+                }
+            }
+
+            if (exibirCalendario) {
+                DatePickerDialog(
+                    onDismissRequest = { exibirCalendario = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            exibirCalendario = false
+                            datePickerState.selectedDateMillis?.let {
+                                viewModel.atualizarDataNasc(
+                                    Instant.ofEpochMilli(it)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate().format(viewModel.dateFormatter)
+                                )
+                            }
+                        }) {
+                            Text("Confirmar")
+
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { exibirCalendario = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
 
             CampoCadastrarCliente(
                 titulo = "Telefone:",
                 valor = telefone,
-                onValorChange = { telefone = it },
-                textStyle = textPadrao
+                onValorChange = viewModel::atualizarTelefone,
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: (11) 98765-4321",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = telefoneError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
 
             CampoCadastrarCliente(
                 titulo = "E-mail:",
                 valor = email,
-                onValorChange = { email = it },
-                textStyle = textPadrao
+                onValorChange = viewModel::atualizarEmail,
+                textStyle = textPadrao.copy(fontSize = 16.sp),
+                placeholderText = "Ex: leticia@lombardi.com",
+                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                errorMessage = emailError
             )
+
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier
@@ -143,25 +231,134 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { navController.navigate("ClienteCadastro") },
+                    onClick = viewModel::cadastrarCliente,
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
-                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
-                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    enabled = !showLoading // Desabilita o botão enquanto carrega
                 ) {
-                    Text(text = "Salvar")
+                    Text(text = if (showLoading) "Salvando..." else "Salvar")
                 }
 
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = { showCancelDialog = true },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
-                    shape = RoundedCornerShape(8.dp), // Deixando os botões menos redondos
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF252525))
                 ) {
                     Text(text = "Cancelar")
+                }
+            }
+        }
+
+        // Popup de confirmação de cancelamento
+        if (showCancelDialog) {
+            AlertDialog(
+                onDismissRequest = { showCancelDialog = false },
+                title = { Text("Confirmar Cancelamento", color = Color.White) },
+                text = { Text("Deseja mesmo abandonar as alterações?", color = Color.White) },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                showCancelDialog = false
+                                navController.navigate("Clientes")
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Sim", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White)
+                        }
+                    }
+                },
+                containerColor = Color(0xFF2B2B2B)
+            )
+        }
+
+        if (cadastroSucesso) {
+            Dialog(
+                onDismissRequest = { }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF2B2B2B))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Sucesso",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Text(
+                            "Cliente cadastrado com sucesso!",
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "Redirecionando...",
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center
+                        )
+                        Button(
+                            onClick = {  },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("OK", color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+
+        mensagemErroBackend?.let { erro ->
+            AlertDialog(
+                onDismissRequest = { viewModel.limparMensagemDeErro() },
+                title = { Text("Erro", color = Color.White) },
+                text = { Text(erro, color = Color.White) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.limparMensagemDeErro() }) {
+                        Text("OK", color = Color.White)
+                    }
+                },
+                containerColor = Color(0xFF2B2B2B)
+            )
+        }
+
+        if (showLoading) {
+            Dialog(onDismissRequest = {  }) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF2B2B2B)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Carregando...", color = Color.White)
                 }
             }
         }
