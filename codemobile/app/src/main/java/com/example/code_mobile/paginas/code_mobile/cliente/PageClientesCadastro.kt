@@ -54,7 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.textPadrao
-import com.example.code_mobile.paginas.code_mobile.viewModel.cliente.ViweModelCliente
+import com.example.code_mobile.paginas.code_mobile.viewModel.cliente.ViewModelCliente
 import com.example.code_mobile.ui.theme.CodemobileTheme
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -64,7 +64,7 @@ import java.time.ZoneId
 @Composable
 fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier) {
 
-    val viewModel: ViweModelCliente = viewModel()
+    val viewModel: ViewModelCliente = viewModel()
 
     val nome by viewModel.nome
     val cpf by viewModel.cpf
