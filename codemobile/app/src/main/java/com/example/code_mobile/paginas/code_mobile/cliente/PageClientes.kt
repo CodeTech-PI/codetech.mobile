@@ -194,60 +194,34 @@ fun ExcluirClienteDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF252525),
-        shape = RoundedCornerShape(1.dp),
-        modifier = Modifier
-            .border(0.5.dp, Color(0xFFDF0050), RoundedCornerShape(2.dp))
-            .clip(RoundedCornerShape(2.dp)),
-        title = {
-            Text(
-                "Excluir Cliente?",
-                style = textPadrao,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        text = {
-            Text(
-                "Nome: \n${cliente.nome}\nCPF: ${cliente.cpf}",
-                style = textPadrao.copy(fontSize = 18.sp, color = Color.White),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
+        title = { Text("Confirmar Exclusão", color = Color.White) },
+        text = { Text("Deseja mesmo excluir o cliente ${cliente.nome}?", color = Color.White) },
         confirmButton = {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { onConfirmExcluir(cliente); onDismiss() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDF0050),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
+                    onClick = {
+                        onConfirmExcluir(cliente)
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text("Excluir")
+                    Text("Sim", color = Color.White)
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF555555),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text("Cancelar")
+                    Text("Não", color = Color.White)
                 }
             }
         },
-        dismissButton = {}
+        containerColor = Color(0xFF2B2B2B)
     )
 }
 

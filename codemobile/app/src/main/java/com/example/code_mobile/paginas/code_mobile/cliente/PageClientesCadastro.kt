@@ -111,7 +111,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 .background(Color(0xFF1B1B1B))
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Espaçamento padrão
         ) {
 
             Row(
@@ -119,26 +119,40 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Voltar",
                     tint = Color.White,
                     modifier = Modifier
-                        .size(30.dp)
+                        .size(24.dp)
                         .clickable { navController.navigate("Clientes") }
                 )
                 Text(
-                    text = "Cadastrar",
-                    style = textPadrao,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(10.dp),
+                    text = "Cadastrar Cliente",
+                    style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.width(30.dp))
+                Spacer(modifier = Modifier.width(24.dp))
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Data de Nascimento:",
+                    style = textPadrao.copy(fontSize = 16.sp, color = Color.White)
+                )
+                Button(
+                    onClick = { exibirCalendario = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
+                ) {
+                    Text(text = if (dataNasc.isEmpty()) "Selecionar" else dataNasc, color = Color.White)
+                }
             }
 
             CampoCadastrarCliente(
@@ -147,7 +161,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 onValorChange = viewModel::atualizarNome,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: Letícia Lombardi",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                tituloStyle = textPadrao.copy(fontSize = 16.sp),
                 errorMessage = nomeError
             )
 
@@ -157,20 +171,11 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 onValorChange = viewModel::atualizarCpf,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 890.623.227-08",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                tituloStyle = textPadrao.copy(fontSize = 16.sp),
                 errorMessage = cpfError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = CpfVisualTransformation()
             )
-
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Data de nascimento: ${dataNasc}")
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { exibirCalendario = true }) {
-                    Text("Alterar")
-                }
-            }
 
             if (exibirCalendario) {
                 DatePickerDialog(
@@ -186,13 +191,12 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                                 )
                             }
                         }) {
-                            Text("Confirmar")
-
+                            Text("Confirmar", color = Color.White)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { exibirCalendario = false }) {
-                            Text("Cancelar")
+                            Text("Cancelar", color = Color.White)
                         }
                     }
                 ) {
@@ -206,7 +210,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 onValorChange = viewModel::atualizarTelefone,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: (11) 98765-4321",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                tituloStyle = textPadrao.copy(fontSize = 16.sp),
                 errorMessage = telefoneError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
@@ -217,12 +221,12 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 onValorChange = viewModel::atualizarEmail,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: leticia@lombardi.com",
-                tituloStyle = textPadrao.copy(fontSize = 18.sp),
+                tituloStyle = textPadrao.copy(fontSize = 16.sp),
                 errorMessage = emailError
             )
 
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier
@@ -234,23 +238,28 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     onClick = viewModel::cadastrarCliente,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 8.dp)
+                        .height(40.dp), // Altura menor
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
-                    enabled = !showLoading // Desabilita o botão enquanto carrega
+                    enabled = !showLoading
                 ) {
-                    Text(text = if (showLoading) "Salvando..." else "Salvar")
+                    Text(
+                        text = if (showLoading) "Salvando..." else "Salvar",
+                        fontSize = 14.sp
+                    ) // Fonte menor
                 }
 
                 Button(
                     onClick = { showCancelDialog = true },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 8.dp)
+                        .height(40.dp), // Altura menor
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF252525))
                 ) {
-                    Text(text = "Cancelar")
+                    Text(text = "Cancelar", fontSize = 14.sp) // Fonte menor
                 }
             }
         }
@@ -259,8 +268,20 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Confirmar Cancelamento", color = Color.White) },
-                text = { Text("Deseja mesmo abandonar as alterações?", color = Color.White) },
+                title = {
+                    Text(
+                        "Confirmar Cancelamento",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }, // Fonte menor
+                text = {
+                    Text(
+                        "Deseja mesmo abandonar as alterações?",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }, // Fonte menor
                 confirmButton = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -274,7 +295,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                             colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
                             modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
-                            Text("Sim", color = Color.White)
+                            Text("Sim", color = Color.White, fontSize = 14.sp) // Fonte menor
                         }
 
                         Button(
@@ -282,7 +303,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                             colors = ButtonDefaults.buttonColors(Color.Gray),
                             modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
-                            Text("Não", color = Color.White)
+                            Text("Não", color = Color.White, fontSize = 14.sp) // Fonte menor
                         }
                     }
                 },
@@ -296,40 +317,35 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .fillMaxWidth(0.7f) // Largura um pouco menor
+                        .clip(RoundedCornerShape(8.dp)) // Bordas menos arredondadas
                         .background(Color(0xFF2B2B2B))
-                        .padding(16.dp),
+                        .padding(12.dp), // Padding menor
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp) // Espaçamento menor
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = "Sucesso",
                             tint = Color(0xFF4CAF50),
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(40.dp) // Ícone menor
                         )
                         Text(
-                            "Cliente cadastrado com sucesso!",
+                            "Cadastrado!", // Mensagem mais curta
                             color = Color.White,
                             textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp // Fonte menor
                         )
                         Text(
                             "Redirecionando...",
                             color = Color.Gray,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp // Fonte menor
                         )
-                        Button(
-                            onClick = {  },
-                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("OK", color = Color.White)
-                        }
                     }
                 }
             }
@@ -338,11 +354,11 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         mensagemErroBackend?.let { erro ->
             AlertDialog(
                 onDismissRequest = { viewModel.limparMensagemDeErro() },
-                title = { Text("Erro", color = Color.White) },
-                text = { Text(erro, color = Color.White) },
+                title = { Text("Erro", color = Color.White, fontSize = 16.sp) }, // Fonte menor
+                text = { Text(erro, color = Color.White, fontSize = 14.sp) }, // Fonte menor
                 confirmButton = {
                     TextButton(onClick = { viewModel.limparMensagemDeErro() }) {
-                        Text("OK", color = Color.White)
+                        Text("OK", color = Color.White, fontSize = 14.sp) // Fonte menor
                     }
                 },
                 containerColor = Color(0xFF2B2B2B)
@@ -350,15 +366,18 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
         }
 
         if (showLoading) {
-            Dialog(onDismissRequest = {  }) {
+            Dialog(onDismissRequest = { }) {
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(80.dp) // Tamanho menor
+                        .clip(RoundedCornerShape(12.dp)) // Bordas menos arredondadas
                         .background(Color(0xFF2B2B2B)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Carregando...", color = Color.White)
+                    androidx.compose.material3.CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    ) // Barra menor
                 }
             }
         }
