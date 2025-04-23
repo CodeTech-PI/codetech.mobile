@@ -1,91 +1,126 @@
 package com.example.code_mobile.paginas.code_mobile.viewmodel
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
 import com.example.code_mobile.paginas.code_mobile.service.ServiceCategoria
-import com.example.code_mobile.token.network.RetrofithAuth
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ViewModelCategoria : ViewModel() {
+class CategoriaViewModel(private val service: ServiceCategoria) : ViewModel() {
 
-    private val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
+    private val _categorias = mutableStateOf<List<ModelCategoria>>(emptyList())
+    val categorias: State<List<ModelCategoria>> = _categorias
 
-    private val _categorias = MutableStateFlow<List<ModelCategoria>>(emptyList())
-    val categorias: StateFlow<List<ModelCategoria>> = _categorias
+    private val _categoria = mutableStateOf<ModelCategoria?>(null)
+    val categoria: State<ModelCategoria?> = _categoria
 
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> = _isLoading
 
-    private val _erro = MutableStateFlow<String?>(null)
-    val erro: StateFlow<String?> = _erro
+    private val _error = mutableStateOf<String?>(null)
+    val error: State<String?> = _error
 
-    fun carregarCategorias() {
+    init {
+        listarCategorias()
+    }
+
+    fun listarCategorias() {
         viewModelScope.launch {
-            _loading.value = true
+            _isLoading.value = true
+            _error.value = null
             try {
                 val response = service.getCategorias()
                 if (response.isSuccessful) {
                     _categorias.value = response.body() ?: emptyList()
                 } else {
-                    _erro.value = "Erro ao carregar categorias: ${response.code()}"
+                    _error.value = "Erro ao listar categorias: ${response.message()}"
                 }
             } catch (e: Exception) {
-                _erro.value = "Erro de conexão: ${e.message}"
+                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
             } finally {
-                _loading.value = false
+                _isLoading.value = false
             }
         }
     }
 
-    fun adicionarCategoria(nome: String) {
+    fun buscarCategoria(id: Int) {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            _categoria.value = null
             try {
-                val response = service.criarCategoria(ModelCategoria(0, nome))
+                val response = service.getCategoriaById(id)
                 if (response.isSuccessful) {
-                    carregarCategorias()
+                    _categoria.value = response.body()
                 } else {
-                    _erro.value = "Erro ao adicionar categoria: ${response.code()}"
+                    _error.value = "Erro ao buscar categoria com ID $id: ${response.message()}"
                 }
             } catch (e: Exception) {
-                _erro.value = "Erro de conexão: ${e.message}"
+                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun criarCategoria(categoria: ModelCategoria) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                val response = service.criarCategoria(categoria)
+                if (response.isSuccessful) {
+                    listarCategorias() // Recarrega a lista após a criação
+                } else {
+                    _error.value = "Erro ao criar categoria: ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun atualizarCategoria(id: Int, categoria: ModelCategoria) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                val response = service.atualizarCategoria(id, categoria)
+                if (response.isSuccessful) {
+                    listarCategorias() // Recarrega a lista após a atualização
+                    buscarCategoria(id) // Atualiza a categoria específica, se necessário
+                } else {
+                    _error.value = "Erro ao atualizar categoria com ID $id: ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun deletarCategoria(id: Int) {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
             try {
                 val response = service.deletarCategoria(id)
                 if (response.isSuccessful) {
-                    carregarCategorias()
+                    listarCategorias() // Recarrega a lista após a exclusão
+                    _categoria.value = null // Limpa a categoria exibida, se for o caso
                 } else {
-                    _erro.value = "Erro ao deletar categoria"
+                    _error.value = "Erro ao deletar categoria com ID $id: ${response.message()}"
                 }
             } catch (e: Exception) {
-                _erro.value = "Erro de conexão"
+                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
             }
         }
-    }
-
-    fun atualizarCategoria(id: Int, nome: String) {
-        viewModelScope.launch {
-            try {
-                val response = service.atualizarCategoria(id, ModelCategoria(id, nome))
-                if (response.isSuccessful) {
-                    carregarCategorias()
-                } else {
-                    _erro.value = "Erro ao atualizar categoria"
-                }
-            } catch (e: Exception) {
-                _erro.value = "Erro de conexão"
-            }
-        }
-    }
-
-    fun limparErro() {
-        _erro.value = null
     }
 }
