@@ -124,6 +124,39 @@ class ViewModelCategoria : ViewModel() {
         }
     }
 
+
+    fun atualizarCategoria(categoria: ModelCategoria, onSuccess: () -> Unit = {}) {
+        if (categoria.nome.isBlank()) {
+            nomeError.value = "O nome da categoria é obrigatório."
+            return
+        }
+
+        viewModelScope.launch {
+            _showLoading.value = true
+            _mensagemErro.value = null
+
+            try {
+                val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
+                val response = withContext(Dispatchers.IO) {
+                    service.atualizarCategoria(categoria.id, categoria)
+                }
+
+                if (response.isSuccessful) {
+                    carregarCategorias()
+                    onSuccess() // Callback para fechar o dialog ou mostrar uma mensagem
+                } else {
+                    _mensagemErro.value = "Erro ao atualizar categoria: ${response.code()}"
+                }
+            } catch (e: IOException) {
+                _mensagemErro.value = "Erro de conexão: ${e.message}"
+            } catch (e: Exception) {
+                _mensagemErro.value = "Erro inesperado: ${e.message}"
+            } finally {
+                _showLoading.value = false
+            }
+        }
+    }
+
     fun limparCampos() {
         nome.value = ""
     }

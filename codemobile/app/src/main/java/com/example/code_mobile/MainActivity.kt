@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +20,7 @@ import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
 import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
+import com.example.code_mobile.paginas.code_mobile.viewmodel.categoria.ViewModelCategoria
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -46,7 +48,9 @@ fun AppNavigation() {
         composable("PageLogin") { TelaLogin(navController) }
         composable("Clientes") { TelaClientes(navController) }
         composable("Estoque") { TelaEstoque(navController) }
-        composable("Categoria") { TelaCategorias(navController) }
+        composable("Categoria") { val viewModelCategoria: ViewModelCategoria = viewModel()
+            TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
+        }
         composable("Menu"){ Menu(navController) }
         composable("Filiais"){ Filiais(navController) }
         composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
