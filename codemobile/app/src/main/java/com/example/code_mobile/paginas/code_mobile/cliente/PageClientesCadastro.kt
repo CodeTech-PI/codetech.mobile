@@ -105,7 +105,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         Column(
             modifier = modifier
-                .fillMaxHeight(0.90f)
+                .fillMaxHeight(0.75f)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
@@ -231,6 +231,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight(0.35f)
                     .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
