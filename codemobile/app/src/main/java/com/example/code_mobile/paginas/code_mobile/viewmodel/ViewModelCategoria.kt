@@ -1,126 +1,138 @@
-package com.example.code_mobile.paginas.code_mobile.viewmodel
+package com.example.code_mobile.paginas.code_mobile.viewmodel.categoria
 
-import androidx.compose.runtime.State
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
 import com.example.code_mobile.paginas.code_mobile.service.ServiceCategoria
+import com.example.code_mobile.token.network.RetrofithAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
-class CategoriaViewModel(private val service: ServiceCategoria) : ViewModel() {
+class ViewModelCategoria : ViewModel() {
 
-    private val _categorias = mutableStateOf<List<ModelCategoria>>(emptyList())
-    val categorias: State<List<ModelCategoria>> = _categorias
+    var nome = mutableStateOf("")
+        private set
 
-    private val _categoria = mutableStateOf<ModelCategoria?>(null)
-    val categoria: State<ModelCategoria?> = _categoria
+    var nomeError = mutableStateOf<String?>(null)
+        private set
 
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: State<Boolean> = _isLoading
+    private val _cadastroSucesso = MutableStateFlow(false)
+    val cadastroSucesso: StateFlow<Boolean> = _cadastroSucesso
 
-    private val _error = mutableStateOf<String?>(null)
-    val error: State<String?> = _error
+    private val _showLoading = MutableStateFlow(false)
+    val showLoading: StateFlow<Boolean> = _showLoading
 
-    init {
-        listarCategorias()
+    private val _mensagemErro = MutableStateFlow<String?>(null)
+    val mensagemErro: StateFlow<String?> = _mensagemErro
+
+    private val _listaCategorias = MutableStateFlow<List<ModelCategoria>>(emptyList())
+    val listaCategorias: StateFlow<List<ModelCategoria>> = _listaCategorias
+
+    fun atualizarNome(novoNome: String) {
+        nome.value = novoNome
+        nomeError.value = null
     }
 
-    fun listarCategorias() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            try {
-                val response = service.getCategorias()
-                if (response.isSuccessful) {
-                    _categorias.value = response.body() ?: emptyList()
-                } else {
-                    _error.value = "Erro ao listar categorias: ${response.message()}"
+    fun validarCampos(): Boolean {
+        var isValid = true
+        if (nome.value.isBlank()) {
+            nomeError.value = "O nome da categoria é obrigatório."
+            isValid = false
+        } else {
+            nomeError.value = null
+        }
+        return isValid
+    }
+
+    fun cadastrarCategoria() {
+        if (validarCampos()) {
+            viewModelScope.launch {
+                _showLoading.value = true
+                _mensagemErro.value = null
+                try {
+                    val novaCategoria = ModelCategoria(id = 0, nome = nome.value)
+                    val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
+                    val response = withContext(Dispatchers.IO) {
+                        service.criarCategoria(novaCategoria)
+                    }
+
+                    if (response.isSuccessful) {
+                        _cadastroSucesso.value = true
+                        carregarCategorias()
+                        limparCampos()
+                    } else {
+                        _mensagemErro.value = "Erro ao cadastrar categoria: ${response.code()}"
+                    }
+                } catch (e: IOException) {
+                    _mensagemErro.value = "Erro de conexão: ${e.message}"
+                } catch (e: Exception) {
+                    _mensagemErro.value = "Erro inesperado: ${e.message}"
+                } finally {
+                    _showLoading.value = false
                 }
-            } catch (e: Exception) {
-                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
-    fun buscarCategoria(id: Int) {
+    fun carregarCategorias() {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            _categoria.value = null
+            _showLoading.value = true
             try {
-                val response = service.getCategoriaById(id)
-                if (response.isSuccessful) {
-                    _categoria.value = response.body()
-                } else {
-                    _error.value = "Erro ao buscar categoria com ID $id: ${response.message()}"
+                val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
+                val response = withContext(Dispatchers.IO) {
+                    service.getCategorias()
                 }
-            } catch (e: Exception) {
-                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun criarCategoria(categoria: ModelCategoria) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            try {
-                val response = service.criarCategoria(categoria)
                 if (response.isSuccessful) {
-                    listarCategorias() // Recarrega a lista após a criação
+                    _listaCategorias.value = response.body() ?: emptyList()
                 } else {
-                    _error.value = "Erro ao criar categoria: ${response.message()}"
+                    _mensagemErro.value = "Erro ao buscar categorias: ${response.code()}"
                 }
+            } catch (e: IOException) {
+                _mensagemErro.value = "Erro de conexão: ${e.message}"
             } catch (e: Exception) {
-                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+                _mensagemErro.value = "Erro inesperado: ${e.message}"
             } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun atualizarCategoria(id: Int, categoria: ModelCategoria) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-            try {
-                val response = service.atualizarCategoria(id, categoria)
-                if (response.isSuccessful) {
-                    listarCategorias() // Recarrega a lista após a atualização
-                    buscarCategoria(id) // Atualiza a categoria específica, se necessário
-                } else {
-                    _error.value = "Erro ao atualizar categoria com ID $id: ${response.message()}"
-                }
-            } catch (e: Exception) {
-                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
-            } finally {
-                _isLoading.value = false
+                _showLoading.value = false
             }
         }
     }
 
     fun deletarCategoria(id: Int) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+            _showLoading.value = true
             try {
-                val response = service.deletarCategoria(id)
+                val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
+                val response = withContext(Dispatchers.IO) {
+                    service.deletarCategoria(id)
+                }
                 if (response.isSuccessful) {
-                    listarCategorias() // Recarrega a lista após a exclusão
-                    _categoria.value = null // Limpa a categoria exibida, se for o caso
+                    carregarCategorias()
                 } else {
-                    _error.value = "Erro ao deletar categoria com ID $id: ${response.message()}"
+                    _mensagemErro.value = "Erro ao deletar categoria: ${response.code()}"
                 }
             } catch (e: Exception) {
-                _error.value = "Erro de rede ou interno: ${e.localizedMessage}"
+                _mensagemErro.value = "Erro inesperado: ${e.message}"
             } finally {
-                _isLoading.value = false
+                _showLoading.value = false
             }
         }
+    }
+
+    fun limparCampos() {
+        nome.value = ""
+    }
+
+    fun limparMensagemDeErro() {
+        _mensagemErro.value = null
+    }
+
+    fun resetCadastroSucesso() {
+        _cadastroSucesso.value = false
     }
 }
