@@ -66,7 +66,7 @@ fun cardCliente(
     coluna1Info2: String,
     coluna2Info1: String,
     coluna2Info2: String,
-    onEditClick: () -> Unit,
+    onEditClick: (ModelCliente) -> Unit,
     onDeleteClick: (ModelCliente) -> Unit
 ) {
     Column(
@@ -96,7 +96,7 @@ fun cardCliente(
                     .size(25.dp)
                     .clickable {
                         println("Clicou para editar cliente!")
-                        onEditClick()
+                        onEditClick(cliente)
                     }
             )
 

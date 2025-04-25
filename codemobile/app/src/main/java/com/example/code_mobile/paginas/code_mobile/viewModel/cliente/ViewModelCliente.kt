@@ -181,7 +181,8 @@ class ViewModelCliente : ViewModel() {
                         _cadastroSucesso.value = true
                         limparCampos()
                     } else {
-                        _mensagemErro.value = "Erro ao cadastrar: ${response.code()} - ${response.message()}"
+                        _mensagemErro.value =
+                            "Erro ao cadastrar: ${response.code()} - ${response.message()}"
                     }
                 } catch (e: IOException) {
                     _mensagemErro.value = "Erro de conexão: ${e.message}"
@@ -227,7 +228,10 @@ class ViewModelCliente : ViewModel() {
                 } else {
                     _erroCarregarClientes.value =
                         "Erro ao carregar clientes: ${response.code()} - ${response.message()}"
-                    Log.e("ViweModelCliente", "Erro ao carregar clientes: ${response.code()} - ${response.message()}")
+                    Log.e(
+                        "ViweModelCliente",
+                        "Erro ao carregar clientes: ${response.code()} - ${response.message()}"
+                    )
                 }
             } catch (e: IOException) {
                 _erroCarregarClientes.value = "Erro de conexão: ${e.message}"
@@ -242,7 +246,11 @@ class ViewModelCliente : ViewModel() {
     }
 
     // Função para excluir um cliente
-    fun excluirCliente(cliente: ModelCliente, onExclusaoSucesso: () -> Unit, onExclusaoErro: (String) -> Unit) {
+    fun excluirCliente(
+        cliente: ModelCliente,
+        onExclusaoSucesso: () -> Unit,
+        onExclusaoErro: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 if (cliente.id != null) {
@@ -250,7 +258,10 @@ class ViewModelCliente : ViewModel() {
                         serviceCliente.deletarUsuario(cliente.id)
                     }
                     if (response.isSuccessful) {
-                        Log.i("ViweModelCliente", "Cliente com ID ${cliente.id} excluído com sucesso.")
+                        Log.i(
+                            "ViweModelCliente",
+                            "Cliente com ID ${cliente.id} excluído com sucesso."
+                        )
                         carregarClientes() // Recarrega a lista após a exclusão
                         onExclusaoSucesso()
                     } else {
@@ -260,7 +271,10 @@ class ViewModelCliente : ViewModel() {
                             404 -> "Cliente não encontrado."
                             else -> "Erro ao excluir o cliente. Tente novamente."
                         }
-                        Log.e("ViweModelCliente", "Erro ao excluir cliente ${cliente.id} (Código: $errorCodeExclusao): $errorBodyExclusao")
+                        Log.e(
+                            "ViweModelCliente",
+                            "Erro ao excluir cliente ${cliente.id} (Código: $errorCodeExclusao): $errorBodyExclusao"
+                        )
                         onExclusaoErro(mensagemErro)
                     }
                 } else {
@@ -274,6 +288,33 @@ class ViewModelCliente : ViewModel() {
                 Log.e("ViweModelCliente", "Erro inesperado ao excluir cliente: ${e.message}", e)
                 onExclusaoErro("Erro inesperado: ${e.message}")
             }
+        }
+    }
+
+    fun atualizarCliente(
+        cliente: ModelCliente,
+        onSucesso: () -> Unit,
+        onError: (String?) -> Unit
+    ) {
+        cliente.id?.let { clienteId ->
+            viewModelScope.launch {
+                try {
+                    val response = withContext(Dispatchers.IO) {
+                        serviceCliente.putUsuario(clienteId, cliente)
+                    }
+                    if (response.isSuccessful) {
+                        onSucesso()
+                    } else {
+                        onError("Erro ao atualizar cliente: ${response.code()}")
+                    }
+                } catch (e: IOException) {
+                    onError("Erro de conexão: ${e.message}")
+                } catch (e: Exception) {
+                    onError("Erro inesperado: ${e.message}")
+                }
+            }
+        } ?: run {
+            onError("ID do cliente não pode ser nulo para atualização.")
         }
     }
 }
