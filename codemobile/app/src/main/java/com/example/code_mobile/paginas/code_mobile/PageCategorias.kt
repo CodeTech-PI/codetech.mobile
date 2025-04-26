@@ -23,6 +23,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,22 +40,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.estoque.CampoTexto
+import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
+import com.example.code_mobile.paginas.code_mobile.viewmodel.categoria.ViewModelCategoria
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) {
+fun TelaCategorias(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    viewModelCategoria: ViewModelCategoria
+) {
+    val categorias by viewModelCategoria.listaCategorias.collectAsState()
+    val cadastroSucesso by viewModelCategoria.cadastroSucesso.collectAsState()
+    val erro by viewModelCategoria.mensagemErro.collectAsState()
+    val isLoading by viewModelCategoria.showLoading.collectAsState()
 
     var pesquisa by remember { mutableStateOf("") }
     var showCadastroDialog by remember { mutableStateOf(false) }
     var showEdicaoDialog by remember { mutableStateOf(false) }
-    var categoriaEditado by remember { mutableStateOf(Categoria("Tinta")) }
-    val categorias = remember { mutableStateListOf(Categoria("Tinta")) }
+    var categoriaEditado by remember { mutableStateOf<ModelCategoria?>(null) }
     var showConfirmDeleteDialog by remember { mutableStateOf(false) }
-    var categoriaParaExcluir by remember { mutableStateOf<Categoria?>(null) }
+    var categoriaParaExcluir by remember { mutableStateOf<ModelCategoria?>(null) }
 
+    // Carregar categorias assim que abrir
+    LaunchedEffect(Unit) {
+        viewModelCategoria.carregarCategorias()
+    }
 
     Column(
         modifier = Modifier
@@ -64,52 +80,34 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
         Spacer(modifier = Modifier.height(30.dp))
         menuComTituloPage("Categoria", navController)
 
-//        Row(
-//            modifier = Modifier
-//                .padding(horizontal = 20.dp)
-//                .fillMaxWidth(),
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Start
-//        ) {
-            Input(
-                titulo = "",
-                valor = pesquisa,
-                onValorChange = { pesquisa = it },
-                textStyle = textPadrao,
-                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
-                modifier = Modifier.weight(1f)
-            )
-
-//            Image(
-//                painter = painterResource(id = R.drawable.icon_add),
-//                contentDescription = "Adicionar",
-//                modifier = Modifier
-//                    .size(60.dp)
-//                    .padding(top = 25.dp)
-//                    .clickable { showCadastroDialog = true }
-//            )
-//        }
+        Input(
+            titulo = "",
+            valor = pesquisa,
+            onValorChange = { pesquisa = it },
+            textStyle = textPadrao,
+            labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Column {
             categorias
-                .filter { it.categoria.contains(pesquisa, ignoreCase = true) }
-                .forEachIndexed{
-                index, categoria ->
-                cardCategoria(
-                    categoria.categoria,
-                    onEditClick = {
-                        categoriaEditado = categoria
-                        showEdicaoDialog = true
-                    },
-                    onDeleteClick ={
-                        categoriaParaExcluir = categoria
-                        showConfirmDeleteDialog = true
-                    }
-                )
-                Spacer(modifier = modifier.height(10.dp))
-            }
+                .filter { it.nome.contains(pesquisa, ignoreCase = true) }
+                .forEach { categoria ->
+                    cardCategoria(
+                        categoria.nome,
+                        onEditClick = {
+                            categoriaEditado = categoria
+                            showEdicaoDialog = true
+                        },
+                        onDeleteClick = {
+                            categoriaParaExcluir = categoria
+                            showConfirmDeleteDialog = true
+                        }
+                    )
+                    Spacer(modifier = modifier.height(10.dp))
+                }
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -125,64 +123,53 @@ fun TelaCategorias(navController: NavController, modifier: Modifier = Modifier) 
         }
     }
 
-    if (showEdicaoDialog) {
-        ModalEdicaoCategoria(
-            categoria = categoriaEditado,
-            onDismiss = { showEdicaoDialog = false },
-            onSave = { novaCategoria ->
-                val index = categorias.indexOfFirst { it == categoriaEditado }
-                if (index != -1) {
-                    categorias[index] = novaCategoria
-                }
-                showEdicaoDialog = false
-            }
-        )
-    }
-
     if (showCadastroDialog) {
         NovaCategoriaDialog(
-            onDismiss = { showCadastroDialog = false },
-            onSalvar = { novaCategoria ->
-                categorias.add(novaCategoria)
-                showCadastroDialog = false
-            }
-            )
+            viewModelCategoria = viewModelCategoria,
+            onDismiss = { showCadastroDialog = false }
+        )
     }
 
     if (showConfirmDeleteDialog && categoriaParaExcluir != null) {
         ConfirmDeleteDialogCategoria(
             onConfirm = {
-                categorias.remove(categoriaParaExcluir)
-                categoriaParaExcluir = null
+                categoriaParaExcluir?.id?.let { viewModelCategoria.deletarCategoria(it) }
                 showConfirmDeleteDialog = false
             },
             onCancel = {
-                categoriaParaExcluir = null
                 showConfirmDeleteDialog = false
             }
         )
     }
 
-}
+    if (cadastroSucesso) {
+        viewModelCategoria.resetCadastroSucesso()
+        showCadastroDialog = false
+    }
 
-@Composable
-fun CampoTextoCat(label: String, valor: String, onValorChange: (String) -> Unit) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(label, color = Color.White, fontSize = 14.sp)
-        OutlinedTextField(
-            value = valor,
-            onValueChange = onValorChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(color = Color.White)
+
+    if (showEdicaoDialog && categoriaEditado != null) {
+        EditarCategoriaDialog(
+            categoria = categoriaEditado!!,
+            onDismiss = { showEdicaoDialog = false },
+            onSalvar = { categoriaAtualizada ->
+                viewModelCategoria.atualizarCategoria(categoriaAtualizada) {
+                    showEdicaoDialog = false
+                }
+            }
         )
     }
 }
 
 
+
 @Composable
-fun NovaCategoriaDialog(onDismiss: () -> Unit, onSalvar: (Categoria) -> Unit) {
-    var categoriaTexto by remember { mutableStateOf("") }
+fun NovaCategoriaDialog(
+    viewModelCategoria: ViewModelCategoria,
+    onDismiss: () -> Unit
+) {
+    val nome by viewModelCategoria.nome
+    val nomeError by viewModelCategoria.nomeError
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -196,25 +183,31 @@ fun NovaCategoriaDialog(onDismiss: () -> Unit, onSalvar: (Categoria) -> Unit) {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
-                    value = categoriaTexto,
-                    onValueChange = { categoriaTexto = it},
+                    value = nome,
+                    onValueChange = viewModelCategoria::atualizarNome,
                     label = { Text("Categoria") },
+                    isError = nomeError != null,
                     textStyle = TextStyle(color = Color.White)
-                    )
+                )
+                nomeError?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp)
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Button(
-                        onClick = { onDismiss() },
-                        colors = ButtonDefaults.buttonColors(Color.Gray)) {
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                    ) {
                         Text("Cancelar")
                     }
                     Button(
-                        onClick = {
-                          onSalvar(Categoria(categoriaTexto))
-                            },
+                        onClick = { viewModelCategoria.cadastrarCategoria() },
                         colors = ButtonDefaults.buttonColors(Color(0xFFE91E63))
-                    ){
+                    ) {
                         Text("Salvar")
                     }
                 }
@@ -223,85 +216,66 @@ fun NovaCategoriaDialog(onDismiss: () -> Unit, onSalvar: (Categoria) -> Unit) {
     }
 }
 
-@Composable
-fun ModalEdicaoCategoria(categoria: Categoria, onDismiss: () -> Unit, onSave: (Categoria)-> Unit) {
-    var categoriaTexto by remember { mutableStateOf(categoria.categoria) }
 
-    Dialog(onDismissRequest = {}) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFF1B1B1B))
-                .padding(16.dp)
-                .fillMaxWidth()
+@Composable
+fun EditarCategoriaDialog(
+    categoria: ModelCategoria,
+    onDismiss: () -> Unit,
+    onSalvar: (ModelCategoria) -> Unit
+) {
+    var nomeEditado by remember { mutableStateOf(categoria.nome) }
+    var erroNome by remember { mutableStateOf<String?>(null) }
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(Color(0xFF121212))
         ) {
-            Column {
-                // Título e botão fechar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Editar", color = Color.White, fontSize = 18.sp)
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Fechar",
-                            tint = Color.Gray
-                        )
-                    }
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Editar Categoria", color = Color.White, fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = nomeEditado,
+                    onValueChange = {
+                        nomeEditado = it
+                        erroNome = null
+                    },
+                    label = { Text("Categoria") },
+                    isError = erroNome != null,
+                    textStyle = TextStyle(color = Color.White)
+                )
+                erroNome?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp)
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                CampoTexto("Categoria", categoriaTexto, { categoriaTexto = it })
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
                         onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(Color.Gray)
                     ) {
-                        Text("Cancelar", color = Color.White)
+                        Text("Cancelar")
                     }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
                     Button(
                         onClick = {
-                            onSave(Categoria(categoriaTexto))
-                            onDismiss()
+                            if (nomeEditado.isBlank()) {
+                                erroNome = "O nome é obrigatório."
+                            } else {
+                                onSalvar(categoria.copy(nome = nomeEditado))
+                            }
                         },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                        colors = ButtonDefaults.buttonColors(Color(0xFFE91E63))
                     ) {
-                        Text("Salvar", color = Color.White)
+                        Text("Salvar")
                     }
                 }
             }
         }
-    }
-}
-
-
-data class Categoria(
-    val categoria: String,
-)
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = Devices.PIXEL_2
-)
-
-@Composable
-fun GreetingPreviewCategoria() {
-    CodemobileTheme {
-
-        val navController = rememberNavController()
-        TelaCategorias(navController)
     }
 }
