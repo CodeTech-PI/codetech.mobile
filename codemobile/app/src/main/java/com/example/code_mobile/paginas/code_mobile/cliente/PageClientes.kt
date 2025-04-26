@@ -441,6 +441,7 @@ fun EditarClienteDialog(
     showSystemUi = true,
     device = androidx.compose.ui.tooling.preview.Devices.PIXEL_2
 )
+
 @Composable
 fun GreetingPreviewClientes() {
     androidx.compose.material3.MaterialTheme {
