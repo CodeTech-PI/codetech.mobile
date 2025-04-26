@@ -29,7 +29,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
 import com.example.code_mobile.paginas.code_mobile.Input
 import com.example.code_mobile.paginas.code_mobile.card4Informacoes
-import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
 import com.example.code_mobile.paginas.code_mobile.model.ModelEstoque
 import com.example.code_mobile.paginas.code_mobile.service.ServiceEstoque
@@ -39,6 +38,9 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response as RetrofitResponse
+import androidx.compose.runtime.rememberCoroutineScope
+import com.example.code_mobile.paginas.code_mobile.textPadrao
+import kotlinx.coroutines.launch
 
 @Composable
 fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
@@ -47,36 +49,66 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
     var pesquisa by remember { mutableStateOf("") }
     var showCadastroDialog by remember { mutableStateOf(false) }
     var showEdicaoDialog by remember { mutableStateOf(false) }
-    var produtoParaEditar by remember { mutableStateOf<ModelEstoque?>(null) } // Estado para o produto a ser editado
+    var produtoParaEditar by remember { mutableStateOf<ModelEstoque?>(null) }
 
     val serviceProduto = RetrofithAuth.retrofit.create(ServiceEstoque::class.java)
+    val coroutineScope = rememberCoroutineScope()
 
-    // Função para adicionar um novo produto à lista (localmente)
     val adicionarNovoProduto: (ModelEstoque) -> Unit = { novoProduto ->
-        produtos = produtos + novoProduto
-        // TODO: Implementar a chamada para cadastrar o produto no backend
-        // serviceProduto.cadastrarProduto(novoProduto).enqueue(...)
-    }
-
-    // Função para atualizar um produto na lista (localmente)
-    val atualizarProduto: (ModelEstoque) -> Unit = { produtoAtualizado ->
-        produtos = produtos.map {
-            if (it.id == produtoAtualizado.id) {
-                produtoAtualizado
-            } else {
-                it
+        coroutineScope.launch {
+            try {
+                val response = serviceProduto.cadastrarProduto(novoProduto)
+                if (response.isSuccessful) {
+                    val produtoCadastrado = response.body()
+                    if (produtoCadastrado != null) {
+                        produtos = produtos + produtoCadastrado
+                        println("Produto cadastrado com sucesso: $produtoCadastrado")
+                    } else {
+                        println("Corpo da resposta nulo ao cadastrar produto.")
+                    }
+                } else {
+                    println("Erro ao cadastrar produto: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Falha ao cadastrar produto: ${e.message}")
+                e.printStackTrace()
             }
         }
-        // TODO: Implementar a chamada para editar o produto no backend
-        // serviceProduto.editarProduto(produtoAtualizado.id, produtoAtualizado).enqueue(...)
+    }
+
+    val atualizarProduto: (ModelEstoque) -> Unit = { produtoAtualizado ->
+        coroutineScope.launch {
+            try {
+                val response = serviceProduto.editarProduto(produtoAtualizado.id!!, produtoAtualizado) // Assumindo que o ID não é nulo ao editar
+                if (response.isSuccessful) {
+                    val produtoEditado = response.body()
+                    if (produtoEditado != null) {
+                        produtos = produtos.map {
+                            if (it.id == produtoEditado.id) {
+                                produtoEditado
+                            } else {
+                                it
+                            }
+                        }
+                        println("Produto editado com sucesso: $produtoEditado")
+                    } else {
+                        println("Corpo da resposta nulo ao editar produto.")
+                    }
+                } else {
+                    println("Erro ao editar produto: ${response.code()} - ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Falha ao editar produto: ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 
     LaunchedEffect(true) {
         println("TelaEstoque LaunchedEffect, token atual: ${TokenManager.token}")
         try {
             val response = serviceProduto.getProdutos()
-
-            println("Entrou no try")
+            println("Entrou no try para carregar produtos")
             println(response.body())
 
             if (response.isSuccessful) {
@@ -95,15 +127,15 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
                 )
             }
         } catch (e: Exception) {
-            println("Erro na requisição: ${e.message}")
-            println("Entrou no catch")
+            println("Erro na requisição ao carregar produtos: ${e.message}")
+            println("Entrou no catch ao carregar produtos")
             e.printStackTrace()
         }
     }
 
     val produtosFiltrados = remember(produtos, pesquisa) {
         produtos.filter {
-            it.categoria.contains(pesquisa, ignoreCase = true) || // Usando a categoria mockada
+            it.categoria.contains(pesquisa, ignoreCase = true) ||
                     it.nome.contains(pesquisa, ignoreCase = true) ||
                     it.descricao.contains(pesquisa, ignoreCase = true)
         }
@@ -171,14 +203,13 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
                     )
 
                     card4Informacoes(
-                        coluna1Info1 = "Categoria: ${produto.categoria}", // Usando a categoria mockada
+                        coluna1Info1 = "Categoria: ${produto.categoria}",
                         coluna1Info2 = "Descrição: ${produto.descricao}",
                         coluna2Info1 = "Unidade: ${produto.unidadeMedida}",
                         coluna2Info2 = "Quantidade: ${produto.quantidade}",
                         onEditClick = {
                             println("Editar produto: ${produto.nome}")
-                            produtoParaEditar =
-                                produto // Atribui o produto clicado à variável de estado
+                            produtoParaEditar = produto
                             showEdicaoDialog = true
                         }
                     )
@@ -196,7 +227,8 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
             ModalEdicaoProduto(
                 produto = it,
                 onDismiss = { showEdicaoDialog = false },
-                onProdutoEditado = atualizarProduto // Passa a função para atualizar
+                onProdutoEditado = atualizarProduto,
+                serviceProduto = serviceProduto // Passando a instância do serviço
             )
         }
     }
@@ -204,7 +236,8 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
     if (showCadastroDialog) {
         NovoProdutoDialog(
             onDismiss = { showCadastroDialog = false },
-            onProdutoCadastrado = adicionarNovoProduto // Passa a função para adicionar
+            onProdutoCadastrado = adicionarNovoProduto,
+            serviceProduto = serviceProduto // Passando a instância do serviço
         )
     }
 }
@@ -224,12 +257,13 @@ fun CampoTexto(label: String, valor: String, onValorChange: (String) -> Unit) {
 }
 
 @Composable
-fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque) -> Unit) {
+fun NovoProdutoDialog(
+    onDismiss: () -> Unit,
+    onProdutoCadastrado: (ModelEstoque) -> Unit,
+    serviceProduto: ServiceEstoque // Recebe a instância do serviço
+) {
     var categoriaSelecionada by remember { mutableStateOf("Teste") } // Mocado
-    // val categorias = listOf("Tinta", "Papel", "Agulha", "Outro") // Removido, pois está mockado
-    // var expanded by remember { mutableStateOf(false) } // Removido, pois está mockado
 
-    // Estados para os campos de texto
     var nomeProduto by remember { mutableStateOf("") }
     var descricaoProduto by remember { mutableStateOf("") }
     var unidadeMedidaProduto by remember { mutableStateOf("") }
@@ -248,14 +282,13 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
                 Text(text = "Cadastrar.", color = Color.White, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Campo de categoria mockado
                 Text(text = "Categoria:", color = Color.White)
                 OutlinedTextField(
                     value = categoriaSelecionada,
                     onValueChange = { categoriaSelecionada = it },
                     label = { Text("Categoria (Mocado)") },
                     textStyle = TextStyle(color = Color.White),
-                    enabled = false // Desabilita a edição, pois está mockado
+                    enabled = false
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -306,13 +339,13 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
                     Button(
                         onClick = {
                             val novoProduto = ModelEstoque(
-                                categoria = categoriaSelecionada, // Usando o valor mockado
+                                categoria = categoriaSelecionada,
                                 nome = nomeProduto,
                                 descricao = descricaoProduto,
                                 unidadeMedida = unidadeMedidaProduto,
                                 quantidade = quantidadeProduto.toIntOrNull() ?: 0,
                                 preco = precoProduto.toDoubleOrNull() ?: 0.0,
-                                id = 0 // O ID será gerado pelo backend
+                                id = 0
                             )
                             onProdutoCadastrado(novoProduto)
                             onDismiss()
@@ -331,14 +364,16 @@ fun NovoProdutoDialog(onDismiss: () -> Unit, onProdutoCadastrado: (ModelEstoque)
 fun ModalEdicaoProduto(
     produto: ModelEstoque,
     onDismiss: () -> Unit,
-    onProdutoEditado: (ModelEstoque) -> Unit
+    onProdutoEditado: (ModelEstoque) -> Unit,
+    serviceProduto: ServiceEstoque // Recebe a instância do serviço
 ) {
-    var categoria by remember { mutableStateOf(produto.categoria) } // Usando o valor mockado
+    var categoria by remember { mutableStateOf(produto.categoria) }
     var nome by remember { mutableStateOf(produto.nome) }
     var descricao by remember { mutableStateOf(produto.descricao) }
     var unidade by remember { mutableStateOf(produto.unidadeMedida) }
     var quantidade by remember { mutableStateOf(produto.quantidade.toString()) }
     var preco by remember { mutableStateOf(produto.preco.toString()) }
+    val coroutineScope = rememberCoroutineScope()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -357,7 +392,6 @@ fun ModalEdicaoProduto(
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Campo de categoria mockado
                 CampoTexto(label = "Categoria (Mocado)", valor = categoria, onValorChange = {
                     categoria = it
                 })
@@ -373,7 +407,7 @@ fun ModalEdicaoProduto(
                 onClick = {
                     val produtoEditado = ModelEstoque(
                         id = produto.id,
-                        categoria = categoria, // Usando o valor mockado
+                        categoria = categoria,
                         nome = nome,
                         descricao = descricao,
                         unidadeMedida = unidade,
