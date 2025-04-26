@@ -19,7 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,9 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.code_mobile.R
@@ -59,6 +64,11 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     var exclusaoSucesso by remember { mutableStateOf(false) }
     var mensagemErroExclusao by remember { mutableStateOf<String?>(null) }
 
+    var showEdicaoDialog by remember { mutableStateOf(false) }
+    var clienteParaEditar by remember { mutableStateOf<ModelCliente?>(null) }
+    var edicaoSucesso by remember { mutableStateOf(false) }
+    var mensagemErroEdicao by remember { mutableStateOf<String?>(null) }
+
     println("Executando tela de clientes")
 
     LaunchedEffect(true) {
@@ -77,6 +87,22 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     LaunchedEffect(mensagemErroExclusao) {
         if (!mensagemErroExclusao.isNullOrEmpty()) {
             println("Erro ao excluir cliente: $mensagemErroExclusao")
+            // Opcional: Mostrar uma mensagem de erro ao usuário
+        }
+    }
+
+    LaunchedEffect(edicaoSucesso) {
+        if (edicaoSucesso) {
+            println("Cliente editado com sucesso!")
+            edicaoSucesso = false
+            showEdicaoDialog = false
+            viewModel.carregarClientes() // Recarregar a lista após a edição
+        }
+    }
+
+    LaunchedEffect(mensagemErroEdicao) {
+        if (!mensagemErroEdicao.isNullOrEmpty()) {
+            println("Erro ao editar cliente: $mensagemErroEdicao")
             // Opcional: Mostrar uma mensagem de erro ao usuário
         }
     }
@@ -156,7 +182,10 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                                 coluna1Info2 = "Nascimento: ${cliente.dataNascimento}",
                                 coluna2Info1 = "Telefone: ${cliente.telefone}",
                                 coluna2Info2 = "Email: ${cliente.email}",
-                                onEditClick = {},
+                                onEditClick = { clienteSelecionado ->
+                                    clienteParaEditar = clienteSelecionado
+                                    showEdicaoDialog = true
+                                },
                                 onDeleteClick = { cliente ->
                                     clienteParaExcluir = cliente
                                     showDialog = true
@@ -183,6 +212,20 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
                 }
             )
         }
+
+        if (showEdicaoDialog && clienteParaEditar != null) {
+            EditarClienteDialog(
+                cliente = clienteParaEditar!!,
+                onDismiss = { showEdicaoDialog = false },
+                onSalvar = { clienteAtualizado ->
+                    viewModel.atualizarCliente(
+                        cliente = clienteAtualizado,
+                        onSucesso = { edicaoSucesso = true },
+                        onError = { mensagemErroEdicao = it }
+                    )
+                }
+            )
+        }
     }
 }
 
@@ -194,61 +237,203 @@ fun ExcluirClienteDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF252525),
-        shape = RoundedCornerShape(1.dp),
-        modifier = Modifier
-            .border(0.5.dp, Color(0xFFDF0050), RoundedCornerShape(2.dp))
-            .clip(RoundedCornerShape(2.dp)),
-        title = {
-            Text(
-                "Excluir Cliente?",
-                style = textPadrao,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        text = {
-            Text(
-                "Nome: \n${cliente.nome}\nCPF: ${cliente.cpf}",
-                style = textPadrao.copy(fontSize = 18.sp, color = Color.White),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
+        title = { Text("Confirmar Exclusão", color = Color.White) },
+        text = { Text("Deseja mesmo excluir o cliente ${cliente.nome}?", color = Color.White) },
         confirmButton = {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { onConfirmExcluir(cliente); onDismiss() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDF0050),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
+                    onClick = {
+                        onConfirmExcluir(cliente)
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text("Excluir")
+                    Text("Sim", color = Color.White)
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF555555),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.weight(1f)
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    Text("Cancelar")
+                    Text("Não", color = Color.White)
                 }
             }
         },
-        dismissButton = {}
+        containerColor = Color(0xFF2B2B2B)
     )
+}
+
+@Composable
+fun EditarClienteDialog(
+    cliente: ModelCliente,
+    onDismiss: () -> Unit,
+    onSalvar: (ModelCliente) -> Unit
+) {
+    var nomeEditado by remember { mutableStateOf(cliente.nome) }
+    var cpfEditado by remember { mutableStateOf(cliente.cpf) }
+    var dataNascimentoEditado by remember { mutableStateOf(cliente.dataNascimento) }
+    var telefoneEditado by remember { mutableStateOf(cliente.telefone) }
+    var emailEditado by remember { mutableStateOf(cliente.email) }
+
+    var erroNome by remember { mutableStateOf<String?>(null) }
+    var erroCpf by remember { mutableStateOf<String?>(null) }
+    var erroDataNascimento by remember { mutableStateOf<String?>(null) }
+    var erroTelefone by remember { mutableStateOf<String?>(null) }
+    var erroEmail by remember { mutableStateOf<String?>(null) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(Color(0xFF2B2B2B))
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Editar Cliente", color = Color.White, fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = nomeEditado,
+                    onValueChange = {
+                        nomeEditado = it
+                        erroNome = null
+                    },
+                    label = { Text("Nome", color = Color.Gray) },
+                    isError = erroNome != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroNome?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = cpfEditado,
+                    onValueChange = {
+                        cpfEditado = it
+                        erroCpf = null
+                    },
+                    label = { Text("CPF", color = Color.Gray) },
+                    isError = erroCpf != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroCpf?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = dataNascimentoEditado,
+                    onValueChange = {
+                        dataNascimentoEditado = it
+                        erroDataNascimento = null
+                    },
+                    label = { Text("Data de Nascimento", color = Color.Gray) },
+                    isError = erroDataNascimento != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroDataNascimento?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = telefoneEditado,
+                    onValueChange = {
+                        telefoneEditado = it
+                        erroTelefone = null
+                    },
+                    label = { Text("Telefone", color = Color.Gray) },
+                    isError = erroTelefone != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroTelefone?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = emailEditado,
+                    onValueChange = {
+                        emailEditado = it
+                        erroEmail = null
+                    },
+                    label = { Text("Email", color = Color.Gray) },
+                    isError = erroEmail != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroEmail?.let {
+                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                    ) {
+                        Text("Cancelar", color = Color.White)
+                    }
+                    Button(
+                        onClick = {
+                            var isValid = true
+                            if (nomeEditado.isBlank()) {
+                                erroNome = "O nome é obrigatório."
+                                isValid = false
+                            }
+                            if (cpfEditado.isBlank()) {
+                                erroCpf = "O CPF é obrigatório."
+                                isValid = false
+                            }
+                            if (dataNascimentoEditado.isBlank()) {
+                                erroDataNascimento = "A data de nascimento é obrigatória."
+                                isValid = false
+                            }
+                            if (telefoneEditado.isBlank()) {
+                                erroTelefone = "O telefone é obrigatório."
+                                isValid = false
+                            }
+                            if (emailEditado.isBlank()) {
+                                erroEmail = "O email é obrigatório."
+                                isValid = false
+                            }
+
+                            if (isValid) {
+                                val clienteAtualizado = cliente.copy(
+                                    nome = nomeEditado,
+                                    cpf = cpfEditado,
+                                    dataNascimento = dataNascimentoEditado,
+                                    telefone = telefoneEditado,
+                                    email = emailEditado
+                                )
+                                onSalvar(clienteAtualizado)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                    ) {
+                        Text("Salvar", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @androidx.compose.ui.tooling.preview.Preview(
@@ -256,6 +441,7 @@ fun ExcluirClienteDialog(
     showSystemUi = true,
     device = androidx.compose.ui.tooling.preview.Devices.PIXEL_2
 )
+
 @Composable
 fun GreetingPreviewClientes() {
     androidx.compose.material3.MaterialTheme {
