@@ -13,6 +13,7 @@ object RetrofithAuth {
         level = HttpLoggingInterceptor.Level.BODY // Or other levels (see below)
     }
 
+
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor())
         .addInterceptor(loggingInterceptor)
