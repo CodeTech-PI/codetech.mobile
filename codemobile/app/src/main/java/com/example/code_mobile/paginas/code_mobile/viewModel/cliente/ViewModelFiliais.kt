@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class FiliaisViewModel(private val serviceFiliais: ServiceFiliais) : ViewModel() {
+class ViewModelFiliais(private val serviceFiliais: ServiceFiliais) : ViewModel() {
 
     // Estados para a lista de filiais
     private val _listaFiliais = MutableStateFlow<List<ModelFiliais>>(emptyList())
