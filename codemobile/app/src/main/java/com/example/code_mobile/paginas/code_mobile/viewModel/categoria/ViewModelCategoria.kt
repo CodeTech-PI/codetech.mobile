@@ -1,6 +1,5 @@
-package com.example.code_mobile.paginas.code_mobile.viewmodel.categoria
+package com.example.code_mobile.paginas.code_mobile.viewModel.categoria
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

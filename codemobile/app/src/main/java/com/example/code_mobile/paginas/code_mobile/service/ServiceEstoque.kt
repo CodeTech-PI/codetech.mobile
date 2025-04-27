@@ -13,13 +13,16 @@ interface ServiceEstoque {
     @GET("produtos")
     suspend fun getProdutos(): Response<List<ModelEstoque>>
 
+    @GET("produtos/{id}")
+    suspend fun getProdutoPorId(@Path("id") id: Int): Response<ModelEstoque>
+
     @POST("produtos")
-    suspend fun cadastrarProduto(@Body novoProduto: ModelEstoque): Response<ModelEstoque>
+    suspend fun postProduto(@Body novoProduto: ModelEstoque): Response<ModelEstoque>
 
     @PUT("produtos/{id}")
-    suspend fun editarProduto(@Path("id") id: Int, @Body produtoAtualizado: ModelEstoque): Response<ModelEstoque>
+    suspend fun putProduto(@Path("id") id: Int, @Body produtoAtualizado: ModelEstoque): Response<ModelEstoque>
     //
     @DELETE("produtos/{id}")
-    suspend fun excluirProduto(@Path("id") id: Int): Response<Unit>
+    suspend fun deleteProduto(@Path("id") id: Int): Response<Unit>
 
 }

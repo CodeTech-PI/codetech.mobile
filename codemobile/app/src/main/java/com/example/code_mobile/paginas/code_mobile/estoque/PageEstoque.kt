@@ -1,436 +1,628 @@
 package com.example.code_mobile.paginas.code_mobile.estoque
 
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.code_mobile.ui.theme.CodemobileTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.Input
-import com.example.code_mobile.paginas.code_mobile.card4Informacoes
+import com.example.code_mobile.paginas.code_mobile.inputPadrao
 import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
+import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
 import com.example.code_mobile.paginas.code_mobile.model.ModelEstoque
-import com.example.code_mobile.paginas.code_mobile.service.ServiceEstoque
-import com.example.code_mobile.token.network.RetrofithAuth
-import com.example.code_mobile.token.network.TokenManager
-import com.example.code_mobile.ui.theme.CodemobileTheme
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response as RetrofitResponse
-import androidx.compose.runtime.rememberCoroutineScope
 import com.example.code_mobile.paginas.code_mobile.textPadrao
-import kotlinx.coroutines.launch
+import com.example.code_mobile.paginas.code_mobile.viewModel.estoque.ViewModelEstoque
 
 @Composable
 fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
+    val viewModel: ViewModelEstoque = viewModel()
 
-    var produtos by remember { mutableStateOf<List<ModelEstoque>>(emptyList()) }
     var pesquisa by remember { mutableStateOf("") }
-    var showCadastroDialog by remember { mutableStateOf(false) }
+    val itensEstoque by viewModel.estoque.collectAsState()
+    val isLoading by viewModel.isLoadingEstoque.collectAsState()
+    val erroCarregar by viewModel.erroCarregarEstoque.collectAsState()
+
+    var showDialogExcluir by remember { mutableStateOf(false) }
+    var itemParaExcluir by remember { mutableStateOf<ModelEstoque?>(null) }
+    var exclusaoSucesso by remember { mutableStateOf(false) }
+    var mensagemErroExclusao by remember { mutableStateOf<String?>(null) }
+
     var showEdicaoDialog by remember { mutableStateOf(false) }
-    var produtoParaEditar by remember { mutableStateOf<ModelEstoque?>(null) }
+    var itemParaEditar by remember { mutableStateOf<ModelEstoque?>(null) }
+    var edicaoSucesso by remember { mutableStateOf(false) }
+    var mensagemErroEdicao by remember { mutableStateOf<String?>(null) }
 
-    val serviceProduto = RetrofithAuth.retrofit.create(ServiceEstoque::class.java)
-    val coroutineScope = rememberCoroutineScope()
+    val listaCategorias by viewModel.categorias.collectAsState()
 
-    val adicionarNovoProduto: (ModelEstoque) -> Unit = { novoProduto ->
-        coroutineScope.launch {
-            try {
-                val response = serviceProduto.cadastrarProduto(novoProduto)
-                if (response.isSuccessful) {
-                    val produtoCadastrado = response.body()
-                    if (produtoCadastrado != null) {
-                        produtos = produtos + produtoCadastrado
-                        println("Produto cadastrado com sucesso: $produtoCadastrado")
-                    } else {
-                        println("Corpo da resposta nulo ao cadastrar produto.")
-                    }
-                } else {
-                    println("Erro ao cadastrar produto: ${response.code()} - ${response.errorBody()?.string()}")
-                }
-            } catch (e: Exception) {
-                println("Falha ao cadastrar produto: ${e.message}")
-                e.printStackTrace()
-            }
-        }
-    }
-
-    val atualizarProduto: (ModelEstoque) -> Unit = { produtoAtualizado ->
-        coroutineScope.launch {
-            try {
-                val response = serviceProduto.editarProduto(produtoAtualizado.id!!, produtoAtualizado) // Assumindo que o ID não é nulo ao editar
-                if (response.isSuccessful) {
-                    val produtoEditado = response.body()
-                    if (produtoEditado != null) {
-                        produtos = produtos.map {
-                            if (it.id == produtoEditado.id) {
-                                produtoEditado
-                            } else {
-                                it
-                            }
-                        }
-                        println("Produto editado com sucesso: $produtoEditado")
-                    } else {
-                        println("Corpo da resposta nulo ao editar produto.")
-                    }
-                } else {
-                    println("Erro ao editar produto: ${response.code()} - ${response.errorBody()?.string()}")
-                }
-            } catch (e: Exception) {
-                println("Falha ao editar produto: ${e.message}")
-                e.printStackTrace()
-            }
-        }
-    }
+    println("Executando tela de estoque")
 
     LaunchedEffect(true) {
-        println("TelaEstoque LaunchedEffect, token atual: ${TokenManager.token}")
-        try {
-            val response = serviceProduto.getProdutos()
-            println("Entrou no try para carregar produtos")
-            println(response.body())
+        println("TelaEstoque LaunchedEffect")
+        viewModel.carregarEstoque()
+    }
 
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    produtos = body
-                } else {
-                    println("Corpo da resposta nulo ao carregar produtos.")
-                    produtos = emptyList()
-                }
-            } else {
-                println(
-                    "Erro ao carregar produtos: ${response.code()} - ${
-                        response.errorBody()?.string()
-                    }"
-                )
-            }
-        } catch (e: Exception) {
-            println("Erro na requisição ao carregar produtos: ${e.message}")
-            println("Entrou no catch ao carregar produtos")
-            e.printStackTrace()
+    LaunchedEffect(exclusaoSucesso) {
+        if (exclusaoSucesso) {
+            println("Item do estoque excluído com sucesso!")
+            exclusaoSucesso = false // Resetar o estado
+            showDialogExcluir = false // Fechar o diálogo após o sucesso
+            viewModel.carregarEstoque() // Recarregar a lista
         }
     }
 
-    val produtosFiltrados = remember(produtos, pesquisa) {
-        produtos.filter {
-            it.categoria.contains(pesquisa, ignoreCase = true) ||
-                    it.nome.contains(pesquisa, ignoreCase = true) ||
-                    it.descricao.contains(pesquisa, ignoreCase = true)
+    LaunchedEffect(mensagemErroExclusao) {
+        if (!mensagemErroExclusao.isNullOrEmpty()) {
+            println("Erro ao excluir item do estoque: $mensagemErroExclusao")
+            // Opcional: Mostrar uma mensagem de erro ao usuário
+        }
+    }
+
+    LaunchedEffect(edicaoSucesso) {
+        if (edicaoSucesso) {
+            println("Item do estoque editado com sucesso!")
+            edicaoSucesso = false
+            showEdicaoDialog = false
+            viewModel.carregarEstoque() // Recarregar a lista após a edição
+        }
+    }
+
+    LaunchedEffect(mensagemErroEdicao) {
+        if (!mensagemErroEdicao.isNullOrEmpty()) {
+            println("Erro ao editar item do estoque: $mensagemErroEdicao")
+            // Opcional: Mostrar uma mensagem de erro ao usuário
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1B1B1B))
-            .verticalScroll(rememberScrollState()),
+            .background(Color(0xFF1B1B1B)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         menuComTituloPage("Estoque", navController)
 
         Row(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp)
         ) {
-            Input(
+            InputPesquisarEstoque(
                 titulo = "",
                 valor = pesquisa,
                 onValorChange = { pesquisa = it },
                 textStyle = textPadrao,
-                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
-                modifier = Modifier.weight(1f)
+                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por Nome") }
             )
 
             Image(
                 painter = painterResource(id = R.drawable.icon_add),
                 contentDescription = "Adicionar",
                 modifier = Modifier
-                    .size(50.dp)
-                    .padding(start = 8.dp)
-                    .clickable { showCadastroDialog = true }
+                    .size(60.dp)
+                    .padding(top = 25.dp)
+                    .clickable {
+                        println("Clicou para cadastrar um item no estoque!")
+                        navController.navigate("EstoqueCadastro")
+                    }
             )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (produtosFiltrados.isEmpty()) {
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White)
+        } else if (!erroCarregar.isNullOrEmpty()) {
             Text(
-                "Nenhum produto encontrado.",
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.CenterHorizontally)
+                text = "Erro ao carregar estoque: $erroCarregar",
+                color = Color.Red,
+                style = textPadrao
             )
         } else {
-            for (produto in produtosFiltrados) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                ) {
-                    Text(
-                        text = produto.nome,
-                        style = textPadrao.copy(fontSize = 16.sp),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 10.dp)
-                    )
+            LazyColumn {
+                item {
+                    val estoqueFiltrado = if (pesquisa.isBlank()) {
+                        itensEstoque
+                    } else {
+                        itensEstoque.filter { it.nome.contains(pesquisa, ignoreCase = true) }
+                    }
 
-                    card4Informacoes(
-                        coluna1Info1 = "Categoria: ${produto.categoria}",
-                        coluna1Info2 = "Descrição: ${produto.descricao}",
-                        coluna2Info1 = "Unidade: ${produto.unidadeMedida}",
-                        coluna2Info2 = "Quantidade: ${produto.quantidade}",
-                        onEditClick = {
-                            println("Editar produto: ${produto.nome}")
-                            produtoParaEditar = produto
-                            showEdicaoDialog = true
+                    for (item in estoqueFiltrado) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = item.nome,
+                                style = textPadrao.copy(fontSize = 16.sp),
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(top = 10.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            cardEstoque(
+                                itemEstoque = item,
+                                coluna1Info1 = "ID: ${item.id}",
+                                coluna1Info2 = "Unidade: ${item.unidadeMedida}",
+                                coluna2Info1 = "Preço: R$ ${String.format("%.2f", item.preco)}",
+                                coluna2Info2 = "Quantidade: ${item.quantidade}",
+                                onEditClick = { itemSelecionado ->
+                                    itemParaEditar = itemSelecionado
+                                    showEdicaoDialog = true
+                                },
+                                onDeleteClick = { itemSelecionado ->
+                                    itemParaExcluir = itemSelecionado
+                                    showDialogExcluir = true
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
+                    }
                 }
             }
+
+
+            if (showDialogExcluir && itemParaExcluir != null) {
+                ExcluirEstoqueDialog(
+                    item = itemParaExcluir!!,
+                    onDismiss = { showDialogExcluir = false },
+                    onConfirmExcluir = { itemExcluir ->
+                        viewModel.excluirEstoque(
+                            item = itemExcluir,
+                            onExclusaoSucesso = { exclusaoSucesso = true },
+                            onExclusaoErro = { mensagemErroExclusao = it }
+                        )
+                    }
+                )
+            }
+
+            if (showEdicaoDialog && itemParaEditar != null) {
+                EditarEstoqueDialog(
+                    item = itemParaEditar!!,
+                    listaCategorias = viewModel.categorias.collectAsState().value,
+                    onDismiss = { itemParaEditar = null },
+                    onSalvar = { itemAtualizado -> // 'itemAtualizado' aqui vem do diálogo
+                        viewModel.atualizarEstoque(
+                            itemAtualizadoRecebido = itemAtualizado, // Passa o item do diálogo
+                            onSucesso = { itemParaEditar = null },
+                            onError = { mensagem -> /* Lidar com o erro */ }
+                        )
+                    }
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
+}
 
-    if (showEdicaoDialog) {
-        produtoParaEditar?.let {
-            ModalEdicaoProduto(
-                produto = it,
-                onDismiss = { showEdicaoDialog = false },
-                onProdutoEditado = atualizarProduto,
-                serviceProduto = serviceProduto // Passando a instância do serviço
+@Composable
+fun InputPesquisarEstoque(
+    titulo: String,
+    valor: String,
+    onValorChange: (String) -> Unit,
+    textStyle: TextStyle,
+    labelInfo: @Composable (() -> Unit),
+    modifier: Modifier = Modifier
+) {
+    Column()
+    {
+        Text(text = titulo, style = textStyle) // Tipo texto com o estilo passado no "Campo"
+
+        // Input
+        TextField(
+            value = valor,
+            onValueChange = onValorChange, // Atualiza o valor conforme o usuário digita
+            textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp),
+            modifier = Modifier
+                .inputPadrao(),
+            singleLine = false, // impede quebra de linha na input
+            label = labelInfo
+        )
+    }
+}
+
+@Composable
+fun cardEstoque(
+    itemEstoque: ModelEstoque,
+    coluna1Info1: String,
+    coluna1Info2: String,
+    coluna2Info1: String,
+    coluna2Info2: String,
+    onEditClick: (ModelEstoque) -> Unit,
+    onDeleteClick: (ModelEstoque) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable { println("Clicou no card do item ${itemEstoque.nome}") },
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(Color(0xFF2B2B2B)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.icone_editar),
+                contentDescription = "Editar",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onEditClick(itemEstoque) }
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.icone_deletar),
+                contentDescription = "Excluir",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onDeleteClick(itemEstoque) }
             )
         }
-    }
 
-    if (showCadastroDialog) {
-        NovoProdutoDialog(
-            onDismiss = { showCadastroDialog = false },
-            onProdutoCadastrado = adicionarNovoProduto,
-            serviceProduto = serviceProduto // Passando a instância do serviço
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = coluna1Info1,
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = coluna1Info2,
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = coluna2Info1,
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = coluna2Info2,
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun CampoTexto(label: String, valor: String, onValorChange: (String) -> Unit) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(label, color = Color.White, fontSize = 14.sp)
-        OutlinedTextField(
-            value = valor,
-            onValueChange = onValorChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(color = Color.White)
-        )
-    }
-}
-
-@Composable
-fun NovoProdutoDialog(
+fun ExcluirEstoqueDialog(
+    item: ModelEstoque,
     onDismiss: () -> Unit,
-    onProdutoCadastrado: (ModelEstoque) -> Unit,
-    serviceProduto: ServiceEstoque // Recebe a instância do serviço
+    onConfirmExcluir: (ModelEstoque) -> Unit
 ) {
-    var categoriaSelecionada by remember { mutableStateOf("Teste") } // Mocado
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Confirmar Exclusão", color = Color.White) },
+        text = { Text("Deseja mesmo excluir o item ${item.nome}?", color = Color.White) },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        onConfirmExcluir(item)
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Sim", color = Color.White)
+                }
 
-    var nomeProduto by remember { mutableStateOf("") }
-    var descricaoProduto by remember { mutableStateOf("") }
-    var unidadeMedidaProduto by remember { mutableStateOf("") }
-    var quantidadeProduto by remember { mutableStateOf("") }
-    var precoProduto by remember { mutableStateOf("") }
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+            }
+        },
+        containerColor = Color(0xFF2B2B2B)
+    )
+}
 
-    Dialog(onDismissRequest = { onDismiss() }) {
+@Composable
+fun EditarEstoqueDialog(
+    item: ModelEstoque,
+    listaCategorias: List<ModelCategoria>,
+    onDismiss: () -> Unit,
+    onSalvar: (ModelEstoque) -> Unit
+) {
+    var nomeEditado by remember { mutableStateOf(item.nome) }
+    var descricaoEditada by remember { mutableStateOf(item.descricao) }
+    var unidadeMedidaEditada by remember { mutableStateOf(item.unidadeMedida) }
+    var precoEditado by remember { mutableStateOf(item.preco.toString()) }
+    var quantidadeEditada by remember { mutableStateOf(item.quantidade.toString()) }
+
+    // Novo estado para a categoria selecionada no DropdownMenu
+    var categoriaSelecionada by remember { mutableStateOf<ModelCategoria?>(item.categoria) }
+    var expandedCategoria by remember { mutableStateOf(false) }
+
+    var erroNome by remember { mutableStateOf<String?>(null) }
+    var erroDescricao by remember { mutableStateOf<String?>(null) }
+    var erroPreco by remember { mutableStateOf<String?>(null) }
+    var erroQuantidade by remember { mutableStateOf<String?>(null) }
+    var erroCategoria by remember { mutableStateOf<String?>(null) }
+
+    Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(Color(0xFF121212))
+            colors = CardDefaults.cardColors(Color(0xFF2B2B2B))
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Cadastrar.", color = Color.White, fontSize = 20.sp)
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Editar Item do Estoque", color = Color.White, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(text = "Categoria:", color = Color.White)
                 OutlinedTextField(
-                    value = categoriaSelecionada,
-                    onValueChange = { categoriaSelecionada = it },
-                    label = { Text("Categoria (Mocado)") },
+                    value = nomeEditado,
+                    onValueChange = {
+                        nomeEditado = it
+                        erroNome = null
+                    },
+                    label = { Text("Nome", color = Color.Gray) },
+                    isError = erroNome != null,
                     textStyle = TextStyle(color = Color.White),
-                    enabled = false
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                erroNome?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = nomeProduto,
-                    onValueChange = { nomeProduto = it },
-                    label = { Text("Produto") },
-                    textStyle = TextStyle(color = Color.White)
+                    value = descricaoEditada,
+                    onValueChange = { descricaoEditada = it },
+                    label = { Text("Descrição", color = Color.Gray) },
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = descricaoProduto,
-                    onValueChange = { descricaoProduto = it },
-                    label = { Text("Descrição") },
-                    textStyle = TextStyle(color = Color.White)
-                )
-                OutlinedTextField(
-                    value = unidadeMedidaProduto,
-                    onValueChange = { unidadeMedidaProduto = it },
-                    label = { Text("Unidade Medida") },
-                    textStyle = TextStyle(color = Color.White)
-                )
-                OutlinedTextField(
-                    value = quantidadeProduto,
-                    onValueChange = { quantidadeProduto = it },
-                    label = { Text("Quantidade") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    textStyle = TextStyle(color = Color.White)
-                )
-                OutlinedTextField(
-                    value = precoProduto,
-                    onValueChange = { precoProduto = it },
-                    label = { Text("Preço") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    textStyle = TextStyle(color = Color.White)
-                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = unidadeMedidaEditada,
+                    onValueChange = { unidadeMedidaEditada = it },
+                    label = { Text("Unidade de Medida", color = Color.Gray) },
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = precoEditado,
+                    onValueChange = {
+                        precoEditado = it
+                        erroPreco = null
+                        if (it.isNotBlank() && it.toDoubleOrNull() == null) {
+                            erroPreco = "Preço inválido"
+                        }
+                    },
+                    label = { Text("Preço", color = Color.Gray) },
+                    isError = erroPreco != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroPreco?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = quantidadeEditada,
+                    onValueChange = {
+                        quantidadeEditada = it
+                        erroQuantidade = null
+                        if (it.isNotBlank() && it.toIntOrNull() == null) {
+                            erroQuantidade = "Quantidade inválida"
+                        }
+                    },
+                    label = { Text("Quantidade", color = Color.Gray) },
+                    isError = erroQuantidade != null,
+                    textStyle = TextStyle(color = Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                erroQuantidade?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Dropdown para selecionar a categoria
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text("Categoria:", color = Color.Gray)
+                    Box {
+                        OutlinedTextField(
+                            value = categoriaSelecionada?.nome ?: "",
+                            onValueChange = { /* Não permitir edição direta */ },
+                            label = { Text("Selecione a Categoria", color = Color.Gray) },
+                            readOnly = true,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowDropDown,
+                                    contentDescription = "Dropdown",
+                                    tint = Color.White,
+                                    modifier = Modifier.clickable {
+                                        expandedCategoria = !expandedCategoria
+                                    }
+                                )
+                            },
+                            isError = erroCategoria != null,
+                            textStyle = TextStyle(color = Color.White),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        DropdownMenu(
+                            expanded = expandedCategoria,
+                            onDismissRequest = { expandedCategoria = false },
+                            modifier = Modifier.fillMaxWidth(),
+                            content = {
+                                listaCategorias.forEach { categoria ->
+                                    DropdownMenuItem(
+                                        text = { Text(categoria.nome, color = Color.White) },
+                                        onClick = {
+                                            categoriaSelecionada = categoria
+                                            expandedCategoria = false
+                                        }
+                                    )
+                                }
+                            }
+                        )
+                    }
+                    erroCategoria?.let {
+                        Text(
+                            text = it,
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(
-                        onClick = { onDismiss() },
+                        onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(Color.Gray)
                     ) {
-                        Text("Cancelar")
+                        Text("Cancelar", color = Color.White)
                     }
                     Button(
                         onClick = {
-                            val novoProduto = ModelEstoque(
-                                categoria = categoriaSelecionada,
-                                nome = nomeProduto,
-                                descricao = descricaoProduto,
-                                unidadeMedida = unidadeMedidaProduto,
-                                quantidade = quantidadeProduto.toIntOrNull() ?: 0,
-                                preco = precoProduto.toDoubleOrNull() ?: 0.0,
-                                id = 0
-                            )
-                            onProdutoCadastrado(novoProduto)
-                            onDismiss()
+                            var isValid = true
+                            if (nomeEditado.isBlank()) {
+                                erroNome = "O nome é obrigatório."
+                                isValid = false
+                            }
+                            if (precoEditado.isBlank() || precoEditado.toDoubleOrNull() == null) {
+                                erroPreco = "O preço é obrigatório e deve ser um número."
+                                isValid = false
+                            }
+                            if (quantidadeEditada.isBlank() || quantidadeEditada.toIntOrNull() == null) {
+                                erroQuantidade =
+                                    "A quantidade é obrigatória e deve ser um número inteiro."
+                                isValid = false
+                            }
+                            if (categoriaSelecionada == null) {
+                                erroCategoria = "A categoria é obrigatória."
+                                isValid = false
+                            }
+
+                            if (isValid) {
+                                val itemAtualizado = item.copy(
+                                    nome = nomeEditado,
+                                    descricao = descricaoEditada,
+                                    unidadeMedida = unidadeMedidaEditada,
+                                    preco = precoEditado.toBigDecimal(),
+                                    quantidade = quantidadeEditada.toInt(),
+                                    categoria = categoriaSelecionada!!
+                                )
+                                onSalvar(itemAtualizado)
+                            }
                         },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFE91E63))
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
                     ) {
-                        Text("Salvar")
+                        Text("Salvar", color = Color.White)
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun ModalEdicaoProduto(
-    produto: ModelEstoque,
-    onDismiss: () -> Unit,
-    onProdutoEditado: (ModelEstoque) -> Unit,
-    serviceProduto: ServiceEstoque // Recebe a instância do serviço
-) {
-    var categoria by remember { mutableStateOf(produto.categoria) }
-    var nome by remember { mutableStateOf(produto.nome) }
-    var descricao by remember { mutableStateOf(produto.descricao) }
-    var unidade by remember { mutableStateOf(produto.unidadeMedida) }
-    var quantidade by remember { mutableStateOf(produto.quantidade.toString()) }
-    var preco by remember { mutableStateOf(produto.preco.toString()) }
-    val coroutineScope = rememberCoroutineScope()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        modifier = Modifier.clip(RoundedCornerShape(12.dp)),
-        containerColor = Color(0xFF1B1B1B),
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Editar", color = Color.White, fontSize = 18.sp)
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = "Fechar", tint = Color.Red)
-                }
-            }
-        },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                CampoTexto(label = "Categoria (Mocado)", valor = categoria, onValorChange = {
-                    categoria = it
-                })
-                CampoTexto("Produto", nome, { nome = it })
-                CampoTexto("Descrição", descricao, { descricao = it })
-                CampoTexto("Unidade Medida", unidade, { unidade = it })
-                CampoTexto("Quantidade", quantidade, { quantidade = it })
-                CampoTexto("Preço", preco, { preco = it })
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    val produtoEditado = ModelEstoque(
-                        id = produto.id,
-                        categoria = categoria,
-                        nome = nome,
-                        descricao = descricao,
-                        unidadeMedida = unidade,
-                        quantidade = quantidade.toIntOrNull() ?: 0,
-                        preco = preco.toDoubleOrNull() ?: 0.0
-                    )
-                    onProdutoEditado(produtoEditado)
-                    onDismiss()
-                },
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
-            ) {
-                Text("Salvar", color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(Color.Gray)
-            ) {
-                Text("Cancelar", color = Color.White)
-            }
-        }
-    )
 }
 
 @Preview(
