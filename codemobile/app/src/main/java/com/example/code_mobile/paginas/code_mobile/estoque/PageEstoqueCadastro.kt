@@ -1,6 +1,5 @@
 package com.example.code_mobile.paginas.code_mobile.estoque
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,14 +46,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.paginas.code_mobile.cliente.ClienteCadastro
 import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.paginas.code_mobile.viewModel.estoque.ViewModelEstoque
+import com.example.code_mobile.ui.theme.CodemobileTheme
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,13 +108,13 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         Column(
             modifier = modifier
-                .fillMaxHeight(0.85f)
+                .fillMaxHeight(0.75f)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Espaçamento padrão
         ) {
 
             Row(
@@ -119,7 +123,7 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                     .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            ){
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Voltar",
@@ -129,7 +133,7 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                         .clickable { navController.navigate("Estoque") }
                 )
                 Text(
-                    text = "Cadastrar Item",
+                    text = "Cadastrar Produto",
                     style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
@@ -137,12 +141,49 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                 Spacer(modifier = Modifier.width(24.dp))
             }
 
+            // Dropdown para selecionar a categoria
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box {
+                    OutlinedTextField(
+                        value = categoriaSelecionada?.nome ?: "Selecione uma categoria", // Texto inicial
+                        onValueChange = { /* Não permitir edição direta */ },
+                        label = { Text("Categoria", style = textPadrao.copy(fontSize = 16.sp, color = Color.Gray)) },
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Dropdown",
+                                tint = Color.White,
+                                modifier = Modifier.clickable { expandedCategoria = !expandedCategoria }
+                            )
+                        },
+                        textStyle = textPadrao.copy(fontSize = 16.sp, color = Color.White),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    DropdownMenu(
+                        expanded = expandedCategoria,
+                        onDismissRequest = { expandedCategoria = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        listaCategorias.forEach { categoria ->
+                            DropdownMenuItem(
+                                text = { Text(categoria.nome, color = Color.White) },
+                                onClick = {
+                                    categoriaSelecionada = categoria
+                                    expandedCategoria = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
             CampoCadastrarEstoque(
                 titulo = "Nome:",
                 valor = nome,
                 onValorChange = viewModel::atualizarNome,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: Camiseta Manga Longa",
+                placeholderText = "Ex: Luva",
                 tituloStyle = textPadrao.copy(fontSize = 16.sp),
                 errorMessage = nomeError
             )
@@ -152,7 +193,7 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                 valor = descricao,
                 onValorChange = viewModel::atualizarDescricao,
                 textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 100% algodão, cor azul",
+                placeholderText = "Ex: Marca latex, cor azul",
                 tituloStyle = textPadrao.copy(fontSize = 16.sp),
             )
 
@@ -186,44 +227,6 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                 errorMessage = quantidadeError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
-
-            // Dropdown para selecionar a categoria
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text("Categoria:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
-                Box {
-                    OutlinedTextField(
-                        value = categoriaSelecionada?.nome ?: "",
-                        onValueChange = { /* Não permitir edição direta */ },
-                        label = { Text("Selecione a Categoria", style = textPadrao.copy(fontSize = 16.sp, color = Color.Gray)) },
-                        readOnly = true,
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowDropDown,
-                                contentDescription = "Dropdown",
-                                tint = Color.White,
-                                modifier = Modifier.clickable { expandedCategoria = !expandedCategoria }
-                            )
-                        },
-                        textStyle = textPadrao.copy(fontSize = 16.sp, color = Color.White),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    DropdownMenu(
-                        expanded = expandedCategoria,
-                        onDismissRequest = { expandedCategoria = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        listaCategorias.forEach { categoria ->
-                            DropdownMenuItem(
-                                text = { Text(categoria.nome, color = Color.White) },
-                                onClick = {
-                                    categoriaSelecionada = categoria
-                                    expandedCategoria = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -314,39 +317,43 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
 
         if (cadastroSucesso) {
             Dialog(
-                onDismissRequest = { }
+                onDismissRequest = {
+                    navController.navigate("Estoque")
+                }
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color(0xFF2B2B2B))
-                        .padding(12.dp),
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = "Sucesso",
                             tint = Color(0xFF4CAF50),
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(48.dp)
                         )
                         Text(
-                            "Cadastrado!",
+                            "Cadastrado com Sucesso!",
                             color = Color.White,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            fontSize = 18.sp
                         )
-                        Text(
-                            "Redirecionando...",
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp
-                        )
+                        Button(
+                            onClick = {
+                                navController.navigate("Estoque")
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                        ) {
+                            Text("Ok", color = Color.White, fontSize = 16.sp)
+                        }
                     }
                 }
             }
@@ -410,5 +417,18 @@ fun CampoCadastrarEstoque(
         errorMessage?.let {
             Text(text = it, color = Color.Red, style = textStyle.copy(fontSize = 12.sp))
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    device = Devices.PIXEL_2
+)
+@Composable
+fun EstoqueCadastroPreview() {
+    CodemobileTheme {
+        val navController = rememberNavController()
+        EstoqueCadastro(navController)
     }
 }

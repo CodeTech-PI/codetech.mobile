@@ -130,10 +130,7 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             InputPesquisarEstoque(
                 titulo = "",
@@ -194,10 +191,10 @@ fun TelaEstoque(navController: NavController, modifier: Modifier = Modifier) {
 
                             cardEstoque(
                                 itemEstoque = item,
-                                coluna1Info1 = "ID: ${item.id}",
-                                coluna1Info2 = "Unidade: ${item.unidadeMedida}",
-                                coluna2Info1 = "Preço: R$ ${String.format("%.2f", item.preco)}",
-                                coluna2Info2 = "Quantidade: ${item.quantidade}",
+                                coluna1Info1 = "Preço: R\$ ${String.format("%.2f", item.preco)}",
+                                coluna1Info2 = "Quantidade: ${item.quantidade}",
+                                coluna2Info1 = "ID: ${item.id}",
+                                coluna2Info2 = "Unidade: ${item.unidadeMedida}",
                                 onEditClick = { itemSelecionado ->
                                     itemParaEditar = itemSelecionado
                                     showEdicaoDialog = true
@@ -429,6 +426,45 @@ fun EditarEstoqueDialog(
                 Text("Editar Item do Estoque", color = Color.White, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Dropdown para selecionar a categoria
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Box {
+                        OutlinedTextField(
+                            value = categoriaSelecionada?.nome ?: "Categoria", // Texto inicial
+                            onValueChange = {  },
+                            label = { Text("Selecione a Categoria", style = textPadrao.copy(fontSize = 16.sp, color = Color.Gray)) },
+                            readOnly = true,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowDropDown,
+                                    contentDescription = "Dropdown",
+                                    tint = Color.White,
+                                    modifier = Modifier.clickable { expandedCategoria = !expandedCategoria }
+                                )
+                            },
+                            textStyle = textPadrao.copy(fontSize = 16.sp, color = Color.White),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        DropdownMenu(
+                            expanded = expandedCategoria,
+                            onDismissRequest = { expandedCategoria = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            listaCategorias.forEach { categoria ->
+                                DropdownMenuItem(
+                                    text = { Text(categoria.nome, color = Color.White) },
+                                    onClick = {
+                                        categoriaSelecionada = categoria
+                                        expandedCategoria = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 OutlinedTextField(
                     value = nomeEditado,
                     onValueChange = {
@@ -449,6 +485,7 @@ fun EditarEstoqueDialog(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
@@ -516,58 +553,6 @@ fun EditarEstoqueDialog(
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Dropdown para selecionar a categoria
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("Categoria:", color = Color.Gray)
-                    Box {
-                        OutlinedTextField(
-                            value = categoriaSelecionada?.nome ?: "",
-                            onValueChange = { /* Não permitir edição direta */ },
-                            label = { Text("Selecione a Categoria", color = Color.Gray) },
-                            readOnly = true,
-                            trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Dropdown",
-                                    tint = Color.White,
-                                    modifier = Modifier.clickable {
-                                        expandedCategoria = !expandedCategoria
-                                    }
-                                )
-                            },
-                            isError = erroCategoria != null,
-                            textStyle = TextStyle(color = Color.White),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        DropdownMenu(
-                            expanded = expandedCategoria,
-                            onDismissRequest = { expandedCategoria = false },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = {
-                                listaCategorias.forEach { categoria ->
-                                    DropdownMenuItem(
-                                        text = { Text(categoria.nome, color = Color.White) },
-                                        onClick = {
-                                            categoriaSelecionada = categoria
-                                            expandedCategoria = false
-                                        }
-                                    )
-                                }
-                            }
-                        )
-                    }
-                    erroCategoria?.let {
-                        Text(
-                            text = it,
-                            color = Color.Red,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

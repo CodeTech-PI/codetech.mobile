@@ -347,6 +347,15 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                             textAlign = TextAlign.Center,
                             fontSize = 12.sp // Fonte menor
                         )
+
+                        Button(
+                            onClick = {
+                                navController.navigate("Clientes")
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                        ) {
+                            Text("Ok", color = Color.White, fontSize = 16.sp)
+                        }
                     }
                 }
             }
