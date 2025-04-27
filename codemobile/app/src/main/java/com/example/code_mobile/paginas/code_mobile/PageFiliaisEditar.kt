@@ -1,29 +1,21 @@
 package com.example.code_mobile.paginas.code_mobile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,23 +23,29 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.CampoFilial
-import com.example.code_mobile.paginas.code_mobile.CampoFilialStatus
+import com.example.code_mobile.paginas.code_mobile.viewModel.ViewModelFiliais
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
-@Composable
-fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
-    var status by remember { mutableStateOf("Operante") }
-    var cep by remember { mutableStateOf("19141010") }
-    var logradouro by remember { mutableStateOf("Rua Caraibas") }
-    var bairro by remember { mutableStateOf("Emilio Marengo") }
-    var cidade by remember { mutableStateOf("São Paulo") }
-    var estado by remember { mutableStateOf("São Paulo") }
-    var numero by remember { mutableStateOf("10") }
 
-    val scrollState = rememberScrollState() // Cria um estado de scroll
+@Composable
+fun FiliaisEditar(navController: NavController, viewModel: ViewModelFiliais = viewModel()) {
+    // Acessa a filial em edição da ViewModel
+    val filialEmEdicao = viewModel.filialEmEdicao
+    val cepError = viewModel.cepError
+    val lagradouroError = viewModel.lagradouroError
+    val bairroError = viewModel.bairroError
+    val cidadeError = viewModel.cidadeError
+    val estadoError = viewModel.estadoError
+    val numError = viewModel.numError
+    val operacaoSucesso by viewModel.operacaoSucesso.collectAsState()
+    val mensagemErro by viewModel.mensagemErro.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
@@ -55,133 +53,194 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
         fontStyle = FontStyle.Normal
     )
 
-    Column(modifier = modifier
-        .fillMaxSize() // faz a mudança pegar na tela toda
-        .verticalScroll(scrollState)
-        .background(Color(0xFF1B1B1B))
-        .padding(20.dp),
+    // Efeito colateral para navegar após a edição bem-sucedida
+    LaunchedEffect(operacaoSucesso) {
+        if (operacaoSucesso) {
+            viewModel.resetOperacaoSucesso()
+            navController.navigate("Filiais") {
+                popUpTo("FiliaisEditar") { inclusive = true } // Evita voltar para a tela de edição
+            }
+        }
+    }
 
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
+    // Efeito colateral para exibir mensagens de erro
+    LaunchedEffect(mensagemErro) {
+        mensagemErro?.let {
+            println("Erro ao editar: $it") // Substitua por uma forma de feedback ao usuário
+            viewModel.limparMensagemDeErro()
+        }
+    }
 
+    // Se filialEmEdicao for nulo, talvez mostrar uma tela de carregamento ou erro
+    if (filialEmEdicao == null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White)
+            } else if (mensagemErro != null) {
+                Text(text = "Erro ao carregar detalhes da filial.", color = Color.Red)
+            } else {
+                Text(text = "Nenhuma filial selecionada para editar.", color = Color.Gray)
+            }
+        }
+        return
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(Color(0xFF1B1B1B))
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp)) // Remova o Spacer.weight() inicial
-
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "Editar",
             style = textPadrao.copy(
-                fontSize = 30.sp, // unidade sp, somente para tamanho de texto
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(20.dp))
 
         CampoFilialStatus(
             titulo = "Status:",
-            valor = status,
-            onValorChange = { status = it },
+            valor = if (filialEmEdicao.estado.isNotEmpty()) "Operante" else "Inoperante", // Adapte conforme a lógica do seu status
+            onValorChange = { /* TODO: Implementar atualização do status na ViewModel */ },
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(20.dp))
 
-        CampoFilial (
+        CampoFilial(
             titulo = "CEP:",
-            valor = cep,
-            onValorChange = { cep = it },
+            valor = filialEmEdicao.cep,
+            onValorChange = viewModel::atualizarCepEdicao,
             textStyle = textPadrao,
-            placeholderText = "19141010"
+            placeholderText = "Digite o CEP"
         )
+        if (cepError != null) {
+            Text(text = cepError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoFilial(
             titulo = "Logradouro:",
-            valor = logradouro,
-            onValorChange = { logradouro = it },
+            valor = filialEmEdicao.lagradouro,
+            onValorChange = viewModel::atualizarLagradouroEdicao,
             textStyle = textPadrao,
-            placeholderText = "Caraibas"
+            placeholderText = "Digite o Logradouro"
         )
+        if (lagradouroError != null) {
+            Text(text = lagradouroError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoFilial(
             titulo = "Bairro:",
-            valor = bairro,
-            onValorChange = { bairro = it },
+            valor = filialEmEdicao.bairro,
+            onValorChange = viewModel::atualizarBairroEdicao,
             textStyle = textPadrao,
-            placeholderText = "Emilio Marengo"
+            placeholderText = "Digite o Bairro"
         )
+        if (bairroError != null) {
+            Text(text = bairroError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoFilial(
             titulo = "Cidade:",
-            valor = cidade,
-            onValorChange = { cidade = it },
+            valor = filialEmEdicao.cidade,
+            onValorChange = viewModel::atualizarCidadeEdicao,
             textStyle = textPadrao,
-            placeholderText = "São Paulo"
+            placeholderText = "Digite a Cidade"
         )
+        if (cidadeError != null) {
+            Text(text = cidadeError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
+        CampoFilial(
             titulo = "Estado:",
-            valor = estado,
-            onValorChange = { estado = it },
+            valor = filialEmEdicao.estado,
+            onValorChange = viewModel::atualizarEstadoEdicao,
             textStyle = textPadrao,
-            placeholderText = "São Paulo"
+            placeholderText = "Ex: SP"
         )
+        if (estadoError != null) {
+            Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        CampoFilial(
+            titulo = "Complemento:",
+            valor = filialEmEdicao.complemento,
+            onValorChange = viewModel::atualizarComplementoEdicao,
+            textStyle = textPadrao,
+            placeholderText = "Digite o Complemento (opcional)"
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
-        CampoFilial (
+        CampoFilial(
             titulo = "Número:",
-            valor = numero,
-            onValorChange = { numero = it },
+            valor = filialEmEdicao.num.toString(),
+            onValorChange = { viewModel.atualizarNumEdicao(it) },
             textStyle = textPadrao,
-            placeholderText = "10"
+            placeholderText = "Digite o Número"
         )
-
-        Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
-
-
-
+        if (numError != null) {
+            Text(text = numError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(modifier = Modifier.height(40.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp), // Adiciona padding horizontal ao Row
+                .padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = {
+                    focusManager.clearFocus()
+                    filialEmEdicao?.let { viewModel.atualizarFilial(it.num) }
+                },
                 modifier = Modifier
                     .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                enabled = !isLoading
             ) {
-                Text(text = "Salvar")
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.White, strokeWidth = 3.dp)
+                } else {
+                    Text(text = "Salvar")
+                }
             }
 
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF252525))
             ) {
                 Text(text = "Cancelar")
             }
         }
-
-
     }
-
 }
+
+
 
 @Preview(
     showBackground = true,
