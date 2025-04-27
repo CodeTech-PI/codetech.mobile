@@ -45,197 +45,117 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
+
 
 @Composable
-fun FiliaisCadastro(navController: NavController, viewModel: ViewModelFiliais = viewModel()) {
-    // Usando os estados da ViewModel diretamente
-    val novoFilial = viewModel.novaFilial
-    val cepError = viewModel.cepError
-    val lagradouroError = viewModel.lagradouroError
-    val bairroError = viewModel.bairroError
-    val cidadeError = viewModel.cidadeError
-    val estadoError = viewModel.estadoError
-    val numError = viewModel.numError
-    val operacaoSucesso by viewModel.operacaoSucesso.collectAsState()
-    val mensagemErro by viewModel.mensagemErro.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+fun FilialCadastro(navController: NavController, viewModel: ViewModelFiliais = viewModel()) {
+    var logradouro by remember { mutableStateOf("") }
+    var estado by remember { mutableStateOf("") }
+    var cidade by remember { mutableStateOf("") }
+    var cep by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("Operante") }
 
-    val scrollState = rememberScrollState()
-    val focusManager = LocalFocusManager.current
-
-    val textPadrao = TextStyle(
-        fontSize = 20.sp,
-        color = Color.White,
-        fontStyle = FontStyle.Normal
-    )
-
-    // Efeito colateral para navegar após o cadastro bem-sucedido
-    LaunchedEffect(operacaoSucesso) {
-        if (operacaoSucesso) {
-            viewModel.resetOperacaoSucesso()
-            navController.navigate("Filiais") {
-                popUpTo("FiliaisCadastro") { inclusive = true } // Evita voltar para a tela de cadastro
-            }
-        }
-    }
-
-    // Efeito colateral para exibir mensagens de erro
-    LaunchedEffect(mensagemErro) {
-        mensagemErro?.let {
-            println("Erro ao cadastrar: $it") // Substitua por uma forma de feedback ao usuário (Snackbar, etc.)
-            viewModel.limparMensagemDeErro()
-        }
+    // Função para salvar a filial
+    val onSaveClick = {
+        val filial = ModelFiliais(
+            id = 0, // Defina o ID como 0 para que a API ou banco gere automaticamente
+            cep = cep,
+            lagradouro = logradouro,
+            bairro = "", // Se for necessário, adicione o campo bairro também
+            cidade = cidade,
+            estado = estado,
+            complemento = "", // Se for necessário, adicione o campo complemento
+            num = 0, // Se for necessário, adicione o campo num
+            status = status
+        )
+        // Chama o ViewModel para salvar a filial
+        viewModel.cadastrarFilial(filial)
+        // Exibe a mensagem de sucesso e navega de volta ou exibe algo mais
+        navController.popBackStack() // Exemplo para voltar à tela anterior
+        println("Filial salva!")
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .background(Color(0xFF1B1B1B))
-            .padding(20.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-
+        // Título da página
         Text(
-            text = "Cadastrar",
-            style = textPadrao.copy(
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold
-            )
+            text = "Cadastro de Filial",
+            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(16.dp)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        // Campos de cadastro
+        CampoFilial(
+            titulo = "Logradouro",
+            valor = logradouro,
+            onValorChange = { logradouro = it },
+            textStyle = textPadrao,
+            placeholderText = "Digite o logradouro"
+        )
 
         CampoFilial(
-            titulo = "CEP:",
-            valor = novoFilial.cep,
-            onValorChange = viewModel::atualizarCep,
+            titulo = "Estado",
+            valor = estado,
+            onValorChange = { estado = it },
             textStyle = textPadrao,
-            placeholderText = "Digite o CEP",
+            placeholderText = "Digite o estado"
         )
-        if (cepError != null) {
-            if (estadoError != null) {
-                Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
 
         CampoFilial(
-            titulo = "Logradouro:",
-            valor = novoFilial.lagradouro,
-            onValorChange = viewModel::atualizarLagradouro,
+            titulo = "Cidade",
+            valor = cidade,
+            onValorChange = { cidade = it },
             textStyle = textPadrao,
-            placeholderText = "Digite o Logradouro",
+            placeholderText = "Digite a cidade"
         )
-        if (lagradouroError != null) {
-            if (estadoError != null) {
-                Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
 
         CampoFilial(
-            titulo = "Bairro:",
-            valor = novoFilial.bairro,
-            onValorChange = viewModel::atualizarBairro,
+            titulo = "CEP",
+            valor = cep,
+            onValorChange = { cep = it },
             textStyle = textPadrao,
-            placeholderText = "Digite o Bairro",
+            placeholderText = "Digite o CEP"
         )
-        if (bairroError != null) {
-            if (estadoError != null) {
-                Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
 
-        CampoFilial(
-            titulo = "Cidade:",
-            valor = novoFilial.cidade,
-            onValorChange = viewModel::atualizarCidade,
-            textStyle = textPadrao,
-            placeholderText = "Digite a Cidade",
+        CampoFilialStatus(
+            titulo = "Status",
+            valor = status,
+            onValorChange = { status = it },
+            textStyle = textPadrao
         )
-        if (cidadeError != null) {
-            if (estadoError != null) {
-                Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
 
-        CampoFilial(
-            titulo = "Estado:",
-            valor = novoFilial.estado,
-            onValorChange = viewModel::atualizarEstado,
-            textStyle = textPadrao,
-            placeholderText = "Ex: SP",
-        )
-        if (estadoError != null) {
-            Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-
-        CampoFilial(
-            titulo = "Complemento:",
-            valor = novoFilial.complemento,
-            onValorChange = viewModel::atualizarComplemento,
-            textStyle = textPadrao,
-            placeholderText = "Digite o Complemento (opcional)",
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        CampoFilial(
-            titulo = "Número:",
-            valor = novoFilial.num.toString(),
-            onValorChange = { viewModel.atualizarNum(it) },
-            textStyle = textPadrao,
-            placeholderText = "Digite o Número",
-        )
-        if (numError != null) {
-            if (estadoError != null) {
-                Text(text = estadoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-            }
-        }
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        // Botão para salvar filial
+        Button(
+            onClick = onSaveClick,
+            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier.padding(16.dp)
         ) {
-            Button(
-                onClick = {
-                    focusManager.clearFocus() // Remove o foco de qualquer campo de texto
-                    viewModel.criarFilial()
-                },
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
-                enabled = !isLoading // Desabilita o botão enquanto carrega
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(color = Color.White, strokeWidth = 3.dp)
-                } else {
-                    Text(text = "Salvar")
-                }
-            }
-
-            Button(
-                onClick = { navController.popBackStack() }, // Use popBackStack para voltar
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-            ) {
-                Text(text = "Cancelar")
-            }
+            Text(text = "Salvar Filial", color = Color.White)
         }
+
+        // Exibir as informações da filial cadastrada no formato de card
+        cardFilial(
+            logradouro = logradouro,
+            estado = estado,
+            cidade = cidade,
+            cep = cep,
+            status = status,
+            onDeleteClick = {
+                // Lógica de exclusão
+                println("Filial excluída!")
+            },
+            navController = navController
+        )
     }
 }
+
+
+
+
 
 @Preview(
     showBackground = true,
@@ -248,6 +168,6 @@ fun GreetingPreview() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
-        FiliaisCadastro(navController)  // Passe o navController para TelaLogin
+        FilialCadastro(navController)  // Passe o navController para TelaLogin
     }
 }

@@ -15,6 +15,7 @@ import com.example.code_mobile.paginas.code_mobile.DashboardScreen
 import com.example.code_mobile.paginas.code_mobile.Filiais
 import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
 import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
+import com.example.code_mobile.paginas.code_mobile.FilialCadastro
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
@@ -52,17 +53,20 @@ fun AppNavigation() {
             TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
         }
         composable("Filiais") {
-            val viewModelFiliais: ViewModelFiliais = viewModel()
-            Filiais(navController = navController, viewModel = viewModelFiliais)
+            val viewModelFiliais: ViewModelFiliais = viewModel() // Instanciando o ViewModel
+            Filiais(navController = navController, viewModel = viewModelFiliais) // Passando o ViewModel
         }
         composable("FiliaisCadastro") {
-            val viewModelFiliais: ViewModelFiliais = viewModel()
-            FiliaisCadastro(navController = navController, viewModel = viewModelFiliais)
+            val viewModelFiliaisCadastro: ViewModelFiliais = viewModel() // Instanciando o ViewModel para Cadastro
+            FilialCadastro(navController = navController, viewModel = viewModelFiliaisCadastro) // Passando o ViewModel
         }
-        composable("FiliaisEditar") {
-            val viewModelFiliais: ViewModelFiliais = viewModel()
-            FiliaisEditar(navController = navController, viewModel = viewModelFiliais)
+
+        composable("FiliaisEditar/{filialId}") { backStackEntry ->
+            val filialId = backStackEntry.arguments?.getString("filialId")?.toIntOrNull() // Pegando o ID da filial
+            val viewModelFiliaisEditar: ViewModelFiliais = viewModel() // Instanciando o ViewModel para Edição
+            FiliaisEditar(navController = navController, viewModel = viewModelFiliaisEditar, filialId = filialId) // Passando o ViewModel e o ID
         }
+
         composable("Menu"){ Menu(navController) }
         //composable("Filiais"){ Filiais(navController) }
        // composable("FiliaisCadastro"){ FiliaisCadastro(navController) }

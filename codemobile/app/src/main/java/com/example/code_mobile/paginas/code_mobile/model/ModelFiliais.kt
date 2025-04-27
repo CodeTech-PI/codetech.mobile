@@ -8,5 +8,7 @@ data class ModelFiliais(
     val cidade: String,
     val estado: String,
     val complemento: String,
-    val num: Int
+    val num: Int,
+    val id: Int,
+    val status: String
 )

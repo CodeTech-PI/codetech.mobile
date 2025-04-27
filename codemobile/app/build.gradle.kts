@@ -50,6 +50,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
+    implementation ("androidx.compose.ui:ui:1.4.0")
+  implementation ("androidx.compose.material:material:1.4.0")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.4.0")
+
+   implementation ("androidx.activity:activity-compose:1.7.0")
+
     implementation(libs.androidx.storage)
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")

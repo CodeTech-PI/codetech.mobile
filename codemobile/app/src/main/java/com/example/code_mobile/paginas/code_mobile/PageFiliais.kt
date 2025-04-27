@@ -41,8 +41,10 @@ import com.example.code_mobile.paginas.code_mobile.viewModel.ViewModelFiliais
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
+
+
 @Composable
-fun Filiais(navController: NavController, viewModel: ViewModelFiliais = viewModel()) {
+fun Filiais(navController: NavController, viewModel: ViewModelFiliais = viewModel(), ) {
 
     var showDialog by remember { mutableStateOf(false) }
     var filialParaExcluir by remember { mutableStateOf<ModelFiliais?>(null) }
@@ -50,14 +52,14 @@ fun Filiais(navController: NavController, viewModel: ViewModelFiliais = viewMode
 
     // Observa o estado da lista de filiais da ViewModel
     val listaFiliais by viewModel.listaFiliais.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoading by viewModel.showLoading.collectAsState()
     val mensagemErro by viewModel.mensagemErro.collectAsState()
-    val operacaoSucesso by viewModel.operacaoSucesso.collectAsState()
+    val operacaoSucesso by viewModel.cadastroSucesso.collectAsState()
 
     // Efeito colateral para recarregar a lista após uma operação de sucesso
     LaunchedEffect(operacaoSucesso) {
         if (operacaoSucesso) {
-            viewModel.resetOperacaoSucesso()
+            viewModel.resetCadastroSucesso()
             // A lista será automaticamente atualizada devido ao collectAsState
         }
     }
@@ -127,7 +129,7 @@ fun Filiais(navController: NavController, viewModel: ViewModelFiliais = viewMode
                         estado = filial.estado,
                         cidade = filial.cidade,
                         cep = filial.cep,
-                        status = "Operante", // Você precisará adicionar o status ao seu ModelFiliais se necessário
+                        status = filial.status ?: "Status desconhecido", // Exibindo o status aqui
                         onDeleteClick = {
                             filialParaExcluir = filial
                             showDialog = true
@@ -143,7 +145,7 @@ fun Filiais(navController: NavController, viewModel: ViewModelFiliais = viewMode
     if (showDialog && filialParaExcluir != null) {
         ConfirmDeleteDialog(
             onConfirm = {
-                filialParaExcluir?.let { viewModel.deletarFilial(it.num) } // Assumindo que 'num' é o ID
+                filialParaExcluir?.let { viewModel.deletarFilial(it.id) } // Agora usando o ID
                 filialParaExcluir = null
                 showDialog = false
             },
