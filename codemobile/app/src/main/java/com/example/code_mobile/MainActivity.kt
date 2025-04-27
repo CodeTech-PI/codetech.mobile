@@ -19,6 +19,7 @@ import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
 import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
+import com.example.code_mobile.paginas.code_mobile.viewModel.ViewModelFiliais
 import com.example.code_mobile.paginas.code_mobile.viewmodel.categoria.ViewModelCategoria
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
@@ -50,10 +51,22 @@ fun AppNavigation() {
         composable("Categoria") { val viewModelCategoria: ViewModelCategoria = viewModel()
             TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
         }
+        composable("Filiais") {
+            val viewModelFiliais: ViewModelFiliais = viewModel()
+            Filiais(navController = navController, viewModel = viewModelFiliais)
+        }
+        composable("FiliaisCadastro") {
+            val viewModelFiliais: ViewModelFiliais = viewModel()
+            FiliaisCadastro(navController = navController, viewModel = viewModelFiliais)
+        }
+        composable("FiliaisEditar") {
+            val viewModelFiliais: ViewModelFiliais = viewModel()
+            FiliaisEditar(navController = navController, viewModel = viewModelFiliais)
+        }
         composable("Menu"){ Menu(navController) }
-        composable("Filiais"){ Filiais(navController) }
-        composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
-        composable("FiliaisEditar"){ FiliaisEditar(navController) }
+        //composable("Filiais"){ Filiais(navController) }
+       // composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
+        //composable("FiliaisEditar"){ FiliaisEditar(navController) }
         composable("Dashboard") { DashboardScreen(navController) }
         composable("ClienteCadastro") { ClienteCadastro(navController) }
 
