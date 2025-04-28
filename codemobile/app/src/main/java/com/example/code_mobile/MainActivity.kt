@@ -18,8 +18,9 @@ import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
 import com.example.code_mobile.paginas.code_mobile.Menu
 import com.example.code_mobile.paginas.code_mobile.TelaCategorias
 import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
+import com.example.code_mobile.paginas.code_mobile.estoque.EstoqueCadastro
 import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
-import com.example.code_mobile.paginas.code_mobile.viewmodel.categoria.ViewModelCategoria
+import com.example.code_mobile.paginas.code_mobile.viewModel.categoria.ViewModelCategoria
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -56,6 +57,7 @@ fun AppNavigation() {
         composable("FiliaisEditar"){ FiliaisEditar(navController) }
         composable("Dashboard") { DashboardScreen(navController) }
         composable("ClienteCadastro") { ClienteCadastro(navController) }
+        composable("EstoqueCadastro") { EstoqueCadastro(navController) }
 
     }
 
