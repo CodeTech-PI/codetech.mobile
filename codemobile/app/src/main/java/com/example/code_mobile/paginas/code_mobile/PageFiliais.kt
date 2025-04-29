@@ -84,7 +84,7 @@ fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: 
                 viewModel.filiais.collectAsState().value
             } else {
                 viewModel.filiais.collectAsState().value.filter {
-                    it.lagradouro.contains(pesquisa, ignoreCase = true)
+                    it.logradouro.contains(pesquisa, ignoreCase = true)
                 }
             }
 
@@ -92,7 +92,7 @@ fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: 
             filiaisFiltradas.forEach { filial ->
                 Box(modifier = Modifier.padding(8.dp)) {
                     cardFilial(
-                        "Rua: ${filial.lagradouro}",
+                        "Rua: ${filial.logradouro}",
                         "Estado: ${filial.estado}",
                         "Cidade: ${filial.cidade}",
                         "CEP: ${filial.cep}",

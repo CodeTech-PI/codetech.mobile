@@ -1,26 +1,12 @@
 package com.example.code_mobile.paginas.code_mobile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,23 +17,19 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.CampoFilial
-import com.example.code_mobile.paginas.code_mobile.CampoFilialStatus
+import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun FiliaisCadastro(navController: NavController, modifier: Modifier = Modifier) {
-    var status by remember { mutableStateOf("") }
-    var cep by remember { mutableStateOf("") }
-    var logradouro by remember { mutableStateOf("") }
-    var bairro by remember { mutableStateOf("") }
-    var cidade by remember { mutableStateOf("") }
-    var estado by remember { mutableStateOf("") }
-    var numero by remember { mutableStateOf("") }
-
-    val scrollState = rememberScrollState() // Cria um estado de scroll
+fun FiliaisCadastro(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    viewModelFilial: ViewModelFilial = viewModel() // <- Usa a ViewModel
+) {
+    val scrollState = rememberScrollState()
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
@@ -55,139 +37,136 @@ fun FiliaisCadastro(navController: NavController, modifier: Modifier = Modifier)
         fontStyle = FontStyle.Normal
     )
 
-    Column(modifier = modifier
-        .fillMaxSize() // faz a mudança pegar na tela toda
-        .verticalScroll(scrollState)
-        .background(Color(0xFF1B1B1B))
-        .padding(20.dp),
+    val cadastroSucesso by viewModelFilial.cadastroSucesso.collectAsState()
+    val showLoading by viewModelFilial.showLoading.collectAsState()
+    val mensagemErro by viewModelFilial.mensagemErro.collectAsState()
 
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
-
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(Color(0xFF1B1B1B))
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp)) // Remova o Spacer.weight() inicial
-
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Cadastrar",
+            text = "Cadastrar Filial",
             style = textPadrao.copy(
-                fontSize = 30.sp, // unidade sp, somente para tamanho de texto
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(20.dp))
 
-        CampoFilialStatus(
-            titulo = "Status:",
-            valor = status,
-            onValorChange = { status = it },
+        CampoFilial(
+            titulo  = "CEP",
+            valor  = viewModelFilial.cep.value,
+            onValorChange  = { viewModelFilial.atualizarCep(it) },
+            erro = viewModelFilial.cepError.value ?: "",
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "CEP:",
-            valor = cep,
-            onValorChange = { cep = it },
+        CampoFilial(
+            titulo  = "Logradouro",
+            valor  = viewModelFilial.logradouro.value,
+            onValorChange  = { viewModelFilial.atualizarlogradouro(it) },
+            erro = viewModelFilial.logradouroError.value ?: "",
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Logradouro:",
-            valor = logradouro,
-            onValorChange = { logradouro = it },
+        CampoFilial(
+            titulo  = "Bairro",
+            valor  = viewModelFilial.bairro.value,
+            onValorChange  = { viewModelFilial.atualizarBairro(it) },
+            erro = viewModelFilial.bairroError.value ?: "",
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Bairro:",
-            valor = bairro,
-            onValorChange = { bairro = it },
+        CampoFilial(
+            titulo  = "Cidade",
+            valor  = viewModelFilial.cidade.value,
+            onValorChange  = { viewModelFilial.atualizarCidade(it) },
+            erro = viewModelFilial.cidadeError.value ?: "",
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        CampoFilial(
+            titulo  = "Estado",
+            valor  = viewModelFilial.estado.value,
+            onValorChange  = { viewModelFilial.atualizarEstado(it) },
+            textStyle = textPadrao,
+            erro = viewModelFilial.estadoError.value ?: "",
+        )
 
-        CampoFilial (
-            titulo = "Cidade:",
-            valor = cidade,
-            onValorChange = { cidade = it },
+        CampoFilial(
+            titulo  = "Número",
+            valor  = viewModelFilial.num.value,
+            onValorChange  = { viewModelFilial.atualizarNum(it) },
+            textStyle = textPadrao,
+            erro = viewModelFilial.numError.value ?: "",
+        )
+
+        CampoFilial(
+            titulo  = "Complemento",
+            valor  = viewModelFilial.complemento.value,
+            onValorChange  = { viewModelFilial.atualizarComplemento(it) },
+            erro = viewModelFilial.complementoError.value ?: "",
             textStyle = textPadrao
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(30.dp))
 
-        CampoFilial (
-            titulo = "Estado:",
-            valor = estado,
-            onValorChange = { estado = it },
-            textStyle = textPadrao
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Número:",
-            valor = numero,
-            onValorChange = { numero = it },
-            textStyle = textPadrao
-        )
-
-        Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
-
-
-
-
-        Row(
+        Button(
+            onClick = { viewModelFilial.cadastrarFilial() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp), // Adiciona padding horizontal ao Row
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .height(60.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Button(
-                onClick = { navController.navigate("Filiais") },
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
-            ) {
-                Text(text = "Salvar")
-            }
+            Text(
+                text = if (showLoading) "Carregando..." else "Cadastrar",
+                fontSize = 20.sp,
+                color = Color.White
+            )
+        }
 
-            Button(
-                onClick = { navController.navigate("Filiais") },
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-            ) {
-                Text(text = "Cancelar")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Exibe mensagem de sucesso
+        if (cadastroSucesso) {
+            Text(
+                text = "Filial cadastrada com sucesso!",
+                color = Color.Green,
+                fontSize = 18.sp
+            )
+            // Reseta sucesso depois de um tempo ou ação
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(2000)
+                viewModelFilial.resetarCadastroSucesso()
+                navController.popBackStack() // Volta para tela anterior
             }
         }
 
-
+        // Exibe mensagem de erro
+        mensagemErro?.let { erro ->
+            Text(
+                text = erro,
+                color = Color.Red,
+                fontSize = 18.sp
+            )
+        }
     }
-
 }
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = Devices.PIXEL_2
-)
-
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_2)
 @Composable
-fun GreetingPreview() {
+fun PreviewFiliaisCadastro() {
     CodemobileTheme {
-        // Inicialize o navController aqui
         val navController = rememberNavController()
-        FiliaisCadastro(navController)  // Passe o navController para TelaLogin
+        val viewModel = ViewModelFilial()
+        FiliaisCadastro(navController = navController, viewModelFilial = viewModel)
     }
 }

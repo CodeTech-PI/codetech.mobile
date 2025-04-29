@@ -19,7 +19,7 @@ class ViewModelFilial : ViewModel() {
     // Campos do formulário
     var cep = mutableStateOf("")
         private set
-    var lagradouro = mutableStateOf("")
+    var logradouro = mutableStateOf("")
         private set
     var bairro = mutableStateOf("")
         private set
@@ -35,7 +35,7 @@ class ViewModelFilial : ViewModel() {
     // Erros de validação
     var cepError = mutableStateOf<String?>(null)
         private set
-    var lagradouroError = mutableStateOf<String?>(null)
+    var logradouroError = mutableStateOf<String?>(null)
         private set
     var bairroError = mutableStateOf<String?>(null)
         private set
@@ -66,7 +66,7 @@ class ViewModelFilial : ViewModel() {
 
     // Atualizar campos
     fun atualizarCep(value: String) { cep.value = value; cepError.value = null }
-    fun atualizarLagradouro(value: String) { lagradouro.value = value; lagradouroError.value = null }
+    fun atualizarlogradouro(value: String) { logradouro.value = value; logradouroError.value = null }
     fun atualizarBairro(value: String) { bairro.value = value; bairroError.value = null }
     fun atualizarCidade(value: String) { cidade.value = value; cidadeError.value = null }
     fun atualizarEstado(value: String) { estado.value = value; estadoError.value = null }
@@ -81,8 +81,8 @@ class ViewModelFilial : ViewModel() {
             cepError.value = "CEP obrigatório."
             isValid = false
         }
-        if (lagradouro.value.isEmpty()) {
-            lagradouroError.value = "Logradouro obrigatório."
+        if (logradouro.value.isEmpty()) {
+            logradouroError.value = "Logradouro obrigatório."
             isValid = false
         }
         if (bairro.value.isEmpty()) {
@@ -118,7 +118,7 @@ class ViewModelFilial : ViewModel() {
             try {
                 val novaFilial = ModelFiliais(
                     cep = cep.value,
-                    lagradouro = lagradouro.value,
+                    logradouro = logradouro.value,
                     bairro = bairro.value,
                     cidade = cidade.value,
                     estado = estado.value,
@@ -151,7 +151,7 @@ class ViewModelFilial : ViewModel() {
     // Limpar campos
     fun limparCampos() {
         cep.value = ""
-        lagradouro.value = ""
+        logradouro.value = ""
         bairro.value = ""
         cidade.value = ""
         estado.value = ""

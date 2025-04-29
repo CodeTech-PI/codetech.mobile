@@ -338,7 +338,8 @@ fun CampoFilial(
     valor: String,
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
-    placeholderText: String = ""
+    placeholderText: String = "",
+    erro: String = ""
 ) {
     Column(
         horizontalAlignment = Alignment.Start // Alinha para esquerda
@@ -367,9 +368,16 @@ fun CampoFilial(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent
+                errorIndicatorColor = Color.Red
             )
         )
+        if (erro.length > 0 ){
+            Text(text = erro, style = TextStyle(
+                fontSize = 14.sp,
+                color = Color.Red,
+                fontStyle = FontStyle.Normal
+            ))
+        }
 
 
     }
