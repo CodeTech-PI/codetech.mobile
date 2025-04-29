@@ -21,6 +21,7 @@ import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
 import com.example.code_mobile.paginas.code_mobile.estoque.EstoqueCadastro
 import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
 import com.example.code_mobile.paginas.code_mobile.viewModel.categoria.ViewModelCategoria
+import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -52,7 +53,10 @@ fun AppNavigation() {
             TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
         }
         composable("Menu"){ Menu(navController) }
-        composable("Filiais"){ Filiais(navController) }
+        composable("Filiais") {
+            val viewModelFilial: ViewModelFilial = viewModel()
+            Filiais(navController, viewModel = viewModelFilial)
+        }
         composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
         composable("FiliaisEditar"){ FiliaisEditar(navController) }
         composable("Dashboard") { DashboardScreen(navController) }

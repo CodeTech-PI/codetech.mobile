@@ -1,23 +1,14 @@
 package com.example.code_mobile.paginas.code_mobile
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,17 +19,33 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.ConfirmDeleteDialog
-import com.example.code_mobile.paginas.code_mobile.Input
 import com.example.code_mobile.paginas.code_mobile.cardFilial
+import com.example.code_mobile.paginas.code_mobile.ConfirmDeleteDialog
+import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
+import kotlinx.coroutines.delay
+
 
 @Composable
-fun Filiais (navController: NavController, modifier: Modifier = Modifier){
+fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: Modifier = Modifier) {
 
     var showDialog by remember { mutableStateOf(false) }
+    var filialToDelete by remember { mutableStateOf<ModelFiliais?>(null) }
+    var filialToEdit by remember { mutableStateOf<ModelFiliais?>(null) }
     var pesquisa by remember { mutableStateOf("") }
+
+    // Carregar filiais
+    LaunchedEffect(Unit) {
+        viewModel.carregarFiliais()
+    }
+    LaunchedEffect(navController.currentBackStackEntry) {
+        // Esse efeito será chamado toda vez que essa tela for exibida novamente
+        delay(2000) // espera 2 segundos
+        viewModel.carregarFiliais()
+    }
+
 
     Column(
         modifier = Modifier
@@ -49,7 +56,7 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
 
         menuComTituloPage("Filiais", navController)
 
-        // Filtro e icone de adicionar
+        // Filtro e ícone de adicionar
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -77,99 +84,76 @@ fun Filiais (navController: NavController, modifier: Modifier = Modifier){
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box (
-        ) {
+        // Exibir lista de filiais
+        if (viewModel.showLoading.collectAsState().value) {
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+        } else {
+            // Filtrar filiais por nome, caso haja pesquisa
+            val filiaisFiltradas = if (pesquisa.isEmpty()) {
+                viewModel.filiais.collectAsState().value
+            } else {
+                viewModel.filiais.collectAsState().value.filter {
+                    it.logradouro.contains(pesquisa, ignoreCase = true)
+                }
+            }
 
+            // Exibir filiais
+            filiaisFiltradas.forEach { filial ->
+                Box(modifier = Modifier.padding(8.dp)) {
+                    cardFilial(
+                        "Rua: ${filial.logradouro}",
+                        "Estado: ${filial.estado}",
+                        "Cidade: ${filial.cidade}",
+                        "CEP: ${filial.cep}",
+                        "Status: Operante",  // Ajuste conforme a lógica de status
 
-            cardFilial(
+                        onDeleteClick = {
+                            filialToDelete = filial
+                            showDialog = true
+                        },
+                        OnEditClick ={
+                            filialToEdit = filial
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("filial", filial.id)
+                            // ao direcionar para tela de editar preciso recuperar essa filialToEdit
+                            navController.navigate("FiliaisEditar")
+                        }
+                    )
+                }
+            }
 
-                "Rua: Haddock lobo",
-                "Estado: SP",
-                "Cidade: São Paulo",
-                "CEP: 12345678",
-                "Status: Inoperante",
-
-                onDeleteClick = { showDialog = true },
-                navController
-
-
-            )
+            // Se não houver filiais
+            if (filiaisFiltradas.isEmpty()) {
+                Text("Nenhuma filial encontrada", color = Color.White, modifier = Modifier.padding(16.dp))
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box (
-        ) {
-            cardFilial(
-
-                "Rua: São Marcos",
-                "Estado: SP",
-                "Cidade: São Paulo",
-                "CEP: 87456321",
-                "Status: Operante",
-
-                onDeleteClick = { showDialog = true },
-                navController
-
-
-                )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-
-        Box (
-        ) {
-            cardFilial(
-
-                "Rua: Caraibas",
-                "Estado: SP",
-                "Cidade: São Paulo",
-                "CEP: 19141010",
-                "Status: Operante",
-
-                onDeleteClick = { showDialog = true },
-                navController
-
-
-                )
-        }
-
     }
 
-//
-
-    if (showDialog) {
-        // Chame o ConfirmDeleteDialog passando as funções para confirmar ou cancelar
+    // Diálogo de exclusão
+    if (showDialog && filialToDelete != null) {
         ConfirmDeleteDialog(
             onConfirm = {
-                println("Filial excluída!")
-                showDialog = false
+                filialToDelete?.let { filial ->
+                    viewModel.deletarFilial(filial)
+                    showDialog = false
+                    Toast.makeText(navController.context, "Filial excluída!", Toast.LENGTH_SHORT).show()
+
+                }
             },
             onCancel = {
                 showDialog = false
             }
         )
     }
-
-
 }
 
-
-
-
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = Devices.PIXEL_2
-)
-
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_2)
 @Composable
-fun GreetingPreviewFiliais() {
+fun PreviewFiliais() {
     CodemobileTheme {
-        // Inicialize o navController aqui
         val navController = rememberNavController()
-        Filiais(navController)  // Passe o navController para TelaLogin
+        val viewModel = ViewModelFilial()
+        Filiais(navController = navController, viewModel = viewModel)
     }
 }

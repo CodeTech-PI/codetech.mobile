@@ -43,11 +43,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 import androidx.navigation.compose.rememberNavController
 
 import com.example.code_mobile.R
+import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
+import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
 
 fun Modifier.inputPadrao() = this
     .height(48.dp)
@@ -231,10 +234,9 @@ fun cardFilial(
     status: String,
 
     onDeleteClick: () -> Unit,
-    navController: NavController
+    OnEditClick: () -> Unit
 
 ) {
-
 
 
     // tudo que tem dentro do card
@@ -265,9 +267,7 @@ fun cardFilial(
                 modifier = Modifier
                     .size(25.dp)
                     .clickable {
-
-                     navController.navigate("FiliaisEditar")
-                        
+                        OnEditClick()
                     }
             )
 
@@ -338,7 +338,8 @@ fun CampoFilial(
     valor: String,
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
-    placeholderText: String = ""
+    placeholderText: String = "",
+    erro: String = ""
 ) {
     Column(
         horizontalAlignment = Alignment.Start // Alinha para esquerda
@@ -367,9 +368,16 @@ fun CampoFilial(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent
+                errorIndicatorColor = Color.Red
             )
         )
+        if (erro.length > 0 ){
+            Text(text = erro, style = TextStyle(
+                fontSize = 14.sp,
+                color = Color.Red,
+                fontStyle = FontStyle.Normal
+            ))
+        }
 
 
     }
@@ -390,7 +398,7 @@ fun CampoFilialStatus( // Novo componente para o campo "Status"
     Column(
         horizontalAlignment = Alignment.Start,
 
-    ) {
+        ) {
         Text(text = titulo, style = textStyle)
 
         Spacer(modifier = Modifier.height(10.dp))
