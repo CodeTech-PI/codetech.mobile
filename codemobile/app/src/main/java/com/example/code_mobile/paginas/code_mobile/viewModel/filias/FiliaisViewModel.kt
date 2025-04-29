@@ -31,6 +31,8 @@ class ViewModelFilial : ViewModel() {
         private set
     var num = mutableStateOf("")
         private set
+    var id = mutableStateOf(0)
+        private set
 
     // Erros de validação
     var cepError = mutableStateOf<String?>(null)
@@ -209,16 +211,16 @@ class ViewModelFilial : ViewModel() {
             }
         }
     }
-    fun editarFilial(filial: ModelFiliais) {
+    fun editarFilial(filialID: Int) {
         if (!validarCampos()) return
 
         viewModelScope.launch {
             _showLoading.value = true
             _mensagemErro.value = null
             try {
-                if(filial.id != null){
+                if(filialID != null){
                     val filialAtualizada = ModelFiliais(
-                        id = filial.id, // Mantém o ID existente
+                        id = filialID, // Mantém o ID existente
                         cep = cep.value,
                         logradouro = logradouro.value,
                         bairro = bairro.value,
@@ -226,18 +228,18 @@ class ViewModelFilial : ViewModel() {
                         estado = estado.value,
                         complemento = complemento.value,
                         num = num.value.toInt(),
-                        status = filial.status // Mantém o status atual
+                        status = "OPERANTE" // Mantém o status atual
                     )
 
                     val response = withContext(Dispatchers.IO) {
-                        serviceFilial.updateFilial(filial.id ?: return@withContext null, filialAtualizada)
-
+                        serviceFilial.updateFilial(filialID ?: return@withContext null, filialAtualizada)
                     }
 
                     if (response!!.isSuccessful) {
+                        carregarFiliais()
                         _cadastroSucesso.value = true
                         limparCampos()
-                        carregarFiliais() // Atualiza a lista com a nova filial editada
+                        // Atualiza a lista com a nova filial editada
                     } else {
                         _mensagemErro.value = "Erro ao editar filial: ${response.code()} - ${response.message()}"
                     }
@@ -254,6 +256,7 @@ class ViewModelFilial : ViewModel() {
 
 
     fun preencherCamposParaEdicao(filial: ModelFiliais) {
+        id.value = filial.id ?: 0
         cep.value = filial.cep
         logradouro.value = filial.logradouro
         bairro.value = filial.bairro
@@ -261,6 +264,7 @@ class ViewModelFilial : ViewModel() {
         estado.value = filial.estado
         num.value = filial.num.toString()
     }
+
 
     fun resetarMensagemErro() {
         _mensagemErro.value = null

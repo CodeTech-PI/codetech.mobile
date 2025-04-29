@@ -45,13 +45,14 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 fun FiliaisEditar(
     navController: NavController,
     viewModel: ViewModelFilial = viewModel(),
-    filial: ModelFiliais, // Filial selecionada para edição
     modifier: Modifier = Modifier
 ) {
-    // Preenche os campos com os dados da filial selecionada
-    LaunchedEffect(Unit) {
-        viewModel.preencherCamposParaEdicao(filial)
-    }
+    // Recupera o objeto da filial passado via SavedStateHandle
+    val filial = navController.previousBackStackEntry
+        ?.savedStateHandle
+        ?.get<Int>("filial")
+
+    // Se filial for nulo, não renderiza nada (ou mostra erro)
 
 
     val cep by viewModel.cep
@@ -60,8 +61,7 @@ fun FiliaisEditar(
     val cidade by viewModel.cidade
     val estado by viewModel.estado
     val num by viewModel.num
-
-    val scrollState = rememberScrollState()
+    val complemento by viewModel.complemento
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
@@ -72,68 +72,51 @@ fun FiliaisEditar(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
+            .verticalScroll(rememberScrollState())
             .background(Color(0xFF1B1B1B))
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Editar",
-            style = textPadrao.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        )
-
+        Text("Editar", style = textPadrao.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold))
         Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("CEP:", cep, onValorChange = viewModel::atualizarCep, textStyle = textPadrao, placeholderText = "")
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("Logradouro:", logradouro, onValorChange = viewModel::atualizarlogradouro, textStyle = textPadrao, placeholderText = "")
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("Bairro:", bairro, onValorChange = viewModel::atualizarBairro, textStyle = textPadrao, placeholderText = "")
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("Cidade:", cidade, onValorChange = viewModel::atualizarCidade, textStyle = textPadrao, placeholderText = "")
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("Estado:", estado, onValorChange = viewModel::atualizarEstado, textStyle = textPadrao, placeholderText = "")
-        Spacer(modifier = Modifier.height(20.dp))
         CampoFilial("Número:", num, onValorChange = viewModel::atualizarNum, textStyle = textPadrao, placeholderText = "")
+        CampoFilial("Complemento:", complemento, onValorChange = viewModel::atualizarComplemento, textStyle = textPadrao, placeholderText = "")
 
         Spacer(modifier = Modifier.height(40.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
                 onClick = {
-                    viewModel.editarFilial(filial)
-                    navController.navigate("Filiais")
+                    viewModel.editarFilial(filial?: 0) // Usa o objeto original com ID
+                    navController.popBackStack()
                 },
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
             ) {
-                Text(text = "Salvar")
+                Text("Salvar")
             }
 
             Button(
-                onClick = { navController.navigate("Filiais") },
-                modifier = Modifier
-                    .width(130.dp)
-                    .padding(horizontal = 8.dp),
+                onClick = { navController.popBackStack() },
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF252525))
             ) {
-                Text(text = "Cancelar")
+                Text("Cancelar")
             }
         }
     }
 }
+
 
 @Preview(
     showBackground = true,
@@ -147,17 +130,8 @@ fun FiliaisEditarPreview() {
         // Inicialize o navController aqui
         val navController = rememberNavController()
         val viewModel = ViewModelFilial()
-        val filial = ModelFiliais(
-            id = 1,
-            status = "Operante",
-            cep = "19141010",
-            logradouro = "Rua Caraibas",
-            bairro = "Emilio Marengo",
-            cidade = "São Paulo",
-            estado = "SP",
-            num = 10,
-            complemento = "casa 2"
-        );
-        FiliaisEditar(navController, viewModel, filial)
+
+        FiliaisEditar(navController, viewModel)
+
     }
 }

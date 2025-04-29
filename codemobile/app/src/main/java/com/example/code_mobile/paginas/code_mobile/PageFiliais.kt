@@ -25,18 +25,27 @@ import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
 import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
+import kotlinx.coroutines.delay
+
 
 @Composable
 fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: Modifier = Modifier) {
 
     var showDialog by remember { mutableStateOf(false) }
     var filialToDelete by remember { mutableStateOf<ModelFiliais?>(null) }
+    var filialToEdit by remember { mutableStateOf<ModelFiliais?>(null) }
     var pesquisa by remember { mutableStateOf("") }
 
     // Carregar filiais
     LaunchedEffect(Unit) {
         viewModel.carregarFiliais()
     }
+    LaunchedEffect(navController.currentBackStackEntry) {
+        // Esse efeito será chamado toda vez que essa tela for exibida novamente
+        delay(2000) // espera 2 segundos
+        viewModel.carregarFiliais()
+    }
+
 
     Column(
         modifier = Modifier
@@ -97,12 +106,19 @@ fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: 
                         "Cidade: ${filial.cidade}",
                         "CEP: ${filial.cep}",
                         "Status: Operante",  // Ajuste conforme a lógica de status
+
                         onDeleteClick = {
                             filialToDelete = filial
                             showDialog = true
                         },
-
-                        navController
+                        OnEditClick ={
+                            filialToEdit = filial
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("filial", filial.id)
+                            // ao direcionar para tela de editar preciso recuperar essa filialToEdit
+                            navController.navigate("FiliaisEditar")
+                        }
                     )
                 }
             }
