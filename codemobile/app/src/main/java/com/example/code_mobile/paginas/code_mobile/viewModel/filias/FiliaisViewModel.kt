@@ -123,7 +123,8 @@ class ViewModelFilial : ViewModel() {
                     cidade = cidade.value,
                     estado = estado.value,
                     complemento = complemento.value,
-                    num = num.value.toInt()
+                    num = num.value.toInt(),
+                    id = null,
                 )
 
                 val response = withContext(Dispatchers.IO) {
@@ -180,6 +181,34 @@ class ViewModelFilial : ViewModel() {
             }
         }
     }
+
+    fun deletarFilial(filial: ModelFiliais) {
+        viewModelScope.launch {
+            _showLoading.value = true
+            _mensagemErro.value = null
+            try {
+                if(filial.id != null){
+                    // Chama o serviço de deleção
+                    val response = withContext(Dispatchers.IO) {
+                        serviceFilial.deleteFilial(filial.id) // Chama o método delete do seu service
+                    }
+
+                    if (response.isSuccessful) {
+                        carregarFiliais() // Atualiza a lista de filiais após a exclusão
+                    } else {
+                        _mensagemErro.value = "Erro ao excluir filial: ${response.code()} - ${response.message()}"
+                    }
+                }
+            } catch (e: IOException) {
+                _mensagemErro.value = "Erro de conexão: ${e.message}"
+            } catch (e: Exception) {
+                _mensagemErro.value = "Erro inesperado: ${e.message}"
+            } finally {
+                _showLoading.value = false
+            }
+        }
+    }
+
 
     fun resetarMensagemErro() {
         _mensagemErro.value = null
