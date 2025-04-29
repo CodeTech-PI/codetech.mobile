@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,23 +32,36 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.CampoFilial
 import com.example.code_mobile.paginas.code_mobile.CampoFilialStatus
+import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
+import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable
-fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
-    var status by remember { mutableStateOf("Operante") }
-    var cep by remember { mutableStateOf("19141010") }
-    var logradouro by remember { mutableStateOf("Rua Caraibas") }
-    var bairro by remember { mutableStateOf("Emilio Marengo") }
-    var cidade by remember { mutableStateOf("São Paulo") }
-    var estado by remember { mutableStateOf("São Paulo") }
-    var numero by remember { mutableStateOf("10") }
+fun FiliaisEditar(
+    navController: NavController,
+    viewModel: ViewModelFilial = viewModel(),
+    filial: ModelFiliais, // Filial selecionada para edição
+    modifier: Modifier = Modifier
+) {
+    // Preenche os campos com os dados da filial selecionada
+    LaunchedEffect(Unit) {
+        viewModel.preencherCamposParaEdicao(filial)
+    }
 
-    val scrollState = rememberScrollState() // Cria um estado de scroll
+
+    val cep by viewModel.cep
+    val logradouro by viewModel.logradouro
+    val bairro by viewModel.bairro
+    val cidade by viewModel.cidade
+    val estado by viewModel.estado
+    val num by viewModel.num
+
+    val scrollState = rememberScrollState()
 
     val textPadrao = TextStyle(
         fontSize = 20.sp,
@@ -55,111 +69,52 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
         fontStyle = FontStyle.Normal
     )
 
-    Column(modifier = modifier
-        .fillMaxSize() // faz a mudança pegar na tela toda
-        .verticalScroll(scrollState)
-        .background(Color(0xFF1B1B1B))
-        .padding(20.dp),
-
-        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
-
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(Color(0xFF1B1B1B))
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(20.dp)) // Remova o Spacer.weight() inicial
-
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = "Editar",
-            style = textPadrao.copy(
-                fontSize = 30.sp, // unidade sp, somente para tamanho de texto
-                fontWeight = FontWeight.Bold
-            )
+            style = textPadrao.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold)
         )
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
+        Spacer(modifier = Modifier.height(20.dp))
 
-        CampoFilialStatus(
-            titulo = "Status:",
-            valor = status,
-            onValorChange = { status = it },
-            textStyle = textPadrao
-        )
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("CEP:", cep, onValorChange = viewModel::atualizarCep, textStyle = textPadrao, placeholderText = "")
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("Logradouro:", logradouro, onValorChange = viewModel::atualizarlogradouro, textStyle = textPadrao, placeholderText = "")
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("Bairro:", bairro, onValorChange = viewModel::atualizarBairro, textStyle = textPadrao, placeholderText = "")
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("Cidade:", cidade, onValorChange = viewModel::atualizarCidade, textStyle = textPadrao, placeholderText = "")
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("Estado:", estado, onValorChange = viewModel::atualizarEstado, textStyle = textPadrao, placeholderText = "")
+        Spacer(modifier = Modifier.height(20.dp))
+        CampoFilial("Número:", num, onValorChange = viewModel::atualizarNum, textStyle = textPadrao, placeholderText = "")
 
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "CEP:",
-            valor = cep,
-            onValorChange = { cep = it },
-            textStyle = textPadrao,
-            placeholderText = "19141010"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Logradouro:",
-            valor = logradouro,
-            onValorChange = { logradouro = it },
-            textStyle = textPadrao,
-            placeholderText = "Caraibas"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Bairro:",
-            valor = bairro,
-            onValorChange = { bairro = it },
-            textStyle = textPadrao,
-            placeholderText = "Emilio Marengo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Cidade:",
-            valor = cidade,
-            onValorChange = { cidade = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Estado:",
-            valor = estado,
-            onValorChange = { estado = it },
-            textStyle = textPadrao,
-            placeholderText = "São Paulo"
-        )
-
-        Spacer(modifier = Modifier.height(20.dp)) // espaço entre os campos
-
-        CampoFilial (
-            titulo = "Número:",
-            valor = numero,
-            onValorChange = { numero = it },
-            textStyle = textPadrao,
-            placeholderText = "10"
-        )
-
-        Spacer(modifier = Modifier.height(40.dp)) // Aumente o espaço antes dos botões
-
-
-
+        Spacer(modifier = Modifier.height(40.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp), // Adiciona padding horizontal ao Row
+                .padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { navController.navigate("Filiais") },
+                onClick = {
+                    viewModel.editarFilial(filial)
+                    navController.navigate("Filiais")
+                },
                 modifier = Modifier
                     .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
             ) {
@@ -170,17 +125,14 @@ fun FiliaisEditar(navController: NavController, modifier: Modifier = Modifier) {
                 onClick = { navController.navigate("Filiais") },
                 modifier = Modifier
                     .width(130.dp)
-                    .padding(horizontal = 8.dp), // Adiciona padding horizontal ao botão
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF252525))
             ) {
                 Text(text = "Cancelar")
             }
         }
-
-
     }
-
 }
 
 @Preview(
@@ -194,6 +146,18 @@ fun FiliaisEditarPreview() {
     CodemobileTheme {
         // Inicialize o navController aqui
         val navController = rememberNavController()
-        FiliaisEditar(navController)
+        val viewModel = ViewModelFilial()
+        val filial = ModelFiliais(
+            id = 1,
+            status = "Operante",
+            cep = "19141010",
+            logradouro = "Rua Caraibas",
+            bairro = "Emilio Marengo",
+            cidade = "São Paulo",
+            estado = "SP",
+            num = 10,
+            complemento = "casa 2"
+        );
+        FiliaisEditar(navController, viewModel, filial)
     }
 }

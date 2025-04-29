@@ -101,6 +101,7 @@ fun Filiais(navController: NavController, viewModel: ViewModelFilial, modifier: 
                             filialToDelete = filial
                             showDialog = true
                         },
+
                         navController
                     )
                 }

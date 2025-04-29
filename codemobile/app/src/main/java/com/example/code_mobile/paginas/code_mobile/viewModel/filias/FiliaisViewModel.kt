@@ -125,6 +125,7 @@ class ViewModelFilial : ViewModel() {
                     complemento = complemento.value,
                     num = num.value.toInt(),
                     id = null,
+                    status = "OPERANTE" // melhoria, criar validação
                 )
 
                 val response = withContext(Dispatchers.IO) {
@@ -208,7 +209,58 @@ class ViewModelFilial : ViewModel() {
             }
         }
     }
+    fun editarFilial(filial: ModelFiliais) {
+        if (!validarCampos()) return
 
+        viewModelScope.launch {
+            _showLoading.value = true
+            _mensagemErro.value = null
+            try {
+                if(filial.id != null){
+                    val filialAtualizada = ModelFiliais(
+                        id = filial.id, // Mantém o ID existente
+                        cep = cep.value,
+                        logradouro = logradouro.value,
+                        bairro = bairro.value,
+                        cidade = cidade.value,
+                        estado = estado.value,
+                        complemento = complemento.value,
+                        num = num.value.toInt(),
+                        status = filial.status // Mantém o status atual
+                    )
+
+                    val response = withContext(Dispatchers.IO) {
+                        serviceFilial.updateFilial(filial.id ?: return@withContext null, filialAtualizada)
+
+                    }
+
+                    if (response!!.isSuccessful) {
+                        _cadastroSucesso.value = true
+                        limparCampos()
+                        carregarFiliais() // Atualiza a lista com a nova filial editada
+                    } else {
+                        _mensagemErro.value = "Erro ao editar filial: ${response.code()} - ${response.message()}"
+                    }
+                }
+            } catch (e: IOException) {
+                _mensagemErro.value = "Erro de conexão: ${e.message}"
+            } catch (e: Exception) {
+                _mensagemErro.value = "Erro inesperado: ${e.message}"
+            } finally {
+                _showLoading.value = false
+            }
+        }
+    }
+
+
+    fun preencherCamposParaEdicao(filial: ModelFiliais) {
+        cep.value = filial.cep
+        logradouro.value = filial.logradouro
+        bairro.value = filial.bairro
+        cidade.value = filial.cidade
+        estado.value = filial.estado
+        num.value = filial.num.toString()
+    }
 
     fun resetarMensagemErro() {
         _mensagemErro.value = null
