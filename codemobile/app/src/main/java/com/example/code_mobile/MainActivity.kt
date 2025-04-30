@@ -10,18 +10,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.cliente.ClienteCadastro
-import com.example.code_mobile.paginas.code_mobile.DashboardScreen
-import com.example.code_mobile.paginas.code_mobile.Filiais
-import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
-import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
-import com.example.code_mobile.paginas.code_mobile.Menu
-import com.example.code_mobile.paginas.code_mobile.TelaCategorias
-import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
-import com.example.code_mobile.paginas.code_mobile.estoque.EstoqueCadastro
-import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
-import com.example.code_mobile.paginas.code_mobile.viewModel.categoria.ViewModelCategoria
-import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
+import com.example.code_mobile.paginas.code_mobile.pCliente.ClienteCadastro
+import com.example.code_mobile.paginas.code_mobile.pDashboard.DashboardScreen
+import com.example.code_mobile.paginas.code_mobile.pFilial.Filiais
+import com.example.code_mobile.paginas.code_mobile.pFilial.FiliaisCadastro
+import com.example.code_mobile.paginas.code_mobile.pFilial.FiliaisEditar
+import com.example.code_mobile.paginas.code_mobile.pComponente.Menu
+import com.example.code_mobile.paginas.code_mobile.pCategoria.TelaCategorias
+import com.example.code_mobile.paginas.code_mobile.pCliente.TelaClientes
+import com.example.code_mobile.paginas.code_mobile.pEstoque.EstoqueCadastro
+import com.example.code_mobile.paginas.code_mobile.pEstoque.TelaEstoque
+import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelCategoria
+import com.example.code_mobile.paginas.code_mobile.cViewModel.filial.ViewModelFilial
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
