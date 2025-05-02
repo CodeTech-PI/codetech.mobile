@@ -21,7 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.CampoFilial
-import com.example.code_mobile.paginas.code_mobile.cViewModel.filial.ViewModelFilial
+import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelFilial
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @Composable

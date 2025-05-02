@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.code_mobile.R
 import com.example.code_mobile.paginas.code_mobile.CampoLogin
 import com.example.code_mobile.token.auth.AuthService
 import com.example.code_mobile.token.auth.LoginRequest
@@ -143,7 +145,6 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                // Altera o estado para indicar que o login foi solicitado
                 loginRequested = true
             },
             modifier = Modifier

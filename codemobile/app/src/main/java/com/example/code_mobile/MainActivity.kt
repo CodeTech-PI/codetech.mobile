@@ -21,7 +21,7 @@ import com.example.code_mobile.paginas.code_mobile.pCliente.TelaClientes
 import com.example.code_mobile.paginas.code_mobile.pEstoque.EstoqueCadastro
 import com.example.code_mobile.paginas.code_mobile.pEstoque.TelaEstoque
 import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelCategoria
-import com.example.code_mobile.paginas.code_mobile.cViewModel.filial.ViewModelFilial
+import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelFilial
 
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
