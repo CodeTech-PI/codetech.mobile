@@ -187,11 +187,20 @@ fun CampoCadastrarCliente(
     Column(modifier = Modifier.padding(bottom = 8.dp)) {
         Text(titulo, style = tituloStyle)
         Spacer(modifier = Modifier.height(4.dp))
+
         OutlinedTextField(
             value = valor,
             onValueChange = onValorChange,
             textStyle = textStyle.copy(color = Color.White),
-            placeholder = { Text(placeholderText, style = textStyle.copy(fontSize = 14.sp, color = Color.LightGray.copy(alpha = 0.5f))) },
+            placeholder = {
+                Text(
+                    placeholderText,
+                    style = textStyle.copy(
+                        fontSize = 14.sp,
+                        color = Color.LightGray.copy(alpha = 0.5f)
+                    )
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             keyboardOptions = keyboardOptions,

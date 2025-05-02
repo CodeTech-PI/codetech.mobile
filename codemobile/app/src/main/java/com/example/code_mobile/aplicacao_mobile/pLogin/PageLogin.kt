@@ -27,6 +27,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -114,7 +115,7 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.weight(0.5f)) // Centraliza verticalmente
 
         Text(
-            text = "Lombardi",
+            text = "Login",
             style = textPadrao.copy(
                 fontSize = 40.sp, // Tamanho de texto
                 fontWeight = FontWeight.Bold
@@ -138,7 +139,8 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
             valor = senha,
             onValorChange = { senha = it },
             textStyle = textPadrao,
-            modifier = Modifier.fillMaxWidth() // Ocupa a largura disponível
+            modifier = Modifier.fillMaxWidth(), // Ocupa a largura disponível
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(30.dp)) // Espaço entre os campos
