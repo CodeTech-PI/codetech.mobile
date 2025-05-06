@@ -1,37 +1,27 @@
 package com.example.code_mobile
 
+import android.content.res.Resources.Theme
 import com.example.code_mobile.paginas.code_mobile.ui.theme.TelaLogin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.code_mobile.paginas.code_mobile.atendimento.PageAtendimento
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.code_mobile.paginas.code_mobile.cliente.ClienteCadastro
-import com.example.code_mobile.paginas.code_mobile.DashboardScreen
-import com.example.code_mobile.paginas.code_mobile.Filiais
-import com.example.code_mobile.paginas.code_mobile.FiliaisCadastro
-import com.example.code_mobile.paginas.code_mobile.FiliaisEditar
-import com.example.code_mobile.paginas.code_mobile.Menu
-import com.example.code_mobile.paginas.code_mobile.TelaCategorias
-import com.example.code_mobile.paginas.code_mobile.cliente.TelaClientes
-import com.example.code_mobile.paginas.code_mobile.estoque.TelaEstoque
-import com.example.code_mobile.paginas.code_mobile.viewmodel.categoria.ViewModelCategoria
 
-import com.example.code_mobile.ui.theme.CodemobileTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CodemobileTheme {
-
                 AppNavigation()
-            }
+
         }
     }
 }
@@ -45,18 +35,18 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = "PageLogin") {
         composable("PageLogin") { TelaLogin(navController) }
-        composable("Clientes") { TelaClientes(navController) }
-        composable("Estoque") { TelaEstoque(navController) }
-        composable("Categoria") { val viewModelCategoria: ViewModelCategoria = viewModel()
-            TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
+        //composable("Clientes") { TelaClientes(navController) }
+        composable("Atendimento") {
+            PageAtendimento(navController = navController)
         }
-        composable("Menu"){ Menu(navController) }
-        composable("Filiais"){ Filiais(navController) }
-        composable("FiliaisCadastro"){ FiliaisCadastro(navController) }
-        composable("FiliaisEditar"){ FiliaisEditar(navController) }
-        composable("Dashboard") { DashboardScreen(navController) }
-        composable("ClienteCadastro") { ClienteCadastro(navController) }
-
     }
 
+}
+
+
+@Preview(showBackground = true, name = "PageAtendimento Preview")
+@Composable
+fun PageAtendimentoPreview() {
+    val navController = rememberNavController()
+    PageAtendimento(navController = navController)
 }
