@@ -21,7 +21,7 @@ interface ServiceFiliais {
 
 
     @PUT("unidades/{id}")
-    suspend fun updateFilial(@Path("id") id: Int, @Body filial: ModelFiliais): Response<ModelFiliais>
+    suspend fun putFilial(@Path("id") id: Int, @Body filial: ModelFiliais): Response<ModelFiliais>
 
     @DELETE("unidades/{id}")
     suspend fun deleteFilial(@Path("id") id: Int): Response<Unit>

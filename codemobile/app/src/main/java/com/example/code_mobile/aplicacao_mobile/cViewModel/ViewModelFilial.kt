@@ -65,13 +65,33 @@ class ViewModelFilial : ViewModel() {
     private val serviceFilial = RetrofithAuth.retrofit.create(ServiceFiliais::class.java)
 
     // Atualizar campos
-    fun atualizarCep(value: String) { cep.value = value; cepError.value = null }
-    fun atualizarlogradouro(value: String) { logradouro.value = value; logradouroError.value = null }
-    fun atualizarBairro(value: String) { bairro.value = value; bairroError.value = null }
-    fun atualizarCidade(value: String) { cidade.value = value; cidadeError.value = null }
-    fun atualizarEstado(value: String) { estado.value = value; estadoError.value = null }
-    fun atualizarComplemento(value: String) { complemento.value = value; complementoError.value = null }
-    fun atualizarNum(value: String) { num.value = value; numError.value = null }
+    fun atualizarCep(value: String) {
+        cep.value = value; cepError.value = null
+    }
+
+    fun atualizarlogradouro(value: String) {
+        logradouro.value = value; logradouroError.value = null
+    }
+
+    fun atualizarBairro(value: String) {
+        bairro.value = value; bairroError.value = null
+    }
+
+    fun atualizarCidade(value: String) {
+        cidade.value = value; cidadeError.value = null
+    }
+
+    fun atualizarEstado(value: String) {
+        estado.value = value; estadoError.value = null
+    }
+
+    fun atualizarComplemento(value: String) {
+        complemento.value = value; complementoError.value = null
+    }
+
+    fun atualizarNum(value: String) {
+        num.value = value; numError.value = null
+    }
 
     // Validação
     fun validarCampos(): Boolean {
@@ -137,7 +157,8 @@ class ViewModelFilial : ViewModel() {
                     limparCampos()
                     carregarFiliais()
                 } else {
-                    _mensagemErro.value = "Erro ao cadastrar: ${response.code()} - ${response.message()}"
+                    _mensagemErro.value =
+                        "Erro ao cadastrar: ${response.code()} - ${response.message()}"
                 }
             } catch (e: IOException) {
                 _mensagemErro.value = "Erro de conexão: ${e.message}"
@@ -183,12 +204,16 @@ class ViewModelFilial : ViewModel() {
         }
     }
 
-    fun deletarFilial(filial: ModelFiliais) {
+    fun deletarFilial(
+        filial: ModelFiliais,
+        onDeleteSuccess: () -> Unit,
+        onDeleteError: (String?) -> Unit
+    ) {
         viewModelScope.launch {
             _showLoading.value = true
             _mensagemErro.value = null
             try {
-                if(filial.id != null){
+                if (filial.id != null) {
                     // Chama o serviço de deleção
                     val response = withContext(Dispatchers.IO) {
                         serviceFilial.deleteFilial(filial.id) // Chama o método delete do seu service
@@ -197,7 +222,8 @@ class ViewModelFilial : ViewModel() {
                     if (response.isSuccessful) {
                         carregarFiliais() // Atualiza a lista de filiais após a exclusão
                     } else {
-                        _mensagemErro.value = "Erro ao excluir filial: ${response.code()} - ${response.message()}"
+                        _mensagemErro.value =
+                            "Erro ao excluir filial: ${response.code()} - ${response.message()}"
                     }
                 }
             } catch (e: IOException) {
@@ -209,49 +235,33 @@ class ViewModelFilial : ViewModel() {
             }
         }
     }
-    fun editarFilial(filialID: Int) {
-        if (!validarCampos()) return
 
-        viewModelScope.launch {
-            _showLoading.value = true
-            _mensagemErro.value = null
-            try {
-                if(filialID != null){
-                    val filialAtualizada = ModelFiliais(
-                        id = filialID, // Mantém o ID existente
-                        cep = cep.value,
-                        logradouro = logradouro.value,
-                        bairro = bairro.value,
-                        cidade = cidade.value,
-                        estado = estado.value,
-                        complemento = complemento.value,
-                        num = num.value.toInt(),
-                        status = "OPERANTE" // Mantém o status atual
-                    )
-
+    fun atualizarFilial(
+        filial: ModelFiliais,
+        onSucesso: () -> Unit,
+        onError: (String?) -> Unit
+    ) {
+        filial.id?.let { filialId ->
+            viewModelScope.launch {
+                try {
                     val response = withContext(Dispatchers.IO) {
-                        serviceFilial.updateFilial(filialID ?: return@withContext null, filialAtualizada)
+                        serviceFilial.putFilial(filialId, filial)
                     }
-
-                    if (response!!.isSuccessful) {
-                        carregarFiliais()
-                        _cadastroSucesso.value = true
-                        limparCampos()
-                        // Atualiza a lista com a nova filial editada
+                    if (response.isSuccessful) {
+                        onSucesso()
                     } else {
-                        _mensagemErro.value = "Erro ao editar filial: ${response.code()} - ${response.message()}"
+                        onError("Erro ao atualizar filial: ${response.code()}")
                     }
+                } catch (e: IOException) {
+                    onError("Erro de conexão: ${e.message}")
+                } catch (e: Exception) {
+                    onError("Erro inesperado: ${e.message}")
                 }
-            } catch (e: IOException) {
-                _mensagemErro.value = "Erro de conexão: ${e.message}"
-            } catch (e: Exception) {
-                _mensagemErro.value = "Erro inesperado: ${e.message}"
-            } finally {
-                _showLoading.value = false
             }
+        } ?: run {
+            onError("ID da filial não pode ser nulo para atualização.")
         }
     }
-
 
     fun preencherCamposParaEdicao(filial: ModelFiliais) {
         id.value = filial.id ?: 0

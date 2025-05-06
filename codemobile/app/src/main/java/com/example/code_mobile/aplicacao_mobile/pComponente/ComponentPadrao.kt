@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -41,6 +44,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -58,7 +63,8 @@ fun CampoLogin(
     valor: String,
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -76,7 +82,8 @@ fun CampoLogin(
             modifier = Modifier
                 .fillMaxWidth()
                 .inputPadrao(),
-            singleLine = false // impede quebra de linha na input
+            singleLine = false, // impede quebra de linha na input
+            visualTransformation = visualTransformation
         )
     }
 }
@@ -333,7 +340,9 @@ fun CampoFilial(
     onValorChange: (String) -> Unit,
     textStyle: TextStyle,
     placeholderText: String = "",
-    erro: String = ""
+    erro: String = "",
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.None), // Correção aqui
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     Column(
         horizontalAlignment = Alignment.Start // Alinha para esquerda
@@ -343,34 +352,33 @@ fun CampoFilial(
         Spacer(modifier = Modifier.height(10.dp)) // Espaço entre título e campo
 
         // Input
-        TextField(
+        OutlinedTextField(
             value = valor,
             onValueChange = onValorChange,
-            placeholder = {Text(placeholderText) }, // Adiciona o placeholder aqui
-            textStyle = textStyle.copy(fontSize = 16.sp, color = Color.White), // Cor do título do campo (branco)
-            modifier = Modifier
-                .width(300.dp)
-                .height(50.dp),
-            singleLine = true,
-            shape = RoundedCornerShape(15.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF252525), // Cor de fundo quando focado (cinza)
-                unfocusedContainerColor = Color(0xFF252525), // Cor de fundo quando desfocado (cinza)
-                cursorColor = Color.White,
-                focusedTextColor = Color.White, // Cor do texto digitado quando focado (branco)
-                unfocusedTextColor = Color.White, // Cor do texto digitado quando desfocado (branco)
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Red
-            )
+            textStyle = textStyle.copy(color = Color.White),
+            placeholder = {
+                Text(
+                    placeholderText,
+                    style = textStyle.copy(
+                        fontSize = 14.sp,
+                        color = Color.LightGray.copy(alpha = 0.5f)
+                    )
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            keyboardOptions = keyboardOptions,
+            visualTransformation = visualTransformation
         )
-        if (erro.length > 0 ){
-            Text(text = erro, style = TextStyle(
-                fontSize = 14.sp,
-                color = Color.Red,
-                fontStyle = FontStyle.Normal
-            ))
+
+        if (erro.length > 0) {
+            Text(
+                text = erro, style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Color.Red,
+                    fontStyle = FontStyle.Normal
+                )
+            )
         }
 
 
