@@ -2,7 +2,7 @@ package com.example.code_mobile.token.network
 
 /* Biblioteca para realizar requisições HTTP */
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
