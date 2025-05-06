@@ -20,11 +20,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.code_mobile.paginas.code_mobile.menuComTituloPage
 import com.example.code_mobile.paginas.code_mobile.viewModel.atendimento.ViewModelAtendimento
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 
 @Composable
-fun PageAtendimento(navController: NavController) {
+fun PageAtendimento(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel: ViewModelAtendimento = viewModel()
+
+    // Observe os erros do ViewModel e exiba uma mensagem, se necessário.
+    val erroCarregarAtendimentos by viewModel.erroCarregarAtendimentos.collectAsState()
+    LaunchedEffect(erroCarregarAtendimentos) {
+        if (erroCarregarAtendimentos != null) {
+            //TODO: Show message to the user.
+            println("Erro ao carregar atendimentos: $erroCarregarAtendimentos")
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,13 +45,13 @@ fun PageAtendimento(navController: NavController) {
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-       // menu("Atendimentos", navController)
+        menuComTituloPage("Atendimentos", navController)
         EtapasAtendimento(viewModel)
     }
 }
 
 @Composable
-fun EtapasAtendimento(viewModel: ViewModelAtendimento) {
+fun EtapasAtendimento(viewModelAtendimento: ViewModelAtendimento) {
     var etapaAtual by remember { mutableStateOf(1) }
     var showConfirmacao by remember { mutableStateOf(false) }
 
@@ -129,7 +142,7 @@ fun EtapasAtendimento(viewModel: ViewModelAtendimento) {
     if (showConfirmacao) {
         ComponentConfirmacaoAtendimento(
             onConfirmar = {
-                viewModel.criarAtendimento(
+                viewModelAtendimento.criarAtendimento(
                     dataAtendimento = dataAtendimento,
                     horarioAtendimento = horarioAtendimento,
                     cancelado = cancelado,
