@@ -236,6 +236,18 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
+                    onClick = { showCancelDialog = true },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                        .height(40.dp), // Altura menor
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
+                ) {
+                    Text(text = "Cancelar", fontSize = 14.sp) // Fonte menor
+                }
+
+                Button(
                     onClick = viewModel::cadastrarCliente,
                     modifier = Modifier
                         .weight(1f)
@@ -246,21 +258,9 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     enabled = !showLoading
                 ) {
                     Text(
-                        text = if (showLoading) "Salvando..." else "Salvar",
+                        text = if (showLoading) "Salvando..." else "Cadastrar",
                         fontSize = 14.sp
                     ) // Fonte menor
-                }
-
-                Button(
-                    onClick = { showCancelDialog = true },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                        .height(40.dp), // Altura menor
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-                ) {
-                    Text(text = "Cancelar", fontSize = 14.sp) // Fonte menor
                 }
             }
         }
