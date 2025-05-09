@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import com.google.gson.JsonObject
+import com.google.gson.JsonArray
+import com.google.gson.Gson
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class ViewModelListaProduto : ViewModel() {
@@ -95,13 +100,35 @@ class ViewModelListaProduto : ViewModel() {
     }
 
     // Função para criar um novo item de lista de produto
-    fun cadastrarListaProduto(novaListaProduto: ModelListaProduto, onSucesso: () -> Unit, onError: (String?) -> Unit) {
+    fun cadastrarListaProduto(produtosSelecionadosMap: Map<Int, Int>, agendamentoId: Int, onSucesso: () -> Unit, onError: (String?) -> Unit) {
         _isLoadingListaProduto.value = true
         _erroListaProduto.value = null
         viewModelScope.launch {
             try {
+                val gson = Gson()
+                val produtosArray = JsonArray()
+
+                produtosSelecionadosMap.forEach { (produtoId, quantidade) ->
+                    val produtoJson = JsonObject().apply {
+                        addProperty("quantidade", quantidade)
+                        val agendamentoJson = JsonObject().apply {
+                            addProperty("id", agendamentoId)
+                        }
+                        add("agendamento", agendamentoJson)
+                        val produtoIdJson = JsonObject().apply {
+                            addProperty("id", produtoId)
+                        }
+                        add("produto", produtoIdJson)
+                    }
+                    produtosArray.add(produtoJson)
+                }
+
+                val requestBody = JsonObject().apply {
+                    add("produtos", produtosArray)
+                }
+
                 val response = withContext(Dispatchers.IO) {
-                    serviceListaProduto.postListaProduto(novaListaProduto)
+                    serviceListaProduto.postListaProduto(gson.toJson(requestBody).toRequestBody("application/json".toMediaTypeOrNull()))
                 }
                 if (response.isSuccessful) {
                     _operacaoSucesso.value = true

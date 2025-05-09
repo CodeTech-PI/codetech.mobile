@@ -61,7 +61,11 @@ import com.example.code_mobile.ui.theme.CodemobileTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgendamentoEtapa2(navController: NavController, agendamentoId: Int, modifier: Modifier = Modifier) {
+fun AgendamentoEtapa2(
+    navController: NavController,
+    agendamentoId: Int,
+    modifier: Modifier = Modifier
+) {
 
     var pesquisa by remember { mutableStateOf("") }
     val viewModelEstoque: ViewModelEstoque = viewModel()
@@ -267,25 +271,20 @@ fun AgendamentoEtapa2(navController: NavController, agendamentoId: Int, modifier
                 Button(
                     onClick = {
                         println("Produtos Selecionados: $produtosSelecionados para o agendamento $agendamentoId")
-                        produtosSelecionados.forEach { (produtoId, quantidade) ->
-                            listaEstoque.find { it.id == produtoId }?.let { produto ->
-                                val novaListaProduto = ModelListaProduto(
-                                    id = null,
-                                    quantidade = quantidade,
-                                    produto = produto,
-                                    agendamento = ModelAgendamento(id = agendamentoId, dt = "", horario = "", cancelado = false, usuario = null) // Cria uma referência ao agendamento existente
-                                )
-                                viewModelListaProduto.cadastrarListaProduto(
-                                    novaListaProduto,
-                                    onSucesso = {
-                                        println("Produto $produtoId adicionado à lista do agendamento $agendamentoId.")
-                                    },
-                                    onError = { erro ->
-                                        println("Erro ao adicionar produto $produtoId à lista do agendamento $agendamentoId: $erro")
-                                    }
-                                )
+                        viewModelListaProduto.cadastrarListaProduto(
+                            produtosSelecionadosMap = produtosSelecionados,
+                            agendamentoId = agendamentoId,
+                            onSucesso = {
+                                println("Produtos adicionados à lista do agendamento $agendamentoId com sucesso.")
+                                println("Dados enviados (IDs): Produtos=$produtosSelecionados, Agendamento=$agendamentoId")
+                                navController.navigate("AgendamentoCadastro3")
+                            },
+                            onError = { erro ->
+                                println("Erro ao adicionar produtos à lista do agendamento $agendamentoId: $erro")
+                                println("Dados da tentativa (IDs): Produtos=$produtosSelecionados, Agendamento=$agendamentoId")
+                                // Exibir mensagem de erro para o usuário
                             }
-                        }
+                        )
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -301,56 +300,56 @@ fun AgendamentoEtapa2(navController: NavController, agendamentoId: Int, modifier
                         color = Color.White
                     )
                 }
-            }
+    }
 
-            if (showLoadingListaProduto) {
-                Dialog(onDismissRequest = { }) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF2B2B2B)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        androidx.compose.material3.CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    }
-                }
-            }
-
-            if (showCancelDialog) {
-                AlertDialog(
-                    onDismissRequest = { showCancelDialog = false },
-                    title = { Text("Cancelar Seleção de Produtos?", color = Color.White) },
-                    text = {
-                        Text(
-                            "Tem certeza que deseja voltar e cancelar a seleção de produtos?",
-                            color = Color.White
-                        )
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = { navController.popBackStack() },
-                            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
-                        ) {
-                            Text("Sim", color = Color.White)
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            onClick = { showCancelDialog = false },
-                            colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-                        ) {
-                            Text("Não", color = Color.White)
-                        }
-                    },
-                    containerColor = Color(0xFF2B2B2B)
+    if (showLoadingListaProduto) {
+        Dialog(onDismissRequest = { }) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2B2B2B)),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 2.dp
                 )
             }
         }
     }
+
+    if (showCancelDialog) {
+        AlertDialog(
+            onDismissRequest = { showCancelDialog = false },
+            title = { Text("Cancelar Seleção de Produtos?", color = Color.White) },
+            text = {
+                Text(
+                    "Tem certeza que deseja voltar e cancelar a seleção de produtos?",
+                    color = Color.White
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { navController.popBackStack() },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                ) {
+                    Text("Sim", color = Color.White)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showCancelDialog = false },
+                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
+                ) {
+                    Text("Não", color = Color.White)
+                }
+            },
+            containerColor = Color(0xFF2B2B2B)
+        )
+    }
+}
+}
 }
 
 @Preview(

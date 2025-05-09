@@ -63,11 +63,11 @@ fun AppNavigation() {
         composable("ClienteCadastro") { ClienteCadastro(navController) }
         composable("AgendamentoCadastro") { AgendamentoEtapa1(navController) }
         composable(
-            "AgendamentoCadastro2/{agendamentoId}",
-            arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
-            AgendamentoEtapa2(navController = navController, agendamentoId = agendamentoId)
+            "AgendamentoCadastro2/{agendamentoId}", //URL com idAgendamento
+            arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType }) // uma lista de argumentos, no caso idAgendamento
+        ) { backStackEntry -> //  entrada na pilha de navegação e contém informações sobre a tela específica
+            val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1 // pega o id enviado na URL
+            AgendamentoEtapa2(navController = navController, agendamentoId = agendamentoId) // passa para a nova tela
         }
         composable("EstoqueCadastro") { EstoqueCadastro(navController) }
         composable("FiliaisCadastro") { FiliaisCadastro(navController) }

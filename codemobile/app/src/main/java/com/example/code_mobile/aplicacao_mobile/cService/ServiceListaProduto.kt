@@ -1,6 +1,8 @@
 package com.example.code_mobile.aplicacao_mobile.cService
 
 import com.example.code_mobile.aplicacao_mobile.cModel.ModelListaProduto
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,7 +20,7 @@ interface ServiceListaProduto {
     suspend fun deletarListaProduto(@Path("id") id: Int): Response<Unit>
 
     @POST("lista-produtos")
-    suspend fun postListaProduto(@Body novaListaProduto: ModelListaProduto): Response<Unit>
+    suspend fun postListaProduto(@Body requestBody: RequestBody): Response<ResponseBody> // Ou a sua Response DTO
 
     @PUT("lista-produtos/{id}")
     suspend fun putListaProduto(@Path("id") id: Int, @Body novaListaProduto: ModelListaProduto): Response<Unit>
