@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.TelaAgendamento
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa1
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa2
+import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa3
 import com.example.code_mobile.paginas.code_mobile.pCliente.ClienteCadastro
 import com.example.code_mobile.paginas.code_mobile.pDashboard.DashboardScreen
 import com.example.code_mobile.paginas.code_mobile.pFilial.FiliaisCadastro
@@ -61,16 +62,32 @@ fun AppNavigation() {
             TelaCategorias(navController, viewModelCategoria = viewModelCategoria)
         }
         composable("ClienteCadastro") { ClienteCadastro(navController) }
+        composable("EstoqueCadastro") { EstoqueCadastro(navController) }
+        composable("FiliaisCadastro") { FiliaisCadastro(navController) }
+
         composable("AgendamentoCadastro") { AgendamentoEtapa1(navController) }
         composable(
             "AgendamentoCadastro2/{agendamentoId}", //URL com idAgendamento
-            arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType }) // uma lista de argumentos, no caso idAgendamento
+            arguments = listOf(navArgument("agendamentoId") { // uma lista de argumentos, no caso idAgendamento
+                type = NavType.IntType
+            })
         ) { backStackEntry -> //  entrada na pilha de navegação e contém informações sobre a tela específica
-            val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1 // pega o id enviado na URL
-            AgendamentoEtapa2(navController = navController, agendamentoId = agendamentoId) // passa para a nova tela
+
+            val agendamentoId =
+                backStackEntry.arguments?.getInt("agendamentoId") ?: -1 // pega o id enviado na URL
+            AgendamentoEtapa2( // passa para a nova tela
+                navController = navController,
+                agendamentoId = agendamentoId
+            )
         }
-        composable("EstoqueCadastro") { EstoqueCadastro(navController) }
-        composable("FiliaisCadastro") { FiliaisCadastro(navController) }
+
+        composable(
+            "AgendamentoCadastro3/{agendamentoId}",
+            arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
+            AgendamentoEtapa3(navController = navController, agendamentoId = agendamentoId)
+        }
 
     }
 

@@ -152,3 +152,41 @@ fun cardExibirCliente(
         }
     }
 }
+
+@Composable
+fun CampoCadastrarOrdem(
+    titulo: String,
+    valor: String,
+    onValorChange: (String) -> Unit,
+    textStyle: TextStyle = TextStyle.Default,
+    placeholderText: String = "",
+    tituloStyle: TextStyle = TextStyle.Default,
+    isError: Boolean = false,
+    errorMessage: String = ""
+) {
+    Column(horizontalAlignment = Alignment.Start) {
+        Text(text = titulo, style = tituloStyle, color = Color.White)
+        OutlinedTextField(
+            value = valor,
+            onValueChange = onValorChange,
+            textStyle = textStyle.copy(color = Color.White),
+            placeholder = {
+                Text(placeholderText, color = Color.Gray)
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFDF0050),
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
+            isError = isError,
+            singleLine = true
+        )
+        if (isError) {
+            Text(text = errorMessage, color = Color.Red)
+        }
+    }
+}

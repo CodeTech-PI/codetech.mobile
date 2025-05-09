@@ -99,7 +99,7 @@ fun AgendamentoEtapa2(
     LaunchedEffect(operacaoSucessoListaProduto) {
         if (operacaoSucessoListaProduto) {
             println("Lista de produtos criada com sucesso!")
-            navController.navigate("AgendamentoEtapa3") // Navega para a próxima tela
+            navController.navigate("AgendamentoCadastro3/$agendamentoId")
             viewModelListaProduto.resetOperacaoFeedback()
         }
     }
@@ -277,7 +277,7 @@ fun AgendamentoEtapa2(
                             onSucesso = {
                                 println("Produtos adicionados à lista do agendamento $agendamentoId com sucesso.")
                                 println("Dados enviados (IDs): Produtos=$produtosSelecionados, Agendamento=$agendamentoId")
-                                navController.navigate("AgendamentoCadastro3")
+                                navController.navigate("AgendamentoCadastro3/$agendamentoId")
                             },
                             onError = { erro ->
                                 println("Erro ao adicionar produtos à lista do agendamento $agendamentoId: $erro")
@@ -357,6 +357,7 @@ fun AgendamentoEtapa2(
     showSystemUi = true,
     device = Devices.PIXEL_2
 )
+
 @Composable
 fun AgendamentoEtapa2Preview() {
     CodemobileTheme {
