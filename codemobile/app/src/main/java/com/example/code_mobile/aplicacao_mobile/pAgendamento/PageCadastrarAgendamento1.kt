@@ -79,6 +79,13 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifier) {
 
+    // Tá enviando p banco certinho
+    // O cadastro está sendo feito por etapas — o agendamento está sendo salvo antes da confirmação final ("gerar ordem").
+    // Teria que arrumar isso p ficar igual na web
+
+    // se o cliente voltar a tela, as informações ESTÃO salvas, mas como já ta cadastrando, precisaria mudar a data do agendamento de novo
+    // Tbm teria que arrumar isso
+
     val scrollState = rememberScrollState()
     val viewModelCliente: ViewModelCliente = viewModel()
     val viewModelAgendamento: ViewModelAgendamento = viewModel()

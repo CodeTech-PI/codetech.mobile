@@ -86,6 +86,11 @@ fun AgendamentoEtapa3(
     agendamentoId: Int,
 
 ) {
+
+    // Precisa testar p ver se o backend ta funcionando
+    // Na teoria ta certo, mas acho que ta com problema no botão de "próximo"
+    // Talvez a rota esteja errada, precisa validar. gemini ajuda demais
+
     val viewModelOrdemServico: ViewModelOrdemServico = viewModel()
     var valorTatuagem by remember { mutableStateOf("") }
     val ordemServicoCriada = viewModelOrdemServico.ordemServico.collectAsState().value

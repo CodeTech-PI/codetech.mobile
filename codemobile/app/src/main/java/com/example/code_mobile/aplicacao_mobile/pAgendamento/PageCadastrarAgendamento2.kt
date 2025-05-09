@@ -67,6 +67,13 @@ fun AgendamentoEtapa2(
     modifier: Modifier = Modifier
 ) {
 
+    // Tá enviando p banco com o agendamentiId certinho
+    // se o cliente voltar a tela, as informações NÂO vão estar "guardada" ele precisaria cadastrar de novo
+
+    // O cadastro está sendo feito por etapas — a lista está sendo salva antes da confirmação final ("gerar ordem").
+    // Teria que arrumar isso p ficar igual na web
+
+
     var pesquisa by remember { mutableStateOf("") }
     val viewModelEstoque: ViewModelEstoque = viewModel()
     val viewModelListaProduto: ViewModelListaProduto = viewModel()
@@ -141,8 +148,7 @@ fun AgendamentoEtapa2(
                         .size(24.dp)
                         .clickable {
                             run {
-                                showCancelDialog = true
-                                navController.popBackStack() // Volta para AgendamentoEtapa1
+                                navController.popBackStack()
                             }
                         }
                 )

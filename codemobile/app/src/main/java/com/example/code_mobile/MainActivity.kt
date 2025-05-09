@@ -16,6 +16,7 @@ import com.example.code_mobile.aplicacao_mobile.pAgendamento.TelaAgendamento
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa1
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa2
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa3
+import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa4
 import com.example.code_mobile.paginas.code_mobile.pCliente.ClienteCadastro
 import com.example.code_mobile.paginas.code_mobile.pDashboard.DashboardScreen
 import com.example.code_mobile.paginas.code_mobile.pFilial.FiliaisCadastro
@@ -87,6 +88,14 @@ fun AppNavigation() {
         ) { backStackEntry ->
             val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
             AgendamentoEtapa3(navController = navController, agendamentoId = agendamentoId)
+        }
+
+        composable(
+            "FinalizarAgendamento/{agendamentoId}",
+            arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
+            AgendamentoEtapa4(navController = navController, agendamentoId = agendamentoId)
         }
 
     }

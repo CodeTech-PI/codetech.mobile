@@ -31,6 +31,10 @@ import com.example.code_mobile.paginas.code_mobile.textPadrao
 @Composable
 fun TelaAgendamento(navController: NavController, modifier: Modifier = Modifier) {
 
+    // Não tem front do card, precisa fazer. Tem o protótipo lá no figma
+    // O get não ta vinculado no back para listar os agendamentos
+    // O botão de adicionar ta vinculado no back
+
     var pesquisa by remember { mutableStateOf("") }
 
     Column(
