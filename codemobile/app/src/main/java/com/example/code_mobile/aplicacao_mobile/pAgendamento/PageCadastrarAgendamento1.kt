@@ -259,12 +259,12 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                                 )
                             }
                         }) {
-                            Text("Confirmar", color = Color.White)
+                            Text("Confirmar", color = Color.Black)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { exibirCalendario = false }) {
-                            Text("Cancelar", color = Color.White)
+                            Text("Cancelar", color = Color.Black)
                         }
                     }
                 ) {
