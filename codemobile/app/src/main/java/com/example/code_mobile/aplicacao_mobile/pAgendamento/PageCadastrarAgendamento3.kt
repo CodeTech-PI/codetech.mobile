@@ -145,7 +145,7 @@ fun AgendamentoEtapa3(
                         .clickable { navController.popBackStack() }
                 )
                 Text(
-                    text = "Cobrança",
+                    text = "Valor",
                     style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
