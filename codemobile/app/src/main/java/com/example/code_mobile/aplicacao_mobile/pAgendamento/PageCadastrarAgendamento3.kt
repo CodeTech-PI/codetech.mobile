@@ -237,7 +237,7 @@ fun AgendamentoEtapa3(
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar cobrança da tatuagem?", color = Color.White) },
+                title = { Text("Cancelar valor da tatuagem?", color = Color.White) },
                 text = {
                     Text(
                         "Tem certeza que deseja voltar para a seleção de produtos?",
