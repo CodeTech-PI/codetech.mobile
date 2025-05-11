@@ -234,7 +234,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 ) {
                     listaClientes.forEach { cliente ->
                         DropdownMenuItem(
-                            text = { Text(cliente.nome, color = Color.White) },
+                            text = { Text(cliente.nome, color = Color.Black) },
                             onClick = {
                                 viewModelAgendamento.atualizarClienteSelecionado(cliente)
                                 expandedCliente = false
