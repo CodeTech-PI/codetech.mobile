@@ -59,10 +59,12 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // ViewModel
-
-
+// Adicione no build.gradle (Module):
+    implementation ("com.google.code.gson:gson:2.10.1")
+    implementation("com.fatboyindustrial.gson-javatime-serialisers:gson-javatime-serialisers:1.1.2")
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.core.i18n)
 
 
     testImplementation(libs.junit)

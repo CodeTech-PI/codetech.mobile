@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.15.11</domain> <!-- Abre o cmd, roda o comando "ipconfig", pega o IPv4 da sua maáuina e coloca aqui -->
+        <domain includeSubdomains="true">192.168.17.152</domain> <!-- Abre o cmd, roda o comando "ipconfig", pega o IPv4 da sua maáuina e coloca aqui -->
     </domain-config>
 </network-security-config>

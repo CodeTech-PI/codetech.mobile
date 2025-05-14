@@ -53,6 +53,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
+    // Exemplo de uso:
     val serviceCliente = RetrofithAuth.retrofit.create(ServiceCliente::class.java)
 
 
