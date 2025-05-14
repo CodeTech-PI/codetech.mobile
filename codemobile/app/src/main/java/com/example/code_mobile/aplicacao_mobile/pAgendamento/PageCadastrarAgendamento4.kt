@@ -48,16 +48,19 @@ fun AgendamentoEtapa4(
     navController: NavController,
     modifier: Modifier = Modifier,
     agendamentoId: Int,
-    ) {
-
-    // 1. Criar o Model, Service e ViewModel para Faturamento.
-    // 2. No botão "Confirmar", deve chamar o método POST de faturamento.
-    // 3. Para exibição dos dados:
-    //    - Usar a ViewModel de Agendamento para obter data e hora.
-    //    - Usar a ViewModel de Ordem de Serviço para obter o valor.
-
-
+) {
     var valorTatuagem by remember { mutableStateOf("") }
+    var mostrarDialogo by remember { mutableStateOf(false) }
+
+    // Função para simular o envio do faturamento
+    val confirmarFaturamento: () -> Unit = {
+        // Aqui você deve chamar seu ViewModel para enviar o faturamento
+        // faturamentoViewModel.postFaturamento(...)
+        println("Faturamento confirmado para o agendamento $agendamentoId")
+
+        // Exemplo de navegação ou ação após confirmação
+        // navController.navigate("proximaTela")
+    }
 
     Box(
         modifier = Modifier
@@ -159,7 +162,6 @@ fun AgendamentoEtapa4(
             )
         }
 
-        // Row dos botões fixada na parte inferior
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -170,7 +172,7 @@ fun AgendamentoEtapa4(
             verticalAlignment = Alignment.Bottom
         ) {
             Button(
-                onClick = { },
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 8.dp)
@@ -182,7 +184,7 @@ fun AgendamentoEtapa4(
             }
 
             Button(
-                onClick = { },
+                onClick = { mostrarDialogo = true },
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 8.dp)
@@ -197,8 +199,62 @@ fun AgendamentoEtapa4(
                 )
             }
         }
+
+        if (mostrarDialogo) {
+            ConfirmarFaturamentoDialog(
+                onDismiss = { mostrarDialogo = false },
+                onConfirmar = {
+                    confirmarFaturamento()
+                    mostrarDialogo = false
+                }
+            )
+        }
     }
 }
+
+@Composable
+fun ConfirmarFaturamentoDialog(
+    onDismiss: () -> Unit,
+    onConfirmar: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Confirmar Faturamento", color = Color.White) },
+        text = {
+            Text(
+                "Tem certeza que deseja gerar a ordem de serviço?",
+                color = Color.White
+            )
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        onConfirmar()
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Sim", color = Color.White)
+                }
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+            }
+        },
+        containerColor = Color(0xFF2B2B2B)
+    )
+}
+
 
 @Preview(
     showBackground = true,
