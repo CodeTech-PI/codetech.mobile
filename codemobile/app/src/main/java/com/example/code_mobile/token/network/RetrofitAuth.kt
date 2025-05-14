@@ -27,6 +27,7 @@ object RetrofithAuth {
     }
 }
 
+
 /*
     retrofit = Configura instância para comunicação com o nosso back-end
     OkHttpClient  = Adiciona o token automaticamente aos headers de todas as requisições feitas pela instância do retrofit
