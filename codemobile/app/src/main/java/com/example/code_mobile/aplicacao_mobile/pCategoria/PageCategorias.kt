@@ -16,6 +16,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +44,7 @@ import com.example.code_mobile.paginas.code_mobile.pComponente.menuComTituloPage
 import com.example.code_mobile.paginas.code_mobile.cModel.ModelCategoria
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelCategoria
+import kotlinx.coroutines.launch
 
 @Composable
 fun TelaCategorias(
@@ -57,64 +63,97 @@ fun TelaCategorias(
     var categoriaEditado by remember { mutableStateOf<ModelCategoria?>(null) }
     var showConfirmDeleteDialog by remember { mutableStateOf(false) }
     var categoriaParaExcluir by remember { mutableStateOf<ModelCategoria?>(null) }
+    var edicaoSucesso by remember { mutableStateOf(false) } // Novo estado
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
 
     // Carregar categorias assim que abrir
     LaunchedEffect(Unit) {
         viewModelCategoria.carregarCategorias()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B1B1B)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(modifier = Modifier.height(30.dp))
-        menuComTituloPage("Categoria", navController)
-
-        Input(
-            titulo = "",
-            valor = pesquisa,
-            onValorChange = { pesquisa = it },
-            textStyle = textPadrao,
-            labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Column {
-            categorias
-                .filter { it.nome.contains(pesquisa, ignoreCase = true) }
-                .forEach { categoria ->
-                    cardCategoria(
-                        categoria.nome,
-                        onEditClick = {
-                            categoriaEditado = categoria
-                            showEdicaoDialog = true
-                        },
-                        onDeleteClick = {
-                            categoriaParaExcluir = categoria
-                            showConfirmDeleteDialog = true
-                        }
-                    )
-                    Spacer(modifier = modifier.height(10.dp))
-                }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = { showCadastroDialog = true },
-            modifier = Modifier
-                .width(300.dp)
-                .padding(bottom = 16.dp),
-            colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
-        ) {
-            Text("Nova Categoria", color = Color.White)
+    LaunchedEffect(edicaoSucesso) {
+        if (edicaoSucesso) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Categoria alterada com sucesso!",
+                    duration = SnackbarDuration.Short
+                )
+            }
+            edicaoSucesso = false // Resetar o estado
+            showEdicaoDialog = false // Fechar o diálogo
+            viewModelCategoria.carregarCategorias() // Recarregar a lista
         }
     }
 
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF1B1B1B)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(modifier = Modifier.height(30.dp))
+                menuComTituloPage("Categoria", navController)
+
+                Input(
+                    titulo = "",
+                    valor = pesquisa,
+                    onValorChange = { pesquisa = it },
+                    textStyle = textPadrao,
+                    labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Column {
+                    categorias
+                        .filter { it.nome.contains(pesquisa, ignoreCase = true) }
+                        .forEach { categoria ->
+                            cardCategoria(
+                                categoria.nome,
+                                onEditClick = {
+                                    categoriaEditado = categoria
+                                    showEdicaoDialog = true
+                                },
+                                onDeleteClick = {
+                                    categoriaParaExcluir = categoria
+                                    showConfirmDeleteDialog = true
+                                }
+                            )
+                            Spacer(modifier = modifier.height(10.dp))
+                        }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    onClick = { showCadastroDialog = true },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .padding(bottom = 16.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                ) {
+                    Text("Nova Categoria", color = Color.White)
+                }
+            }
+        }
+    }
     if (showCadastroDialog) {
         NovaCategoriaDialog(
             viewModelCategoria = viewModelCategoria,
@@ -146,13 +185,14 @@ fun TelaCategorias(
             onDismiss = { showEdicaoDialog = false },
             onSalvar = { categoriaAtualizada ->
                 viewModelCategoria.atualizarCategoria(categoriaAtualizada) {
+                    edicaoSucesso = true
                     showEdicaoDialog = false
+
                 }
             }
         )
     }
 }
-
 
 
 @Composable
@@ -165,7 +205,9 @@ fun NovaCategoriaDialog(
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(Color(0xFF121212))
         ) {
@@ -220,7 +262,9 @@ fun EditarCategoriaDialog(
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(Color(0xFF121212))
         ) {

@@ -21,6 +21,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +50,7 @@ import com.example.code_mobile.paginas.code_mobile.pComponente.menuComTituloPage
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.paginas.code_mobile.cModel.ModelCliente
 import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelCliente
+import kotlinx.coroutines.launch
 
 @Composable
 fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
@@ -64,6 +70,9 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
     var clienteParaEditar by remember { mutableStateOf<ModelCliente?>(null) }
     var edicaoSucesso by remember { mutableStateOf(false) }
     var mensagemErroEdicao by remember { mutableStateOf<String?>(null) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     println("Executando tela de clientes")
 
@@ -92,7 +101,13 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
             println("Cliente editado com sucesso!")
             edicaoSucesso = false
             showEdicaoDialog = false
-            viewModel.carregarClientes() // Recarregar a lista após a edição
+            viewModel.carregarClientes()
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Cliente alterado com sucesso!",
+                    duration = SnackbarDuration.Short
+                )
+            }
         }
     }
 
@@ -103,124 +118,137 @@ fun TelaClientes(navController: NavController, modifier: Modifier = Modifier) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B1B1B)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        menuComTituloPage("Clientes", navController)
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B)),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            InputPesquisarCliente(
-                titulo = "",
-                valor = pesquisa,
-                onValorChange = { pesquisa = it },
-                textStyle = textPadrao,
-                labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por CPF") }
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.icon_add),
-                contentDescription = "Adicionar",
+            Column(
                 modifier = Modifier
-                    .size(60.dp)
-                    .padding(top = 25.dp)
-                    .clickable {
-                        println("Clicou para cadastrar um cliente!")
-                        navController.navigate("ClienteCadastro")
-                    }
-            )
-        }
+                    .fillMaxSize()
+                    .background(Color(0xFF1B1B1B)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                menuComTituloPage("Clientes", navController)
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    InputPesquisarCliente(
+                        titulo = "",
+                        valor = pesquisa,
+                        onValorChange = { pesquisa = it },
+                        textStyle = textPadrao,
+                        labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por CPF") }
+                    )
 
-        if (isLoading) {
-            CircularProgressIndicator(color = Color.White)
-        } else if (!erroCarregar.isNullOrEmpty()) {
-            Text(
-                text = "Erro ao carregar clientes: $erroCarregar",
-                color = Color.Red,
-                style = textPadrao
-            )
-        } else {
-            LazyColumn {
-                item {
-                    val clientesFiltrados = if (pesquisa.isBlank()) {
-                        clientes
-                    } else {
-                        clientes.filter { it.cpf.contains(pesquisa) }
-                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.icon_add),
+                        contentDescription = "Adicionar",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(top = 25.dp)
+                            .clickable {
+                                println("Clicou para cadastrar um cliente!")
+                                navController.navigate("ClienteCadastro")
+                            }
+                    )
+                }
 
-                    for (cliente in clientesFiltrados) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 30.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = cliente.nome,
-                                style = textPadrao.copy(fontSize = 16.sp),
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(top = 10.dp)
-                            )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.White)
+                } else if (!erroCarregar.isNullOrEmpty()) {
+                    Text(
+                        text = "Erro ao carregar clientes: $erroCarregar",
+                        color = Color.Red,
+                        style = textPadrao
+                    )
+                } else {
+                    LazyColumn {
+                        item {
+                            val clientesFiltrados = if (pesquisa.isBlank()) {
+                                clientes
+                            } else {
+                                clientes.filter { it.cpf.contains(pesquisa) }
+                            }
 
-                            cardCliente(
-                                cliente = cliente,
-                                coluna1Info1 = "CPF: ${cliente.cpf}",
-                                coluna1Info2 = "Nascimento: ${cliente.dataNascimento}",
-                                coluna2Info1 = "Telefone: ${cliente.telefone}",
-                                coluna2Info2 = "Email: ${cliente.email}",
-                                onEditClick = { clienteSelecionado ->
-                                    clienteParaEditar = clienteSelecionado
-                                    showEdicaoDialog = true
-                                },
-                                onDeleteClick = { cliente ->
-                                    clienteParaExcluir = cliente
-                                    showDialog = true
+                            for (cliente in clientesFiltrados) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 30.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = cliente.nome,
+                                        style = textPadrao.copy(fontSize = 16.sp),
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(top = 10.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    cardCliente(
+                                        cliente = cliente,
+                                        coluna1Info1 = "CPF: ${cliente.cpf}",
+                                        coluna1Info2 = "Nascimento: ${cliente.dataNascimento}",
+                                        coluna2Info1 = "Telefone: ${cliente.telefone}",
+                                        coluna2Info2 = "Email: ${cliente.email}",
+                                        onEditClick = { clienteSelecionado ->
+                                            clienteParaEditar = clienteSelecionado
+                                            showEdicaoDialog = true
+                                        },
+                                        onDeleteClick = { cliente ->
+                                            clienteParaExcluir = cliente
+                                            showDialog = true
+                                        }
+                                    )
+
+                                    Spacer(modifier = Modifier.height(10.dp))
                                 }
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            }
                         }
                     }
                 }
+
+                if (showDialog && clienteParaExcluir != null) {
+                    ExcluirClienteDialog(
+                        cliente = clienteParaExcluir!!,
+                        onDismiss = { showDialog = false },
+                        onConfirmExcluir = { clienteExcluir ->
+                            viewModel.excluirCliente(
+                                cliente = clienteExcluir,
+                                onExclusaoSucesso = { exclusaoSucesso = true },
+                                onExclusaoErro = { mensagemErroExclusao = it }
+                            )
+                        }
+                    )
+                }
+
+                if (showEdicaoDialog && clienteParaEditar != null) {
+                    EditarClienteDialog(
+                        cliente = clienteParaEditar!!,
+                        onDismiss = { showEdicaoDialog = false },
+                        onSalvar = { clienteAtualizado ->
+                            viewModel.atualizarCliente(
+                                cliente = clienteAtualizado,
+                                onSucesso = { edicaoSucesso = true },
+                                onError = { mensagemErroEdicao = it }
+                            )
+                        }
+                    )
+                }
             }
-        }
-
-        if (showDialog && clienteParaExcluir != null) {
-            ExcluirClienteDialog(
-                cliente = clienteParaExcluir!!,
-                onDismiss = { showDialog = false },
-                onConfirmExcluir = { clienteExcluir ->
-                    viewModel.excluirCliente(
-                        cliente = clienteExcluir,
-                        onExclusaoSucesso = { exclusaoSucesso = true },
-                        onExclusaoErro = { mensagemErroExclusao = it }
-                    )
-                }
-            )
-        }
-
-        if (showEdicaoDialog && clienteParaEditar != null) {
-            EditarClienteDialog(
-                cliente = clienteParaEditar!!,
-                onDismiss = { showEdicaoDialog = false },
-                onSalvar = { clienteAtualizado ->
-                    viewModel.atualizarCliente(
-                        cliente = clienteAtualizado,
-                        onSucesso = { edicaoSucesso = true },
-                        onError = { mensagemErroEdicao = it }
-                    )
-                }
-            )
         }
     }
 }
@@ -309,7 +337,13 @@ fun EditarClienteDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 erroNome?.let {
-                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -325,7 +359,13 @@ fun EditarClienteDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 erroCpf?.let {
-                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -341,7 +381,13 @@ fun EditarClienteDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 erroDataNascimento?.let {
-                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -357,7 +403,13 @@ fun EditarClienteDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 erroTelefone?.let {
-                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -373,7 +425,13 @@ fun EditarClienteDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 erroEmail?.let {
-                    Text(text = it, color = Color.Red, fontSize = 12.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 

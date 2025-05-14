@@ -16,6 +16,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +47,11 @@ import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelFilial
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
-
     val viewModel: ViewModelFilial = viewModel()
 
     var pesquisa by remember { mutableStateOf("") }
@@ -64,6 +68,9 @@ fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
     var filialParaEditar by remember { mutableStateOf<ModelFiliais?>(null) }
     var edicaoSucesso by remember { mutableStateOf(false) }
     var mensagemErroEdicao by remember { mutableStateOf<String?>(null) }
+
+    val snackbarHostState = remember { SnackbarHostState() } // Adicione esta linha
+    val scope = rememberCoroutineScope() // Adicione esta linha
 
     println("Executando tela de filiais")
 
@@ -98,6 +105,12 @@ fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
             edicaoSucesso = false
             showEdicaoDialog = false
             viewModel.carregarFiliais() // Recarregar a lista após a edição
+            scope.launch { // Use o CoroutineScope para mostrar o Snackbar
+                snackbarHostState.showSnackbar(
+                    message = "Filial alterada com sucesso!",
+                    duration = SnackbarDuration.Short
+                )
+            }
         }
     }
 
@@ -108,122 +121,128 @@ fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B1B1B)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        menuComTituloPage("Filiais", navController)
-
-        // Filtro e ícone de adicionar
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues) // Aplique o padding do Scaffold
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B)),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Input(
-                titulo = "",
-                valor = pesquisa,
-                onValorChange = { pesquisa = it },
-                textStyle = textPadrao,
-                labelInfo = { if (pesquisa.isEmpty()) Text("Pesquisar filial") }
-            )
+            menuComTituloPage("Filiais", navController)
 
-            Image(
-                painter = painterResource(id = R.drawable.icon_add),
-                contentDescription = "Adicionar",
-                modifier = Modifier
-                    .size(60.dp)
-                    .padding(top = 25.dp)
-                    .clickable {
-                        println("Clicou para cadastrar uma filial!")
-                        navController.navigate("FiliaisCadastro")
-                    }
-            )
-        }
+            // Filtro e ícone de adicionar
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Input(
+                    titulo = "",
+                    valor = pesquisa,
+                    onValorChange = { pesquisa = it },
+                    textStyle = textPadrao,
+                    labelInfo = { if (pesquisa.isEmpty()) Text("Pesquisar filial") }
+                )
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.icon_add),
+                    contentDescription = "Adicionar",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .padding(top = 25.dp)
+                        .clickable {
+                            println("Clicou para cadastrar uma filial!")
+                            navController.navigate("FiliaisCadastro")
+                        }
+                )
+            }
 
-        // Exibir lista de filiais
-        if (isLoading) {
-            CircularProgressIndicator(color = Color.White)
-        } else if (!erroCarregar.isNullOrEmpty()) {
-            Text(
-                text = "Erro ao carregar filiais: $erroCarregar",
-                color = Color.Red,
-                style = textPadrao
-            )
-        } else {
-            // Filtrar filiais por nome, caso haja pesquisa
-            val filiaisFiltradas = if (pesquisa.isEmpty()) {
-                filiais
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Exibir lista de filiais
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White)
+            } else if (!erroCarregar.isNullOrEmpty()) {
+                Text(
+                    text = "Erro ao carregar filiais: $erroCarregar",
+                    color = Color.Red,
+                    style = textPadrao
+                )
             } else {
-                filiais.filter {
-                    it.logradouro.contains(pesquisa, ignoreCase = true)
+                // Filtrar filiais por nome, caso haja pesquisa
+                val filiaisFiltradas = if (pesquisa.isEmpty()) {
+                    filiais
+                } else {
+                    filiais.filter {
+                        it.logradouro.contains(pesquisa, ignoreCase = true)
+                    }
+                }
+
+                // Exibir filiais
+                LazyColumn {
+                    items(filiaisFiltradas) { filial ->
+                        Box(modifier = Modifier.padding(8.dp)) {
+                            cardFilial(
+                                "Rua: ${filial.logradouro}",
+                                "Estado: ${filial.estado}",
+                                "Cidade: ${filial.cidade}",
+                                "CEP: ${filial.cep}",
+                                "Status: ${filial.status}", // Usando o status da filial
+
+                                onDeleteClick = {
+                                    filialParaExcluir = filial
+                                    showDialogExcluir = true
+                                },
+                                OnEditClick = {
+                                    filialParaEditar = filial
+                                    showEdicaoDialog = true
+                                }
+                            )
+                        }
+                    }
+
+                    // Se não houver filiais
+                    if (filiaisFiltradas.isEmpty()) {
+                        item {
+                            Text("Nenhuma filial encontrada", color = Color.White, modifier = Modifier.padding(16.dp))
+                        }
+                    }
                 }
             }
 
-            // Exibir filiais
-            LazyColumn {
-                items(filiaisFiltradas) { filial ->
-                    Box(modifier = Modifier.padding(8.dp)) {
-                        cardFilial(
-                            "Rua: ${filial.logradouro}",
-                            "Estado: ${filial.estado}",
-                            "Cidade: ${filial.cidade}",
-                            "CEP: ${filial.cep}",
-                            "Status: ${filial.status}", // Usando o status da filial
+            // Diálogo de exclusão
+            if (showDialogExcluir && filialParaExcluir != null) {
+                ExcluirFilialDialog(
 
-                            onDeleteClick = {
-                                filialParaExcluir = filial
-                                showDialogExcluir = true
-                            },
-                            OnEditClick = {
-                                filialParaEditar = filial
-                                showEdicaoDialog = true
-                            }
+                    filial = filialParaExcluir!!,
+                    onDismiss = { showDialogExcluir = false },
+                    onConfirmExcluir = { filialExcluir ->
+                        viewModel.deletarFilial(
+                            filial = filialExcluir,
+                            onDeleteSuccess = { exclusaoSucesso = true },
+                            onDeleteError = { mensagemErroExclusao = it }
                         )
                     }
-                }
-
-                // Se não houver filiais
-                if (filiaisFiltradas.isEmpty()) {
-                    item {
-                        Text("Nenhuma filial encontrada", color = Color.White, modifier = Modifier.padding(16.dp))
-                    }
-                }
+                )
             }
-        }
 
-        // Diálogo de exclusão
-        if (showDialogExcluir && filialParaExcluir != null) {
-            ExcluirFilialDialog(
-
-                filial = filialParaExcluir!!,
-                onDismiss = { showDialogExcluir = false },
-                onConfirmExcluir = { filialExcluir ->
-                    viewModel.deletarFilial(
-                        filial = filialExcluir,
-                        onDeleteSuccess = { exclusaoSucesso = true },
-                        onDeleteError = { mensagemErroExclusao = it }
-                    )
-                }
-            )
-        }
-
-        // Diálogo de edição
-        if (showEdicaoDialog && filialParaEditar != null) {
-            EditarFilialDialog(
-                onDismiss = { showEdicaoDialog = false },
-                onSalvar = { filialAtualizada ->
-                    viewModel.atualizarFilial(
-                        filial = filialAtualizada,
-                        onSucesso = { edicaoSucesso = true },
-                        onError = { mensagemErroEdicao = it }
-                    )
-                },
-                filial = filialParaEditar!! // !! pois já verificamos que não é nulo
-            )
+            // Diálogo de edição
+            if (showEdicaoDialog && filialParaEditar != null) {
+                EditarFilialDialog(
+                    onDismiss = { showEdicaoDialog = false },
+                    onSalvar = { filialAtualizada ->
+                        viewModel.atualizarFilial(
+                            filial = filialAtualizada,
+                            onSucesso = { edicaoSucesso = true },
+                            onError = { mensagemErroEdicao = it }
+                        )
+                    },
+                    filial = filialParaEditar!!
+                )
+            }
         }
     }
 }
