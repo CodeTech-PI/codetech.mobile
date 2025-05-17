@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,15 +52,11 @@ fun AgendamentoEtapa4(
 ) {
     var valorTatuagem by remember { mutableStateOf("") }
     var mostrarDialogo by remember { mutableStateOf(false) }
+    var mostrarModalSucesso by remember { mutableStateOf(false) }
 
     // Função para simular o envio do faturamento
     val confirmarFaturamento: () -> Unit = {
-        // Aqui você deve chamar seu ViewModel para enviar o faturamento
-        // faturamentoViewModel.postFaturamento(...)
-        println("Faturamento confirmado para o agendamento $agendamentoId")
-
-        // Exemplo de navegação ou ação após confirmação
-        // navController.navigate("proximaTela")
+        mostrarModalSucesso = true
     }
 
     Box(
@@ -107,7 +104,7 @@ fun AgendamentoEtapa4(
                 style = textPadrao.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color.Yellow
+                    color = Color.White
                 ),
                 textAlign = TextAlign.Center
             )
@@ -209,8 +206,84 @@ fun AgendamentoEtapa4(
                 }
             )
         }
+
+        if (mostrarModalSucesso) {
+            ModalSucessoOrdemServico(
+                onClose = {
+                    mostrarModalSucesso = false
+                    navController.navigate("Agendamentos") {
+                        popUpTo("Agendamentos") { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
+
+
+@Composable
+fun ModalSucessoOrdemServico(
+    onClose: () -> Unit
+) {
+    Dialog(onDismissRequest = { }) {
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0xFF2B2B2B))
+                .padding(20.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // X de fechar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Fechar",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .clickable { onClose() }
+                            .size(24.dp)
+                    )
+                }
+
+                Text(
+                    text = "Ordem de Serviço",
+                    style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 22.sp),
+                    color = Color(0xFFDF0050)
+                )
+
+                Text(
+                    text = "Atendimento realizado com sucesso!",
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Lucro Estimado",
+                    style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+                    color = Color.White
+                )
+
+                Text(
+                    text = "R$ 40,00.",
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ConfirmarFaturamentoDialog(
