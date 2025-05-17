@@ -91,7 +91,7 @@ fun AppNavigation() {
         }
 
         composable(
-            "FinalizarAgendamento/{agendamentoId}",
+            "AgendamentoCadastro4/{agendamentoId}", //PageCadastrarAgendamento4.kt
             arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
         ) { backStackEntry ->
             val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
