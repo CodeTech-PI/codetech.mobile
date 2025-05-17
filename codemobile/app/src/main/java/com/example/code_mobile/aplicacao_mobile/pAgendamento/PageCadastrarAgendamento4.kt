@@ -209,20 +209,20 @@ fun AgendamentoEtapa4(
 
         if (mostrarModalSucesso) {
             ModalSucessoOrdemServico(
+                navController = navController,
                 onClose = {
                     mostrarModalSucesso = false
-                    navController.navigate("Agendamentos") {
-                        popUpTo("Agendamentos") { inclusive = true }
-                    }
                 }
             )
         }
+
     }
 }
 
 
 @Composable
 fun ModalSucessoOrdemServico(
+    navController: NavController,
     onClose: () -> Unit
 ) {
     Dialog(onDismissRequest = { }) {
@@ -247,7 +247,11 @@ fun ModalSucessoOrdemServico(
                         contentDescription = "Fechar",
                         tint = Color.White,
                         modifier = Modifier
-                            .clickable { onClose() }
+                            .clickable { onClose()
+                                navController.navigate("Agendamentos") {
+                                    popUpTo("Agendamentos") { inclusive = true }
+                               }
+                            }
                             .size(24.dp)
                     )
                 }
