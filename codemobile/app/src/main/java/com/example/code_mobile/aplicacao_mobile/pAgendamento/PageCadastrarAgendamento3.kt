@@ -103,7 +103,7 @@ fun AgendamentoEtapa3(
         mensagemOrdemServico?.let {
             println("Ordem de Serviço: $it")
             viewModelOrdemServico.resetFeedback()
-            navController.navigate("FinalizarAgendamento/$agendamentoId")
+            navController.navigate("AgendamentoCadastro4/$agendamentoId")
         }
     }
 
@@ -195,6 +195,7 @@ fun AgendamentoEtapa3(
                             valorTatuagem = valor,
                             agendamentoId = agendamentoId,
                             onSucesso = {
+                                navController.navigate("AgendamentoCadastro4/$agendamentoId")
                             }
                         )
                     } else {
