@@ -77,42 +77,28 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifier) {
-
-    // Tá enviando p banco certinho
-    // O cadastro está sendo feito por etapas — o agendamento está sendo salvo antes da confirmação final ("gerar ordem").
-    // Teria que arrumar isso p ficar igual na web
-
-    // se o cliente voltar a tela, as informações ESTÃO salvas, mas como já ta cadastrando, precisaria mudar a data do agendamento de novo
-    // Tbm teria que arrumar isso
-
-    val scrollState = rememberScrollState()
+fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifier,viewModelAgendamento : ViewModelAgendamento) {
     val viewModelCliente: ViewModelCliente = viewModel()
-    val viewModelAgendamento: ViewModelAgendamento = viewModel()
 
     val dataAgendamento by viewModelAgendamento.dataAgendamento
     val horarioAgendamento by viewModelAgendamento.horarioAgendamento
     val clienteSelecionado by viewModelAgendamento.clienteSelecionado
     val agendamentoIdCriado by viewModelAgendamento.agendamentoIdCriado.collectAsState()
-
-    val dataAgendamentoError by viewModelAgendamento.dataAgendamentoError
-    val horarioAgendamentoError by viewModelAgendamento.horarioAgendamentoError
-
     val agendamentoSucesso by viewModelAgendamento.agendamentoSucesso.collectAsState()
     val mensagemErroAgendamento by viewModelAgendamento.mensagemErro.collectAsState()
-
     val listaClientes by viewModelCliente.clientes.collectAsState()
-
     val showLoading by viewModelAgendamento.showLoading.collectAsState()
 
     var expandedCliente by remember { mutableStateOf(false) }
     var showCancelDialog by remember { mutableStateOf(false) }
     var exibirCalendario by remember { mutableStateOf(false) }
     var exibirCliente by remember { mutableStateOf(false) }
-    val datePickerState =
-        rememberDatePickerState(initialSelectedDateMillis = dataAgendamento.toEpochDay()) // Inicializa com a data do ViewModel
 
 
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = dataAgendamento?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+            ?: 0L
+    )
 
     LaunchedEffect(Unit) {
         viewModelCliente.carregarClientes()
@@ -120,17 +106,14 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
 
     LaunchedEffect(agendamentoSucesso) {
         if (agendamentoSucesso && agendamentoIdCriado != null) {
-            println("Agendamento realizado com sucesso! ID: ${agendamentoIdCriado}")
             navController.navigate("AgendamentoCadastro2/${agendamentoIdCriado}")
             viewModelAgendamento.resetAgendamentoSucesso()
-        } else if (agendamentoSucesso && agendamentoIdCriado == null) {
-            println("Agendamento realizado com sucesso, mas o ID não foi retornado.")
         }
     }
 
     LaunchedEffect(mensagemErroAgendamento) {
-        mensagemErroAgendamento?.let { erro ->
-            println("Erro ao agendar: $erro")
+        mensagemErroAgendamento?.let {
+            // TODO: Exibir erro com Snackbar ou Toast
             viewModelAgendamento.limparMensagemDeErro()
         }
     }
@@ -144,16 +127,14 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
         Column(
             modifier = modifier
                 .fillMaxHeight(0.75f)
-                .fillMaxSize()
-                .background(Color(0xFF1B1B1B))
+                .fillMaxWidth()
                 .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Cabeçalho
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -174,47 +155,50 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 Spacer(modifier = Modifier.width(24.dp))
             }
 
+            // Campo Data
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Data do Agendamento:",
-                    style = textPadrao.copy(fontSize = 16.sp, color = Color.White)
-                )
+                Text("Data do Agendamento:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
                 Button(
                     onClick = { exibirCalendario = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
                 ) {
                     Text(
-                        text = if (dataAgendamento == LocalDate.now()) "Selecionar" else dataAgendamento.toString(),
+                        text = dataAgendamento?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "Selecionar",
                         color = Color.White
                     )
                 }
             }
 
-            CampoCadastrarAgendamneto(
-                titulo = "Horário:",
-                valor = horarioAgendamento,
-                onValorChange = viewModelAgendamento::atualizarHorarioAgendamento,
-                textStyle = textPadrao.copy(fontSize = 16.sp),
-                placeholderText = "Ex: 10:30",
-                tituloStyle = textPadrao.copy(fontSize = 16.sp),
-                isError = horarioAgendamentoError != null,
-                errorMessage = horarioAgendamentoError
+            // Campo Horário
+            OutlinedTextField(
+                value = horarioAgendamento ?: "",
+                onValueChange = {
+                    viewModelAgendamento.atualizarHorarioAgendamento(it)
+                },
+                label = { Text("Horário (ex: 10:30)", color = Color.Gray) },
+                placeholder = { Text("Ex: 10:30") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                textStyle = textPadrao.copy(fontSize = 16.sp, color = Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                isError = viewModelAgendamento.horarioAgendamentoError.value != null,
+                supportingText = {
+                    viewModelAgendamento.horarioAgendamentoError.value?.let {
+                        Text(it, color = Color.Red, fontSize = 12.sp)
+                    }
+                }
             )
 
+            // Dropdown Cliente
             Box {
                 OutlinedTextField(
                     value = clienteSelecionado?.nome ?: "Selecione um cliente",
-                    onValueChange = { /* Não permitir edição direta */ },
-                    label = {
-                        Text(
-                            "Clientes",
-                            style = textPadrao.copy(fontSize = 16.sp, color = Color.Gray)
-                        )
-                    },
+                    onValueChange = {},
+                    label = { Text("Clientes", color = Color.Gray) },
                     readOnly = true,
                     trailingIcon = {
                         Icon(
@@ -245,6 +229,17 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 }
             }
 
+            // Card com informações do cliente selecionado
+            if (exibirCliente && clienteSelecionado != null) {
+                cardExibirCliente(
+                    cliente = clienteSelecionado!!,
+                    nome = "${clienteSelecionado?.nome}",
+                    CPF = "CPF: ${clienteSelecionado?.cpf}",
+                    telefone = "Telefone: ${clienteSelecionado?.telefone}"
+                )
+            }
+
+            // Date Picker Dialog
             if (exibirCalendario) {
                 DatePickerDialog(
                     onDismissRequest = { exibirCalendario = false },
@@ -252,11 +247,10 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                         TextButton(onClick = {
                             exibirCalendario = false
                             datePickerState.selectedDateMillis?.let {
-                                viewModelAgendamento.atualizarDataAgendamento(
-                                    Instant.ofEpochMilli(it)
-                                        .atZone(ZoneId.systemDefault())
-                                        .toLocalDate()
-                                )
+                                val dataSelecionada = Instant.ofEpochMilli(it)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                                viewModelAgendamento.atualizarDataAgendamento(dataSelecionada)
                             }
                         }) {
                             Text("Confirmar", color = Color.Black)
@@ -271,18 +265,9 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                     DatePicker(state = datePickerState)
                 }
             }
-
-            if (exibirCliente && clienteSelecionado != null) {
-                cardExibirCliente(
-                    cliente = clienteSelecionado!!,
-                    nome = "${clienteSelecionado?.nome}",
-                    CPF = "CPF: ${clienteSelecionado?.cpf}",
-                    telefone = "Telefone: ${clienteSelecionado?.telefone}"
-                )
-            }
         }
 
-        // Row dos botões fixada na parte inferior
+        // Botões inferiores
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -301,23 +286,22 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFF252525))
             ) {
-                Text(text = "Cancelar", fontSize = 14.sp, color = Color.White)
+                Text("Cancelar", fontSize = 14.sp, color = Color.White)
             }
 
             Button(
                 onClick = {
                     if (viewModelAgendamento.validarAgendamento()) {
-                        clienteSelecionado?.let { cliente ->
-                            val novoAgendamento = ModelAgendamento(
-                                id = null,
-                                dt = dataAgendamento.toString(),
-                                horario = horarioAgendamento,
-                                cancelado = false,
-                                usuario = cliente
+                        clienteSelecionado?.let {
+                            viewModelAgendamento.cadastrarAgendamento(
+                                ModelAgendamento(
+                                    id = null,
+                                    dt = dataAgendamento?.toString().orEmpty(),
+                                    horario = horarioAgendamento.orEmpty(),
+                                    cancelado = false,
+                                    usuario = it
+                                )
                             )
-                            viewModelAgendamento.cadastrarAgendamento(novoAgendamento)
-                        } ?: run {
-                            println("Erro: Cliente não selecionado.")
                         }
                     }
                 },
@@ -337,6 +321,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
             }
         }
 
+        // Loading Dialog
         if (showLoading) {
             Dialog(onDismissRequest = { }) {
                 Box(
@@ -354,20 +339,19 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
             }
         }
 
+        // Alerta de cancelamento
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
                 title = { Text("Cancelar Agendamento?", color = Color.White) },
-                text = {
-                    Text(
-                        "Tem certeza que deseja cancelar o agendamento?",
-                        color = Color.White
-                    )
-                },
+                text = { Text("Tem certeza que deseja cancelar o agendamento?", color = Color.White) },
                 confirmButton = {
                     Button(
-                        onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050))
+                        onClick = {
+                            showCancelDialog = false
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                     ) {
                         Text("Sim", color = Color.White)
                     }
@@ -375,17 +359,16 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 dismissButton = {
                     Button(
                         onClick = { showCancelDialog = false },
-                        colors = ButtonDefaults.buttonColors(Color(0xFF252525))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                     ) {
                         Text("Não", color = Color.White)
                     }
                 },
-                containerColor = Color(0xFF2B2B2B)
+                containerColor = Color(0xFF1B1B1B)
             )
         }
     }
 }
-
 @Preview(
     showBackground = true,
     showSystemUi = true,
@@ -395,6 +378,6 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
 fun AgendamentoEtapa1Preview() {
     CodemobileTheme {
         val navController = rememberNavController()
-        AgendamentoEtapa1(navController)
+        AgendamentoEtapa1(navController, viewModelAgendamento = ViewModelAgendamento())
     }
 }

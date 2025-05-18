@@ -84,7 +84,7 @@ fun AgendamentoEtapa3(
     navController: NavController,
     modifier: Modifier = Modifier,
     agendamentoId: Int,
-
+    viewModelAgendamento: ViewModelAgendamento
 ) {
 
     // Precisa testar p ver se o backend ta funcionando
@@ -156,7 +156,17 @@ fun AgendamentoEtapa3(
             CampoCadastrarOrdem(
                 titulo = "Valor da tatuagem:",
                 valor = valorTatuagem,
-                onValorChange = { valorTatuagem = it },
+                onValorChange = { novoValor ->
+                    valorTatuagem = novoValor
+
+                    // Tenta converter para BigDecimal
+                    val valorConvertido = novoValor.toBigDecimalOrNull()
+
+                    // Só chama o ViewModel se for um valor válido
+                    valorConvertido?.let {
+                        viewModelAgendamento.atualizarValor(it)
+                    }
+                },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 100.00",
                 tituloStyle = textPadrao.copy(fontSize = 16.sp),
@@ -189,18 +199,9 @@ fun AgendamentoEtapa3(
 
             Button(
                 onClick = {
-                    val valor = valorTatuagem.toBigDecimalOrNull()
-                    if (valor != null) {
-                        viewModelOrdemServico.cadastrarOrdemServico(
-                            valorTatuagem = valor,
-                            agendamentoId = agendamentoId,
-                            onSucesso = {
-                                navController.navigate("AgendamentoCadastro4/$agendamentoId")
-                            }
-                        )
-                    } else {
-                        println("Valor da tatuagem inválido.")
-                    }
+
+                    navController.navigate("AgendamentoCadastro4/$agendamentoId")
+
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -277,6 +278,6 @@ fun AgendamentoEtapa3(
 fun AgendamentoEtapa3Preview() {
     CodemobileTheme {
         val navController = rememberNavController()
-        AgendamentoEtapa3(navController = navController, agendamentoId = 1)
+        AgendamentoEtapa3(navController = navController, agendamentoId = 1, viewModelAgendamento = ViewModelAgendamento())
     }
 }

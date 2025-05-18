@@ -2,6 +2,7 @@ package com.example.code_mobile.aplicacao_mobile.cViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.code_mobile.aplicacao_mobile.cModel.AgendamentoIdWrapper
 import com.example.code_mobile.aplicacao_mobile.cModel.ModelOrdemServico
 import com.example.code_mobile.aplicacao_mobile.cService.ServiceOrdemServico
 import com.example.code_mobile.token.network.RetrofithAuth
@@ -16,9 +17,10 @@ import java.math.BigDecimal
 
 class ViewModelOrdemServico  : ViewModel() {
 
-    private val serviceOrdemServico: ServiceOrdemServico by lazy {
-        RetrofithAuth.retrofit.create(serviceOrdemServico::class.java)
+    private val ordemServicoApi: ServiceOrdemServico by lazy {
+        RetrofithAuth.retrofit.create(ServiceOrdemServico::class.java)
     }
+
 
     private val _ordensServico = MutableStateFlow<List<ModelOrdemServico>>(emptyList())
     val ordensServico: StateFlow<List<ModelOrdemServico>> = _ordensServico
@@ -46,7 +48,7 @@ class ViewModelOrdemServico  : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    serviceOrdemServico.listarOrdensServico()
+                    ordemServicoApi.listarOrdensServico()
                 }
                 if (response.isSuccessful) {
                     _ordensServico.value = response.body() ?: emptyList()
@@ -69,7 +71,7 @@ class ViewModelOrdemServico  : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    serviceOrdemServico.buscarOrdemServicoPorId(id)
+                    ordemServicoApi.buscarOrdemServicoPorId(id)
                 }
                 if (response.isSuccessful) {
                     _ordemServico.value = response.body()
@@ -91,9 +93,9 @@ class ViewModelOrdemServico  : ViewModel() {
         _erro.value = null
         viewModelScope.launch {
             try {
-                val novaOrdemServico = ModelOrdemServico(id = 0, valorTatuagem = valorTatuagem, agendamento = agendamentoId) // O ID provavelmente será gerado pelo backend
+                val novaOrdemServico = ModelOrdemServico(id = 0, valorTatuagem = valorTatuagem, agendamento = AgendamentoIdWrapper(agendamentoId)) // O ID provavelmente será gerado pelo backend
                 val response = withContext(Dispatchers.IO) {
-                    serviceOrdemServico.criarOrdemServico(novaOrdemServico)
+                    ordemServicoApi.criarOrdemServico(novaOrdemServico)
                 }
                 if (response.isSuccessful) {
                     _mensagem.value = "Ordem de serviço criada com sucesso."
@@ -119,9 +121,9 @@ class ViewModelOrdemServico  : ViewModel() {
         _erro.value = null
         viewModelScope.launch {
             try {
-                val ordemServicoAtualizada = ModelOrdemServico(id = id, valorTatuagem = valorTatuagem, agendamento = agendamentoId)
+                val ordemServicoAtualizada = ModelOrdemServico(id = id, valorTatuagem = valorTatuagem, agendamento = AgendamentoIdWrapper(agendamentoId))
                 val response = withContext(Dispatchers.IO) {
-                    serviceOrdemServico.atualizarOrdemServico(id, ordemServicoAtualizada)
+                    ordemServicoApi.atualizarOrdemServico(id, ordemServicoAtualizada)
                 }
                 if (response.isSuccessful) {
                     _mensagem.value = "Ordem de serviço atualizada com sucesso."
@@ -148,7 +150,7 @@ class ViewModelOrdemServico  : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    serviceOrdemServico.buscarOrdemServicoPorPreco(valorProcurado)
+                    ordemServicoApi.buscarOrdemServicoPorPreco(valorProcurado)
                 }
                 if (response.isSuccessful) {
                     _ordensServico.value = response.body() ?: emptyList()

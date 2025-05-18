@@ -1,5 +1,6 @@
 package com.example.code_mobile.aplicacao_mobile.pAgendamento
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,20 +44,62 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.paginas.code_mobile.textPadrao
 import com.example.code_mobile.ui.theme.CodemobileTheme
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.code_mobile.aplicacao_mobile.cViewModel.ViewModelAgendamento
+import com.example.code_mobile.aplicacao_mobile.cViewModel.ViewModelFaturamento
+import com.example.code_mobile.aplicacao_mobile.cViewModel.ViewModelOrdemServico
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 
 @Composable
 fun AgendamentoEtapa4(
     navController: NavController,
     modifier: Modifier = Modifier,
-    agendamentoId: Int,
+    viewModelAgendamento: ViewModelAgendamento,
+    agendamentoId: Int
 ) {
-    var valorTatuagem by remember { mutableStateOf("") }
+    val viewModelOrdemServico: ViewModelOrdemServico = viewModel()
+    val viewModelFaturamento: ViewModelFaturamento = viewModel();
+    val dataAgendamento by viewModelAgendamento.dataAgendamento
+    val horarioAgendamento by viewModelAgendamento.horarioAgendamento
+    val valorTatuagem by viewModelAgendamento.valorTatuagem;
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val isLoadingFaturamento by viewModelFaturamento.isLoadingFaturamento.collectAsState();
+    val showModalSucessoFaturamento by viewModelFaturamento.sucessoCarregarFaturamento.collectAsState();
+    val erroFaturamento by viewModelFaturamento.erroCarregarFaturamento.collectAsState()
+
+    val faturamento by viewModelFaturamento.faturamento.collectAsState()
+
+
     var mostrarDialogo by remember { mutableStateOf(false) }
     var mostrarModalSucesso by remember { mutableStateOf(false) }
+    var sucessoCadastrarOrdem by remember { mutableStateOf(false) }
+    val valor = valorTatuagem
 
-    // Função para simular o envio do faturamento
     val confirmarFaturamento: () -> Unit = {
-        mostrarModalSucesso = true
+        if (valor != null) {
+            viewModelOrdemServico.cadastrarOrdemServico(
+                valorTatuagem = valor,
+                agendamentoId = agendamentoId,
+                onSucesso = { ordemCriada ->
+                    if (ordemCriada != null) {
+                        println("Ordem criada com sucesso! ID: ${ordemCriada.id}")
+                        viewModelFaturamento.carregarFaturamento(ordemCriada.id);
+                        sucessoCadastrarOrdem = true;
+
+                    } else {
+                        println("Erro: ordem criada veio nula.")
+                    }
+                }
+            )
+        } else {
+            println("Valor da tatuagem inválido.")
+        }
+
     }
 
     Box(
@@ -96,6 +139,7 @@ fun AgendamentoEtapa4(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
+
                 Spacer(modifier = Modifier.width(24.dp))
             }
 
@@ -118,44 +162,25 @@ fun AgendamentoEtapa4(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text("Valor da Tatuagem:", style = textPadrao.copy(fontSize = 16.sp))
             Text(
-                text = "Valor da Tatuagem:",
+                text = "${ NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(valorTatuagem)}",
                 style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
+                color = Color.White
             )
 
+            Text("Data do atendimento:", style = textPadrao.copy(fontSize = 16.sp))
             Text(
-                text = "R$ 400.0",
+                text = dataAgendamento?.format(formatter)?.toString() ?: "-",
                 style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
+                color = Color.White
             )
 
-            Spacer(modifier = Modifier.width(24.dp))
-
+            Text("Horário do atendimento:", style = textPadrao.copy(fontSize = 16.sp))
             Text(
-                text = "Data do atendimento:",
+                text = horarioAgendamento?.toString() ?: "-",
                 style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "18/11/2025",
-                style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.width(24.dp))
-
-            Text(
-                text = "Horário do atendimento:",
-                style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "10:00",
-                style = textPadrao.copy(fontSize = 16.sp),
-                textAlign = TextAlign.Center
+                color = Color.White
             )
         }
 
@@ -189,11 +214,7 @@ fun AgendamentoEtapa4(
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
             ) {
-                Text(
-                    text = "Confirmar",
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
+                Text(text = "Confirmar", fontSize = 14.sp, color = Color.White)
             }
         }
 
@@ -207,15 +228,28 @@ fun AgendamentoEtapa4(
             )
         }
 
-        if (mostrarModalSucesso) {
+        if (showModalSucessoFaturamento && !isLoadingFaturamento) {
+            mostrarModalSucesso = true;
+            var valor = faturamento?.lucro
             ModalSucessoOrdemServico(
                 navController = navController,
-                onClose = {
-                    mostrarModalSucesso = false
-                }
+                onClose = { mostrarModalSucesso = false },
+                valorLucro = valor ?: BigDecimal.ZERO,
+                erroLucro = false
             )
         }
-
+        if ((erroFaturamento?.length ?: 0) > 0 && !isLoadingFaturamento && !showModalSucessoFaturamento) {
+            mostrarModalSucesso = true;
+            ModalSucessoOrdemServico(
+                navController = navController,
+                onClose = { mostrarModalSucesso = false },
+                valorLucro = BigDecimal.ZERO,
+                erroLucro = true
+            )
+        }
+        if (isLoadingFaturamento) {
+            ModalLoadingFaturamento()
+        }
     }
 }
 
@@ -223,7 +257,9 @@ fun AgendamentoEtapa4(
 @Composable
 fun ModalSucessoOrdemServico(
     navController: NavController,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    valorLucro: BigDecimal,
+    erroLucro: Boolean
 ) {
     Dialog(onDismissRequest = { }) {
         Box(
@@ -250,7 +286,7 @@ fun ModalSucessoOrdemServico(
                             .clickable { onClose()
                                 navController.navigate("Agendamentos") {
                                     popUpTo("Agendamentos") { inclusive = true }
-                               }
+                                }
                             }
                             .size(24.dp)
                     )
@@ -272,18 +308,41 @@ fun ModalSucessoOrdemServico(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Lucro Estimado",
-                    style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
-                    color = Color.White
-                )
 
-                Text(
-                    text = "R$ 40,00.",
-                    style = textPadrao.copy(fontSize = 16.sp),
-                    color = Color.White
-                )
+
+                if (!erroLucro) {
+                    Text(
+                        text = "Lucro Estimado",
+                        style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+                        color = Color.White
+                    )
+                    Text(
+                        text = "${ NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(valorLucro)}",
+                        style = textPadrao.copy(fontSize = 16.sp),
+                        color = Color.White
+                    )
+                }
+
             }
+        }
+    }
+}
+
+
+@Composable
+fun ModalLoadingFaturamento() {
+    Dialog(onDismissRequest = { }) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF2B2B2B)),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = Color.White,
+                strokeWidth = 2.dp
+            )
         }
     }
 }
@@ -343,6 +402,6 @@ fun ConfirmarFaturamentoDialog(
 fun AgendamentoEtapa4Preview() {
     CodemobileTheme {
         val navController = rememberNavController()
-        AgendamentoEtapa4(navController = navController, agendamentoId = 1)
+        AgendamentoEtapa4(navController = navController, viewModelAgendamento = ViewModelAgendamento(), agendamentoId = 1,  )
     }
 }
