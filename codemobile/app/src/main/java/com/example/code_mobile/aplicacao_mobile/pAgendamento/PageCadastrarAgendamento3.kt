@@ -84,7 +84,7 @@ fun AgendamentoEtapa3(
     navController: NavController,
     modifier: Modifier = Modifier,
     agendamentoId: Int,
-
+    viewModelAgendamento: ViewModelAgendamento
 ) {
 
     // Precisa testar p ver se o backend ta funcionando
@@ -103,7 +103,7 @@ fun AgendamentoEtapa3(
         mensagemOrdemServico?.let {
             println("Ordem de Serviço: $it")
             viewModelOrdemServico.resetFeedback()
-            navController.navigate("FinalizarAgendamento/$agendamentoId")
+            navController.navigate("AgendamentoCadastro4/$agendamentoId")
         }
     }
 
@@ -145,7 +145,7 @@ fun AgendamentoEtapa3(
                         .clickable { navController.popBackStack() }
                 )
                 Text(
-                    text = "Cobrança",
+                    text = "Valor",
                     style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
@@ -156,7 +156,17 @@ fun AgendamentoEtapa3(
             CampoCadastrarOrdem(
                 titulo = "Valor da tatuagem:",
                 valor = valorTatuagem,
-                onValorChange = { valorTatuagem = it },
+                onValorChange = { novoValor ->
+                    valorTatuagem = novoValor
+
+                    // Tenta converter para BigDecimal
+                    val valorConvertido = novoValor.toBigDecimalOrNull()
+
+                    // Só chama o ViewModel se for um valor válido
+                    valorConvertido?.let {
+                        viewModelAgendamento.atualizarValor(it)
+                    }
+                },
                 textStyle = textPadrao.copy(fontSize = 16.sp),
                 placeholderText = "Ex: 100.00",
                 tituloStyle = textPadrao.copy(fontSize = 16.sp),
@@ -189,17 +199,9 @@ fun AgendamentoEtapa3(
 
             Button(
                 onClick = {
-                    val valor = valorTatuagem.toBigDecimalOrNull()
-                    if (valor != null) {
-                        viewModelOrdemServico.cadastrarOrdemServico(
-                            valorTatuagem = valor,
-                            agendamentoId = agendamentoId,
-                            onSucesso = {
-                            }
-                        )
-                    } else {
-                        println("Valor da tatuagem inválido.")
-                    }
+
+                    navController.navigate("AgendamentoCadastro4/$agendamentoId")
+
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -237,7 +239,7 @@ fun AgendamentoEtapa3(
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar cobrança da tatuagem?", color = Color.White) },
+                title = { Text("Cancelar valor da tatuagem?", color = Color.White) },
                 text = {
                     Text(
                         "Tem certeza que deseja voltar para a seleção de produtos?",
@@ -276,6 +278,6 @@ fun AgendamentoEtapa3(
 fun AgendamentoEtapa3Preview() {
     CodemobileTheme {
         val navController = rememberNavController()
-        AgendamentoEtapa3(navController = navController, agendamentoId = 1)
+        AgendamentoEtapa3(navController = navController, agendamentoId = 1, viewModelAgendamento = ViewModelAgendamento())
     }
 }

@@ -31,9 +31,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.code_mobile.R
+import com.example.code_mobile.aplicacao_mobile.cModel.ModelAgendamento
 import com.example.code_mobile.paginas.code_mobile.cModel.ModelCliente
 import com.example.code_mobile.paginas.code_mobile.inputPadrao
 import com.example.code_mobile.paginas.code_mobile.textPadrao
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable // Input
 fun InputPesquisarAgendamento(
@@ -44,6 +47,8 @@ fun InputPesquisarAgendamento(
     labelInfo: @Composable (() -> Unit),
     modifier: Modifier = Modifier
 ) {
+
+
     Column(
     )
     {
@@ -146,6 +151,58 @@ fun cardExibirCliente(
 
                 Text(
                     text = telefone,
+                    style = textPadrao.copy(fontSize = 14.sp)
+                )
+            }
+        }
+    }
+}
+@Composable
+fun cardExibirAgendamento(
+    agendamento: ModelAgendamento
+) {
+    val localDate = LocalDate.parse(agendamento.dt) // Padrão ISO: yyyy-MM-dd
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .border(
+                2.dp,
+                Color(0xFF252525),
+                shape = RoundedCornerShape(12.dp)
+            ),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Row(
+            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(
+                modifier = Modifier.weight(0.5f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = agendamento.usuario?.nome.toString(),
+                    style = textPadrao.copy(fontSize = 16.sp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Data agendamento:  "+ localDate.format(formatter).toString(),
+                    style = textPadrao.copy(fontSize = 14.sp)
+                )
+
+                Text(
+                    text = "Horario agendamento:  "+agendamento.horario,
                     style = textPadrao.copy(fontSize = 14.sp)
                 )
             }

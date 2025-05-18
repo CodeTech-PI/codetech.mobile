@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -39,7 +40,8 @@ class ViewModelAgendamento : ViewModel() {
         private set
     private val _agendamentoIdCriado = MutableStateFlow<Int?>(null)
     val agendamentoIdCriado: StateFlow<Int?> = _agendamentoIdCriado.asStateFlow()
-
+    var valorTatuagem = mutableStateOf<BigDecimal?>(null)
+        private set
 
     // Estados para erros de validação
     var dataAgendamentoError = mutableStateOf<String?>(null)
@@ -86,6 +88,10 @@ class ViewModelAgendamento : ViewModel() {
         horarioAgendamento.value = novoHorario
         horarioAgendamentoError.value = null
         println("Horário Agendamento Atualizado: $novoHorario")
+    }
+    fun atualizarValor(novoValor: BigDecimal) {
+        valorTatuagem.value = novoValor
+        println("Horário Agendamento Atualizado: $novoValor")
     }
 
     // Função para atualizar o cliente selecionado

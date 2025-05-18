@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.code_mobile.aplicacao_mobile.cViewModel.ViewModelAgendamento
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.TelaAgendamento
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa1
 import com.example.code_mobile.aplicacao_mobile.pAgendamento.AgendamentoEtapa2
@@ -47,8 +48,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
-
+    val viewModelAgendamentos: ViewModelAgendamento = viewModel()
     NavHost(navController = navController, startDestination = "PageLogin") {
 
         composable("PageLogin") { TelaLogin(navController) }
@@ -66,7 +66,7 @@ fun AppNavigation() {
         composable("EstoqueCadastro") { EstoqueCadastro(navController) }
         composable("FiliaisCadastro") { FiliaisCadastro(navController) }
 
-        composable("AgendamentoCadastro") { AgendamentoEtapa1(navController) }
+        composable("AgendamentoCadastro") { AgendamentoEtapa1(navController, viewModelAgendamento = viewModelAgendamentos) }
         composable(
             "AgendamentoCadastro2/{agendamentoId}", //URL com idAgendamento
             arguments = listOf(navArgument("agendamentoId") { // uma lista de argumentos, no caso idAgendamento
@@ -87,15 +87,15 @@ fun AppNavigation() {
             arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
         ) { backStackEntry ->
             val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
-            AgendamentoEtapa3(navController = navController, agendamentoId = agendamentoId)
+            AgendamentoEtapa3(navController = navController, agendamentoId = agendamentoId, viewModelAgendamento =  viewModelAgendamentos)
         }
 
         composable(
-            "FinalizarAgendamento/{agendamentoId}",
+            "AgendamentoCadastro4/{agendamentoId}", //PageCadastrarAgendamento4.kt
             arguments = listOf(navArgument("agendamentoId") { type = NavType.IntType })
         ) { backStackEntry ->
             val agendamentoId = backStackEntry.arguments?.getInt("agendamentoId") ?: -1
-            AgendamentoEtapa4(navController = navController, agendamentoId = agendamentoId)
+            AgendamentoEtapa4(navController = navController, agendamentoId = agendamentoId, viewModelAgendamento = viewModelAgendamentos)
         }
 
     }
