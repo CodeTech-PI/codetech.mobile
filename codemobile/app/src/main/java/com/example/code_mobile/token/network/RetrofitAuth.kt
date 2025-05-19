@@ -1,13 +1,15 @@
 package com.example.code_mobile.token.network
 
 /* Biblioteca para realizar requisições HTTP */
+import com.example.code_mobile.paginas.code_mobile.cService.ServiceDashboard
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofithAuth {
-    private const val BASE_URL = "http://192.168.15.18:8080/"
+    private const val BASE_URL = "http://192.168.38.152:8080/"
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // Or other levels (see below)
@@ -18,12 +20,18 @@ object RetrofithAuth {
         .addInterceptor(loggingInterceptor)
         .build()
 
-    val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+
+    public val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(
+            GsonBuilder()
+                .setDateFormat("yyyy-MM-dd") // Formato da data
+                .create()
+        ))
+        .build()
+    val dashboardService: ServiceDashboard by lazy {
+        retrofit.create(ServiceDashboard::class.java)
     }
 }
 
