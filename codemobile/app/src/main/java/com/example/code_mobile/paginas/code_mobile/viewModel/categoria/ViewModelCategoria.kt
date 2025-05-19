@@ -33,6 +33,13 @@ class ViewModelCategoria : ViewModel() {
     private val _listaCategorias = MutableStateFlow<List<ModelCategoria>>(emptyList())
     val listaCategorias: StateFlow<List<ModelCategoria>> = _listaCategorias
 
+    // Novos estados para a exclusão
+    private val _exclusaoSucesso = MutableStateFlow(false)
+    val exclusaoSucesso: StateFlow<Boolean> = _exclusaoSucesso
+
+    private val _mensagemErroExclusao = MutableStateFlow<String?>(null)
+    val mensagemErroExclusao: StateFlow<String?> = _mensagemErroExclusao
+
     fun atualizarNome(novoNome: String) {
         nome.value = novoNome
         nomeError.value = null
@@ -102,27 +109,38 @@ class ViewModelCategoria : ViewModel() {
         }
     }
 
-    fun deletarCategoria(id: Int) {
+    // Função deletarCategoria modificada para usar callbacks e estados de exclusão
+    fun deletarCategoria(
+        categoriaId: Int, // O parâmetro categoriaId deve ser Int, pois seu ModelCategoria.id é Int
+        onExclusaoSucesso: () -> Unit,
+        onExclusaoErro: (String?) -> Unit
+    ) {
         viewModelScope.launch {
             _showLoading.value = true
+            _mensagemErroExclusao.value = null // Limpa qualquer erro anterior de exclusão
             try {
                 val service = RetrofithAuth.retrofit.create(ServiceCategoria::class.java)
                 val response = withContext(Dispatchers.IO) {
-                    service.deletarCategoria(id)
+                    service.deletarCategoria(categoriaId) // Usa o categoriaId passado
                 }
                 if (response.isSuccessful) {
-                    carregarCategorias()
+                    _exclusaoSucesso.value = true // Define o estado de sucesso
+                    carregarCategorias() // Recarrega a lista após a exclusão
+                    onExclusaoSucesso() // Chama o callback de sucesso
                 } else {
-                    _mensagemErro.value = "Erro ao deletar categoria: ${response.code()}"
+                    val errorMessage = "Erro ao deletar categoria: ${response.code()}"
+                    _mensagemErroExclusao.value = errorMessage // Define a mensagem de erro
+                    onExclusaoErro(errorMessage) // Chama o callback de erro
                 }
             } catch (e: Exception) {
-                _mensagemErro.value = "Erro inesperado: ${e.message}"
+                val errorMessage = "Erro inesperado: ${e.message}"
+                _mensagemErroExclusao.value = errorMessage // Define a mensagem de erro
+                onExclusaoErro(errorMessage) // Chama o callback de erro
             } finally {
                 _showLoading.value = false
             }
         }
     }
-
 
     fun atualizarCategoria(categoria: ModelCategoria, onSuccess: () -> Unit = {}) {
         if (categoria.nome.isBlank()) {
@@ -166,5 +184,15 @@ class ViewModelCategoria : ViewModel() {
 
     fun resetCadastroSucesso() {
         _cadastroSucesso.value = false
+    }
+
+    // Nova função para resetar o estado de exclusão bem-sucedida
+    fun resetExclusaoSucesso() {
+        _exclusaoSucesso.value = false
+    }
+
+    // Nova função para definir a mensagem de erro de exclusão
+    fun setMensagemErroExclusao(mensagem: String?) {
+        _mensagemErroExclusao.value = mensagem
     }
 }
