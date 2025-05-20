@@ -48,8 +48,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.model.ModelCategoria
-import com.example.code_mobile.paginas.code_mobile.viewModel.categoria.ViewModelCategoria
+import com.example.code_mobile.paginas.code_mobile.cModel.ModelCategoria
+import com.example.code_mobile.paginas.code_mobile.cViewModel.ViewModelCategoria
+import com.example.code_mobile.paginas.code_mobile.pComponente.menuComTituloPage
 import com.example.code_mobile.ui.theme.CodemobileTheme
 import kotlinx.coroutines.delay
 

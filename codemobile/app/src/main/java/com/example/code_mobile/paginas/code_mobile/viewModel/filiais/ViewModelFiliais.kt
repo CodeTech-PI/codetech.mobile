@@ -2,7 +2,7 @@ package com.example.code_mobile.paginas.code_mobile.viewModel.filial
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais // Importe ModelFiliais
+import com.example.code_mobile.paginas.code_mobile.cModel.ModelFiliais
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,9 +36,9 @@ class ViewModelFilial : ViewModel() {
                 // Simule a chamada à sua API ou banco de dados para buscar as filiais
                 // Adapte a criação de ModelFiliais com os seus atributos
                 val filiaisCarregadas = listOf(
-                    ModelFiliais(cep = "12345678", lagradouro = "Rua Haddock Lobo", bairro = "Cerqueira César", cidade = "São Paulo", estado = "SP", complemento = "Apto 101", num = 123),
-                    ModelFiliais(cep = "87456321", lagradouro = "Rua São Marcos", bairro = "Vila Madalena", cidade = "São Paulo", estado = "SP", complemento = "Casa", num = 456),
-                    ModelFiliais(cep = "19141010", lagradouro = "Rua Caraíbas", bairro = "Pinheiros", cidade = "São Paulo", estado = "SP", complemento = "Sala 2", num = 789)
+                    ModelFiliais(id = 1,cep = "12345678", logradouro = "Rua Haddock Lobo", bairro = "Cerqueira César", cidade = "São Paulo", estado = "SP", complemento = "Apto 101", num = 123, status = "Operante"),
+                    ModelFiliais(id = 2, cep = "87456321", logradouro = "Rua São Marcos", bairro = "Vila Madalena", cidade = "São Paulo", estado = "SP", complemento = "Casa", num = 456, status = "Operante"),
+                    ModelFiliais(id = 3, cep = "19141010", logradouro = "Rua Caraíbas", bairro = "Pinheiros", cidade = "São Paulo", estado = "SP", complemento = "Sala 2", num = 789, status = "Inoperante")
                 )
                 _filiais.value = filiaisCarregadas
             } catch (e: Exception) {

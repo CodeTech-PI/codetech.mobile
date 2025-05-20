@@ -36,7 +36,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.code_mobile.R
-import com.example.code_mobile.paginas.code_mobile.model.ModelFiliais
+import com.example.code_mobile.paginas.code_mobile.cModel.ModelFiliais
+import com.example.code_mobile.paginas.code_mobile.pComponente.menuComTituloPage
 import com.example.code_mobile.paginas.code_mobile.viewModel.filial.ViewModelFilial
 import com.example.code_mobile.ui.theme.CodemobileTheme
 
@@ -125,7 +126,7 @@ fun Filiais(navController: NavController, modifier: Modifier = Modifier) {
                     filiais
                 } else {
                     filiais.filter {
-                        it.lagradouro.contains(pesquisa, ignoreCase = true) ||
+                        it.logradouro.contains(pesquisa, ignoreCase = true) ||
                                 it.cidade.contains(pesquisa, ignoreCase = true) ||
                                 it.estado.contains(pesquisa, ignoreCase = true) ||
                                 it.cep.contains(pesquisa, ignoreCase = true)
@@ -135,7 +136,7 @@ fun Filiais(navController: NavController, modifier: Modifier = Modifier) {
                 filiaisFiltradas.forEach { filial ->
                     Box(modifier = Modifier.padding(bottom = 10.dp)) {
                         cardFilial(
-                            logradouro = "Rua: ${filial.lagradouro}",
+                            logradouro = "Rua: ${filial.logradouro}",
                             estado = "Estado: ${filial.estado}",
                             cidade = "Cidade: ${filial.cidade}",
                             cep = "CEP: ${filial.cep}",
@@ -144,7 +145,7 @@ fun Filiais(navController: NavController, modifier: Modifier = Modifier) {
                                 filialParaExcluir = filial
                                 showDialogExcluir = true
                             },
-                            navController = navController
+                            OnEditClick = TODO()
                         )
                     }
                 }
@@ -169,14 +170,14 @@ fun Filiais(navController: NavController, modifier: Modifier = Modifier) {
 
 @Composable
 fun ExcluirFilialDialog(
-    filial: com.example.code_mobile.paginas.code_mobile.model.ModelFiliais,
+    filial: com.example.code_mobile.paginas.code_mobile.cModel.ModelFiliais,
     onDismiss: () -> Unit,
-    onConfirmExcluir: (com.example.code_mobile.paginas.code_mobile.model.ModelFiliais) -> Unit
+    onConfirmExcluir: (com.example.code_mobile.paginas.code_mobile.cModel.ModelFiliais) -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Confirmar Exclusão", color = Color.White) },
-        text = { Text("Deseja mesmo excluir a filial ${filial.lagradouro}?", color = Color.White) },
+        text = { Text("Deseja mesmo excluir a filial ${filial.logradouro}?", color = Color.White) },
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
