@@ -11,7 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-interface ServiceAgendamento {
+interface  ServiceAgendamento {
 
     @GET("agendamentos")
     suspend fun getAgendamentos(): Response<List<ModelAgendamento>>

@@ -340,7 +340,8 @@ fun ChartBar(height: Dp, label: String, color: Color) {
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color.Gray
+            color = Color.Gray,
+            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }
