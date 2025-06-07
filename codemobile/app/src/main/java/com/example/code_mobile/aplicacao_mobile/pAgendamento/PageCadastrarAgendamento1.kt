@@ -147,7 +147,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                         .clickable { navController.navigate("Agendamentos") }
                 )
                 Text(
-                    text = "Cadastrar Agendamento",
+                    text = "Cadastrar Atendimento",
                     style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
@@ -161,7 +161,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Data do Agendamento:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
+                Text("Data do Atendimento:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
                 Button(
                     onClick = { exibirCalendario = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
