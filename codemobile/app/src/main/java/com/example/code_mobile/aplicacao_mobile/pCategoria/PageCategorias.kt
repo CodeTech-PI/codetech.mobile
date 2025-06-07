@@ -135,6 +135,7 @@ fun TelaCategorias(
                 contentDescription = "Adicionar",
                 modifier = Modifier
                     .size(60.dp)
+                    .padding(top = 25.dp)
                     .clickable {
                         println("Clicou para cadastrar uma categoria!")
                         showCadastroDialog = true
