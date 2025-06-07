@@ -71,6 +71,7 @@ fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
         println("TelaFiliais LaunchedEffect")
         viewModel.carregarFiliais()
     }
+    
     LaunchedEffect(navController.currentBackStackEntry) {
         // Esse efeito será chamado toda vez que essa tela for exibida novamente
         delay(2000) // espera 2 segundos
