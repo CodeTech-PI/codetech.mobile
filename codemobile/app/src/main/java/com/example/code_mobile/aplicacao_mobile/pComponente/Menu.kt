@@ -73,8 +73,8 @@ fun Menu(navController: NavController){
             selectedItem = "Categoria"
             navController.navigate("Categoria")
         })
-        MenuItem(iconResId = R.drawable.atendimentos_branco, text = "Agendamentos", selected = selectedItem == "Agendamentos", onClick = {
-            selectedItem = "Agendamentos"
+        MenuItem(iconResId = R.drawable.atendimentos_branco, text = "Atendimentos", selected = selectedItem == "Atendimentos", onClick = {
+            selectedItem = "Atendimentos"
             navController.navigate("Agendamentos")
         })
         MenuItem(iconResId = R.drawable.dash_branco, text = "Dashboard", selected = selectedItem == "Dashboard", onClick = {

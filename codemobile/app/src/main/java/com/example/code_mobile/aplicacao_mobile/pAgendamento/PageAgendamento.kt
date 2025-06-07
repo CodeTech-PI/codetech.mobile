@@ -61,7 +61,7 @@ fun TelaAgendamento(navController: NavController, modifier: Modifier = Modifier)
             .background(Color(0xFF1B1B1B)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        menuComTituloPage("Agendamentos", navController)
+        menuComTituloPage("Atendimentos", navController)
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
