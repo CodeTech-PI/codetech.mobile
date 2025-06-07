@@ -365,6 +365,14 @@ fun ExcluirEstoqueDialog(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+
+                Button(
                     onClick = {
                         onConfirmExcluir(item)
                         onDismiss()
@@ -373,14 +381,6 @@ fun ExcluirEstoqueDialog(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text("Sim", color = Color.White)
-                }
-
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Color.Gray),
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text("Não", color = Color.White)
                 }
             }
         },
