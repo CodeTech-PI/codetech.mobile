@@ -244,6 +244,15 @@ fun ExcluirFilialDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+
                 Button(
                     onClick = {
                         onConfirmExcluir(filial)
@@ -253,14 +262,6 @@ fun ExcluirFilialDialog(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text("Sim", color = Color.White)
-                }
-
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Color.Gray),
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text("Não", color = Color.White)
                 }
             }
         },
