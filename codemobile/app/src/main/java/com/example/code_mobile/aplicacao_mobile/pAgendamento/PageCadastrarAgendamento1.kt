@@ -343,15 +343,15 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar Agendamento?", color = Color.White) },
-                text = { Text("Tem certeza que deseja cancelar o agendamento?", color = Color.White) },
+                title = { Text("Cancelar Atendimento?", color = Color.White) },
+                text = { Text("Tem certeza que deseja cancelar o atendimento?", color = Color.White) },
                 confirmButton = {
                     Button(
                         onClick = {
                             showCancelDialog = false
                             navController.popBackStack()
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
                     ) {
                         Text("Sim", color = Color.White)
                     }
