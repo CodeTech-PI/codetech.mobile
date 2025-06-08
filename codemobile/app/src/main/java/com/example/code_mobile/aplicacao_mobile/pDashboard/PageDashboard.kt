@@ -1,6 +1,7 @@
 package com.example.code_mobile.paginas.code_mobile.pDashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import com.example.code_mobile.paginas.code_mobile.cModel.ModelFaturamentoDash
 import com.example.code_mobile.paginas.code_mobile.cModel.ModelProduto
 import com.example.code_mobile.paginas.code_mobile.cService.ServiceDashboard
 import com.example.code_mobile.paginas.code_mobile.cService.ServiceEstoque
+import com.example.code_mobile.paginas.code_mobile.pComponente.menuComTituloPage
 import com.example.code_mobile.token.auth.AuthService
 import com.example.code_mobile.token.auth.LoginRequest
 import java.time.format.DateTimeFormatter
@@ -124,9 +127,11 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFF1B1B1B)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-//        menuComTituloPage("Dashboard", navController)
+       menuComTituloPage("Dashboard", navController)
+
 
         if (isLoading) {
             CircularProgressIndicator(
@@ -187,42 +192,94 @@ fun DashboardScreen(navController: NavController, modifier: Modifier = Modifier)
                 }
 
                 // Gráfico de Atendimentos Mensais
-                ChartWithArrow(title = "Atendimentos Mensais") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom,
-                    ) {
-                        financialData.take(12).forEachIndexed { index, data ->
-                            ChartBar(
-                                height = (data.second * 0.002).dp,
-                                label = "${index + 1}",
-                                color = Color(0xFFDF0050)
-                            )
+//                ChartWithArrow(title = "Atendimentos Mensais") {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.Bottom,
+//                    ) {
+//                        financialData.take(12).forEachIndexed { index, data ->
+//                            ChartBar(
+//                                height = (data.second * 0.002).dp,
+//                                label = "${index + 1}",
+//                                color = Color(0xFFDF0050)
+//                            )
+//                        }
+//                    }
+//                }
+
+                // Gráfico de Itens em Estoque
+                    var produtoSelecionado by remember { mutableStateOf<String?>(null) }
+
+                    Column {
+                        ChartWithArrow(title = "Itens em Estoque") {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.Bottom
+                            ) {
+                                produtos.take(5).forEach { produto ->
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(horizontal = 4.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Bottom
+                                    ) {
+                                        // Quantidade acima da barra
+                                        Text(
+                                            text = produto.quantidade.toString(),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(bottom = 4.dp),
+                                            color = Color.White
+                                        )
+
+                                        // Barra clicável
+                                        Box(
+                                            modifier = Modifier
+                                                .height((produto.quantidade * 20).dp) // 🔁 aplique altura aqui!
+                                                .width(24.dp)
+                                                .clickable {
+                                                    produtoSelecionado = produto.nome
+                                                }
+                                        ) {
+                                            ChartBar(
+                                                height = (produto.quantidade * 20).dp,
+                                                label = "",
+                                                color = Color(0xFFDF0050)
+                                            )
+                                        }
+
+                                        // Nome abaixo da barra
+                                        Text(
+                                            text = produto.nome.take(6),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(top = 4.dp),
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
                         }
+
+
+                        // Mostra o nome do produto clicado
+                            produtoSelecionado?.let { nome ->
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Produto selecionado: $nome",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    color = Color.White
+                                )
+                            }
                     }
                 }
 
-                // Gráfico de Itens em Estoque
-                ChartWithArrow(title = "Itens em Estoque") {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        produtos.take(6).forEach { produto ->
-                            ChartBar(
-                                height = (produto.quantidade * 10).dp,
-                                label = produto.nome.take(3),
-                                color = Color(0xFF4888B7)
-                            )
-                        }
-                    }
-                }
             }
         }
     }
-}
 
 @Composable
 fun KpiItem(
