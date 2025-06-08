@@ -179,26 +179,13 @@ fun FiliaisCadastro(    navController: NavController,
                     .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Botão CANCELAR (agora à direita)
-                Button(
-                    onClick = { showCancelDialog = true },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-                ) {
-                    Text(text = "Cancelar", fontSize = 14.sp)
-                }
 
-                // Botão CADASTRAR (agora à esquerda)
                 Button(
                     onClick = viewModelFilial::cadastrarFilial,
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp)
-                        .height(40.dp),
+                        .height(40.dp), // Altura menor
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
                     enabled = !showLoading
@@ -208,6 +195,24 @@ fun FiliaisCadastro(    navController: NavController,
                         fontSize = 14.sp
                     )
                 }
+
+                Button(
+                    onClick = viewModelFilial::cadastrarFilial,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                        .height(40.dp), // Altura menor
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    enabled = !showLoading
+                ) {
+                    Text(
+                        text = if (showLoading) "Carregando..." else "Cadastrar",
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
+
             }
 
             // Exibe mensagem de sucesso
@@ -283,7 +288,6 @@ fun FiliaisCadastro(    navController: NavController,
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-
                             Button(
                                 onClick = { showCancelDialog = false },
                                 colors = ButtonDefaults.buttonColors(Color.Gray),
@@ -302,6 +306,7 @@ fun FiliaisCadastro(    navController: NavController,
                             ) {
                                 Text("Sim", color = Color.White, fontSize = 14.sp) // Fonte menor
                             }
+
                         }
                     },
                     containerColor = Color(0xFF2B2B2B)

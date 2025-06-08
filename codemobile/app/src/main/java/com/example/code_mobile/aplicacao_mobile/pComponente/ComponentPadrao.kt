@@ -78,7 +78,7 @@ fun CampoLogin(
         TextField(
             value = valor,
             onValueChange = onValorChange, // Atualiza o valor conforme o usuário digita
-            textStyle = textStyle.copy(color = Color.Black, fontSize = 16.sp),
+            textStyle = textStyle.copy(color = Color.White, fontSize = 16.sp),
             modifier = Modifier
                 .fillMaxWidth()
                 .inputPadrao(),

@@ -29,7 +29,7 @@ class ViewModelAgendamento : ViewModel() {
     }
 
     // Estados para os campos de agendamento
-    var dataAgendamento = mutableStateOf(LocalDate.now())
+    var dataAgendamento =  mutableStateOf<LocalDate?>(null)
         private set
     var horarioAgendamento =
         mutableStateOf(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))

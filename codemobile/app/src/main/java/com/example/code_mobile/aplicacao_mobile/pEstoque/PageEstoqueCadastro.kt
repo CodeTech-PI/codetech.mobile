@@ -235,19 +235,6 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                     .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-
-                Button(
-                    onClick = { showCancelDialog = true },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF252525))
-                ) {
-                    Text(text = "Cancelar", fontSize = 14.sp)
-                }
-
                 Button(
                     onClick = {
                         viewModel.cadastrarEstoque(categoriaSelecionada) // Passa a categoria selecionada
@@ -265,6 +252,26 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                         fontSize = 14.sp
                     )
                 }
+
+                Button(
+                    onClick = {
+                        viewModel.cadastrarEstoque(categoriaSelecionada) // Passa a categoria selecionada
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                        .height(40.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    enabled = !showLoading
+                ) {
+                    Text(
+                        text = if (showLoading) "Salvando..." else "Cadastrar",
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
+
             }
         }
 
@@ -291,6 +298,7 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
+
                         Button(
                             onClick = { showCancelDialog = false },
                             colors = ButtonDefaults.buttonColors(Color.Gray),
@@ -308,6 +316,14 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                             modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
                             Text("Sim", color = Color.White, fontSize = 14.sp)
+                        }
+
+                        Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White, fontSize = 14.sp)
                         }
                     }
                 },

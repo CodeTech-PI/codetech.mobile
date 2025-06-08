@@ -158,7 +158,7 @@ fun TelaLogin(navController: NavController, modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(0.dp) // Centralizando o texto
         ) {
             Text(
-                text = if (loading) "Carregando..." else "Entrar"
+                text = if (loading) "Carregando..." else "Entrar", color = Color.White
             )
         }
 

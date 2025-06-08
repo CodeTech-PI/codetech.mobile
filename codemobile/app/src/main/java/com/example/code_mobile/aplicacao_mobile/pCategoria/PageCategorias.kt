@@ -116,10 +116,7 @@ fun TelaCategorias(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Input(
                 titulo = "",
@@ -129,7 +126,9 @@ fun TelaCategorias(
                 labelInfo = { if (pesquisa.isEmpty()) Text("Filtre por categoria") },
                 modifier = Modifier.weight(1f)
             )
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.icon_add),
                 contentDescription = "Adicionar",
@@ -255,6 +254,14 @@ fun ExcluirCategoriaDialog( // Diálogo de exclusão reutilizado e adaptado
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+
+                Button(
                     onClick = {
                         onConfirmExcluir(categoria)
                         onDismiss()
@@ -263,14 +270,6 @@ fun ExcluirCategoriaDialog( // Diálogo de exclusão reutilizado e adaptado
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text("Sim", color = Color.White)
-                }
-
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Color.Gray),
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text("Não", color = Color.White)
                 }
             }
         },
@@ -319,13 +318,13 @@ fun NovaCategoriaDialog(
                         onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(Color.Gray)
                     ) {
-                        Text("Cancelar")
+                        Text("Cancelar", color = Color.White)
                     }
                     Button(
                         onClick = { viewModelCategoria.cadastrarCategoria() },
                         colors = ButtonDefaults.buttonColors(Color(0xFFE91E63))
                     ) {
-                        Text("Salvar")
+                        Text("Cadastrar", color = Color.White)
                     }
                 }
             }

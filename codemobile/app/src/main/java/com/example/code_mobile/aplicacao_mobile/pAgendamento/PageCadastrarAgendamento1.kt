@@ -147,7 +147,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                         .clickable { navController.navigate("Agendamentos") }
                 )
                 Text(
-                    text = "Cadastrar Atendimento",
+                    text = "Cadastrar Agendamento",
                     style = textPadrao.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
@@ -161,7 +161,10 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Data do Atendimento:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
+                Text(
+                    "Data do Agendamento:",
+                    style = textPadrao.copy(fontSize = 16.sp, color = Color.White)
+                )
                 Button(
                     onClick = { exibirCalendario = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
@@ -343,25 +346,42 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar Atendimento?", color = Color.White) },
-                text = { Text("Tem certeza que deseja cancelar o atendimento?", color = Color.White) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showCancelDialog = false
-                            navController.popBackStack()
-                        },
-                        colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
-                    ) {
-                        Text("Sim", color = Color.White)
-                    }
+                title = {
+                    Text(
+                        "Confirmar Cancelamento", color = Color.White,
+                        fontSize = 16.sp
+                    )
                 },
-                dismissButton = {
-                    Button(
-                        onClick = { showCancelDialog = false },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                text = {
+                    Text(
+                        "Tem certeza que deseja cancelar o agendamento?",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("Não", color = Color.White)
+                        Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White, fontSize = 14.sp)
+                        }
+
+                        Button(
+                            onClick = {
+                                showCancelDialog = false
+                                navController.popBackStack()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050)),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Sim", color = Color.White, fontSize = 14.sp)
+                        }
                     }
                 },
                 containerColor = Color(0xFF1B1B1B)
