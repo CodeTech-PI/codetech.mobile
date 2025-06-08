@@ -71,6 +71,7 @@ fun TelaFiliais(navController: NavController, modifier: Modifier = Modifier) {
         println("TelaFiliais LaunchedEffect")
         viewModel.carregarFiliais()
     }
+    
     LaunchedEffect(navController.currentBackStackEntry) {
         // Esse efeito será chamado toda vez que essa tela for exibida novamente
         delay(2000) // espera 2 segundos
@@ -243,6 +244,15 @@ fun ExcluirFilialDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
+
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(Color.Gray),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text("Não", color = Color.White)
+                }
+
                 Button(
                     onClick = {
                         onConfirmExcluir(filial)
@@ -252,14 +262,6 @@ fun ExcluirFilialDialog(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text("Sim", color = Color.White)
-                }
-
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(Color.Gray),
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text("Não", color = Color.White)
                 }
             }
         },
