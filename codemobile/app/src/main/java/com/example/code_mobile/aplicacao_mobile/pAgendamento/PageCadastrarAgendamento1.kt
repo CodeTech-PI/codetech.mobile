@@ -77,7 +77,11 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifier,viewModelAgendamento : ViewModelAgendamento) {
+fun AgendamentoEtapa1(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    viewModelAgendamento: ViewModelAgendamento
+) {
     val viewModelCliente: ViewModelCliente = viewModel()
 
     val dataAgendamento by viewModelAgendamento.dataAgendamento
@@ -96,7 +100,8 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
 
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = dataAgendamento?.atStartOfDay(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+        initialSelectedDateMillis = dataAgendamento?.atStartOfDay(ZoneId.systemDefault())
+            ?.toInstant()?.toEpochMilli()
             ?: 0L
     )
 
@@ -161,13 +166,17 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Data do Agendamento:", style = textPadrao.copy(fontSize = 16.sp, color = Color.White))
+                Text(
+                    "Data do Agendamento:",
+                    style = textPadrao.copy(fontSize = 16.sp, color = Color.White)
+                )
                 Button(
                     onClick = { exibirCalendario = true },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050))
                 ) {
                     Text(
-                        text = dataAgendamento?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "Selecionar",
+                        text = dataAgendamento?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                            ?: "Selecionar",
                         color = Color.White
                     )
                 }
@@ -218,7 +227,7 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 ) {
                     listaClientes.forEach { cliente ->
                         DropdownMenuItem(
-                            text = { Text(cliente.nome, color = Color.Black) },
+                            text = { Text(cliente.nome, color = Color.White) },
                             onClick = {
                                 viewModelAgendamento.atualizarClienteSelecionado(cliente)
                                 expandedCliente = false
@@ -239,32 +248,6 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
                 )
             }
 
-            // Date Picker Dialog
-            if (exibirCalendario) {
-                DatePickerDialog(
-                    onDismissRequest = { exibirCalendario = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            exibirCalendario = false
-                            datePickerState.selectedDateMillis?.let {
-                                val dataSelecionada = Instant.ofEpochMilli(it)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                                viewModelAgendamento.atualizarDataAgendamento(dataSelecionada)
-                            }
-                        }) {
-                            Text("Confirmar", color = Color.Black)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { exibirCalendario = false }) {
-                            Text("Cancelar", color = Color.Black)
-                        }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
         }
 
         // Botões inferiores
@@ -343,25 +326,42 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar Agendamento?", color = Color.White) },
-                text = { Text("Tem certeza que deseja cancelar o agendamento?", color = Color.White) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showCancelDialog = false
-                            navController.popBackStack()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                    ) {
-                        Text("Sim", color = Color.White)
-                    }
+                title = {
+                    Text(
+                        "Confirmar Cancelamento", color = Color.White,
+                        fontSize = 16.sp
+                    )
                 },
-                dismissButton = {
-                    Button(
-                        onClick = { showCancelDialog = false },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                text = {
+                    Text(
+                        "Tem certeza que deseja cancelar o agendamento?",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("Não", color = Color.White)
+                        Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White, fontSize = 14.sp)
+                        }
+
+                        Button(
+                            onClick = {
+                                showCancelDialog = false
+                                navController.popBackStack()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDF0050)),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Sim", color = Color.White, fontSize = 14.sp)
+                        }
                     }
                 },
                 containerColor = Color(0xFF1B1B1B)
@@ -369,11 +369,13 @@ fun AgendamentoEtapa1(navController: NavController, modifier: Modifier = Modifie
         }
     }
 }
+
 @Preview(
     showBackground = true,
     showSystemUi = true,
     device = Devices.PIXEL_2
 )
+
 @Composable
 fun AgendamentoEtapa1Preview() {
     CodemobileTheme {

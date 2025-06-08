@@ -244,7 +244,7 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF252525))
                 ) {
-                    Text(text = "Cancelar", fontSize = 14.sp) // Fonte menor
+                    Text(text = "Cancelar", fontSize = 14.sp, color = Color.White) // Fonte menor
                 }
 
                 Button(
@@ -259,7 +259,8 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                 ) {
                     Text(
                         text = if (showLoading) "Salvando..." else "Cadastrar",
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        color = Color.White
                     ) // Fonte menor
                 }
             }
@@ -289,6 +290,14 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Button(
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(Color.Gray),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Text("Não", color = Color.White, fontSize = 14.sp) // Fonte menor
+                        }
+
+                        Button(
                             onClick = {
                                 showCancelDialog = false
                                 navController.navigate("Clientes")
@@ -297,14 +306,6 @@ fun ClienteCadastro(navController: NavController, modifier: Modifier = Modifier)
                             modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
                             Text("Sim", color = Color.White, fontSize = 14.sp) // Fonte menor
-                        }
-
-                        Button(
-                            onClick = { showCancelDialog = false },
-                            colors = ButtonDefaults.buttonColors(Color.Gray),
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Text("Não", color = Color.White, fontSize = 14.sp) // Fonte menor
                         }
                     }
                 },
