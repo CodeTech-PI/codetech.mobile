@@ -237,19 +237,20 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
             ) {
                 Button(
                     onClick = {
-                        viewModel.cadastrarEstoque(categoriaSelecionada) // Passa a categoria selecionada
+                        showCancelDialog = true
                     },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp)
                         .height(40.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    colors = ButtonDefaults.buttonColors(Color.Black),
                     enabled = !showLoading
                 ) {
                     Text(
-                        text = if (showLoading) "Salvando..." else "Salvar",
-                        fontSize = 14.sp
+                        text = "Cancelar",
+                        fontSize = 14.sp,
+                        color = Color.White
                     )
                 }
 
@@ -266,7 +267,7 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                     enabled = !showLoading
                 ) {
                     Text(
-                        text = if (showLoading) "Salvando..." else "Cadastrar",
+                        text = if (showLoading) "Cadastrando..." else "Cadastrar",
                         fontSize = 14.sp,
                         color = Color.White
                     )
@@ -318,13 +319,6 @@ fun EstoqueCadastro(navController: NavController, modifier: Modifier = Modifier)
                             Text("Sim", color = Color.White, fontSize = 14.sp)
                         }
 
-                        Button(
-                            onClick = { showCancelDialog = false },
-                            colors = ButtonDefaults.buttonColors(Color.Gray),
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Text("Não", color = Color.White, fontSize = 14.sp)
-                        }
                     }
                 },
                 containerColor = Color(0xFF2B2B2B)

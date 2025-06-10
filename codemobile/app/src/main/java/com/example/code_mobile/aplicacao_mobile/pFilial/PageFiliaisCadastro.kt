@@ -181,18 +181,21 @@ fun FiliaisCadastro(    navController: NavController,
             ) {
 
                 Button(
-                    onClick = viewModelFilial::cadastrarFilial,
+                    onClick = {
+                        showCancelDialog = true
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp)
-                        .height(40.dp), // Altura menor
+                        .height(40.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFFDF0050)),
+                    colors = ButtonDefaults.buttonColors(Color.Black),
                     enabled = !showLoading
                 ) {
                     Text(
-                        text = if (showLoading) "Carregando..." else "Cadastrar",
-                        fontSize = 14.sp
+                        text = "Cancelar",
+                        fontSize = 14.sp,
+                        color = Color.White
                     )
                 }
 
